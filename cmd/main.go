@@ -1,13 +1,14 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"im/api"
 	"im/core/plugin"
 	"im/core/protocol"
+	pb "im/core/protocol/pb"
 
 	"github.com/gorilla/websocket"
+	"google.golang.org/protobuf/proto"
 )
 
 func main() {
@@ -23,16 +24,20 @@ func main() {
 	go func() {
 		wsProto := protocol.NewWSProtocol()
 		wsProto.OnMessage(func(conn *websocket.Conn, data []byte) {
-			var msg protocol.IMMessage
-			if err := json.Unmarshal(data, &msg); err != nil {
-				conn.WriteMessage(websocket.TextMessage, []byte(`{"type":"error","content":"消息格式错误"}`))
+			var msg pb.IMMessage
+			if err := proto.Unmarshal(data, &msg); err != nil {
+				errMsg := &pb.IMMessage{Type: "error", Content: "消息格式错误"}
+				b, _ := proto.Marshal(errMsg)
+				conn.WriteMessage(websocket.BinaryMessage, b)
 				return
 			}
 			if msg.Type == "chat" && msg.To != "" {
-				b, _ := json.Marshal(msg)
+				b, _ := proto.Marshal(&msg)
 				err := protocol.SendToUser(msg.To, b)
 				if err != nil {
-					conn.WriteMessage(websocket.TextMessage, []byte(`{"type":"error","content":"对方不在线"}`))
+					errMsg := &pb.IMMessage{Type: "error", Content: "对方不在线"}
+					b, _ := proto.Marshal(errMsg)
+					conn.WriteMessage(websocket.BinaryMessage, b)
 				}
 			}
 		})
