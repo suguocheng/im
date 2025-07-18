@@ -4,8 +4,13 @@ import (
 	"fmt"
 	"im/core/auth"
 	pb "im/core/protocol/pb"
+	pbuser "im/core/protocol/pb"
 	"io/ioutil"
 	"net/http"
+
+	"im/core/protocol"
+	"im/core/storage"
+	"time"
 
 	"google.golang.org/protobuf/proto"
 )
@@ -226,7 +231,15 @@ func UserInfoHandler(w http.ResponseWriter, r *http.Request) {
 		writeResp(w, 1, err.Error(), nil)
 		return
 	}
-	writeResp(w, 0, "ok", []byte(user.UID))
+	resp := &pbuser.UserInfoResp{
+		Uid:      user.UID,
+		Username: user.Username,
+		Email:    user.Email,
+		Code:     0,
+		Msg:      "ok",
+	}
+	data, _ := proto.Marshal(resp)
+	writeResp(w, 0, "ok", data)
 }
 
 // 在线账号管理
@@ -276,6 +289,233 @@ func SendEmailCodeHandler(w http.ResponseWriter, r *http.Request) {
 	writeResp(w, 0, "验证码已发送(模拟)", nil)
 }
 
+// 添加好友请求
+func AddFriendHandler(w http.ResponseWriter, r *http.Request) {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		writeResp(w, 1, "请求体读取失败", nil)
+		return
+	}
+	var req pb.AddFriendReq
+	if err := proto.Unmarshal(body, &req); err != nil {
+		writeResp(w, 1, "请求格式错误", nil)
+		return
+	}
+	if req.FromUid == "" || req.ToUid == "" {
+		writeResp(w, 1, "缺少UID", nil)
+		return
+	}
+	// TODO: 校验token
+	storage.FriendStore.AddFriendRequest(req.FromUid, req.ToUid, req.VerifyMsg)
+	// 推送好友请求通知
+	notif := &pb.Notification{
+		Type:      "friend_request",
+		From:      req.FromUid,
+		To:        req.ToUid,
+		Content:   req.VerifyMsg,
+		Timestamp: time.Now().Unix(),
+	}
+	fmt.Println("准备推送通知给", req.ToUid)
+	err = protocol.SendNotificationToUser(req.ToUid, notif)
+	fmt.Println("推送结果：", err)
+	resp := &pb.AddFriendResp{Code: 0, Msg: "好友请求已发送"}
+	data, _ := proto.Marshal(resp)
+	writeResp(w, 0, "ok", data)
+}
+
+// 处理好友请求
+func HandleFriendHandler(w http.ResponseWriter, r *http.Request) {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		writeResp(w, 1, "请求体读取失败", nil)
+		return
+	}
+	var req pb.HandleFriendReq
+	if err := proto.Unmarshal(body, &req); err != nil {
+		writeResp(w, 1, "请求格式错误", nil)
+		return
+	}
+	if req.FromUid == "" || req.ToUid == "" {
+		writeResp(w, 1, "缺少UID", nil)
+		return
+	}
+	// TODO: 校验token
+	storage.FriendStore.HandleFriendRequest(req.FromUid, req.ToUid, req.Accept)
+	resp := &pb.HandleFriendResp{Code: 0, Msg: "处理成功"}
+	data, _ := proto.Marshal(resp)
+	writeResp(w, 0, "ok", data)
+}
+
+// 获取好友列表
+func FriendListHandler(w http.ResponseWriter, r *http.Request) {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		writeResp(w, 1, "请求体读取失败", nil)
+		return
+	}
+	var req pb.FriendListReq
+	if err := proto.Unmarshal(body, &req); err != nil {
+		writeResp(w, 1, "请求格式错误", nil)
+		return
+	}
+	if req.Uid == "" {
+		writeResp(w, 1, "缺少UID", nil)
+		return
+	}
+	// TODO: 校验token
+	friends := storage.FriendStore.GetFriends(req.Uid)
+	var friendUsernames []string
+	for _, f := range friends {
+		user, err := userStore.GetByUID(f)
+		if err != nil {
+			friendUsernames = append(friendUsernames, "<未知>")
+		} else {
+			friendUsernames = append(friendUsernames, user.Username)
+		}
+	}
+	remarks := storage.FriendStore.GetRemarks(req.Uid, friends)
+	resp := &pb.FriendListResp{FriendUids: friends, FriendUsernames: friendUsernames, Remarks: remarks, Code: 0, Msg: "ok"}
+	data, _ := proto.Marshal(resp)
+	writeResp(w, 0, "ok", data)
+}
+
+// 设置好友备注
+func UpdateRemarkHandler(w http.ResponseWriter, r *http.Request) {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		writeResp(w, 1, "请求体读取失败", nil)
+		return
+	}
+	var req pb.UpdateRemarkReq
+	if err := proto.Unmarshal(body, &req); err != nil {
+		writeResp(w, 1, "请求格式错误", nil)
+		return
+	}
+	if req.Uid == "" || req.FriendUid == "" {
+		writeResp(w, 1, "缺少UID", nil)
+		return
+	}
+	// TODO: 校验token
+	storage.FriendStore.SetRemark(req.Uid, req.FriendUid, req.Remark)
+	resp := &pb.UpdateRemarkResp{Code: 0, Msg: "备注设置成功"}
+	data, _ := proto.Marshal(resp)
+	writeResp(w, 0, "ok", data)
+}
+
+// 查看好友信息
+func FriendInfoHandler(w http.ResponseWriter, r *http.Request) {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		writeResp(w, 1, "请求体读取失败", nil)
+		return
+	}
+	var req pb.FriendInfoReq
+	if err := proto.Unmarshal(body, &req); err != nil {
+		writeResp(w, 1, "请求格式错误", nil)
+		return
+	}
+	if req.Uid == "" || req.FriendUid == "" {
+		writeResp(w, 1, "缺少UID", nil)
+		return
+	}
+	// TODO: 校验token
+	user, err := userStore.GetByUID(req.FriendUid)
+	if err != nil {
+		writeResp(w, 1, "好友不存在", nil)
+		return
+	}
+	remark := storage.FriendStore.GetRemark(req.Uid, req.FriendUid)
+	dnd := storage.FriendStore.GetDND(req.Uid, req.FriendUid)
+	resp := &pb.FriendInfoResp{
+		Uid:      user.UID,
+		Username: user.Username,
+		Email:    user.Email,
+		Remark:   remark,
+		Code:     0,
+		Msg:      "ok",
+		// 新增 dnd 字段
+		Dnd: dnd,
+	}
+	data, _ := proto.Marshal(resp)
+	writeResp(w, 0, "ok", data)
+}
+
+// 删除好友
+func DeleteFriendHandler(w http.ResponseWriter, r *http.Request) {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		writeResp(w, 1, "请求体读取失败", nil)
+		return
+	}
+	var req pb.DeleteFriendReq
+	if err := proto.Unmarshal(body, &req); err != nil {
+		writeResp(w, 1, "请求格式错误", nil)
+		return
+	}
+	if req.Uid == "" || req.FriendUid == "" {
+		writeResp(w, 1, "缺少UID", nil)
+		return
+	}
+	// TODO: 校验token
+	storage.FriendStore.DeleteFriend(req.Uid, req.FriendUid)
+	resp := &pb.DeleteFriendResp{Code: 0, Msg: "已删除"}
+	data, _ := proto.Marshal(resp)
+	writeResp(w, 0, "ok", data)
+}
+
+// 获取收到的好友请求列表
+func FriendRequestListHandler(w http.ResponseWriter, r *http.Request) {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		writeResp(w, 1, "请求体读取失败", nil)
+		return
+	}
+	var req pb.FriendListReq // 复用已有结构
+	if err := proto.Unmarshal(body, &req); err != nil {
+		writeResp(w, 1, "请求格式错误", nil)
+		return
+	}
+	// TODO: 校验token
+	reqs := storage.FriendStore.GetFriendRequests(req.Uid)
+	var fromUids, fromUsernames, msgs []string
+	for from, msg := range reqs {
+		fromUids = append(fromUids, from)
+		msgs = append(msgs, msg)
+		user, err := userStore.GetByUID(from)
+		if err != nil {
+			fromUsernames = append(fromUsernames, "<未知>")
+		} else {
+			fromUsernames = append(fromUsernames, user.Username)
+		}
+	}
+	resp := &pb.FriendRequestListResp{FromUids: fromUids, FromUsernames: fromUsernames, VerifyMsgs: msgs, Code: 0, Msg: "ok"}
+	data, _ := proto.Marshal(resp)
+	writeResp(w, 0, "ok", data)
+}
+
+// 设置消息免打扰
+func SetDNDHandler(w http.ResponseWriter, r *http.Request) {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		writeResp(w, 1, "请求体读取失败", nil)
+		return
+	}
+	var req pb.SetDNDReq
+	if err := proto.Unmarshal(body, &req); err != nil {
+		writeResp(w, 1, "请求格式错误", nil)
+		return
+	}
+	if req.Uid == "" || req.FriendUid == "" {
+		writeResp(w, 1, "缺少UID", nil)
+		return
+	}
+	// TODO: 校验token
+	storage.FriendStore.SetDND(req.Uid, req.FriendUid, req.Dnd)
+	resp := &pb.SetDNDResp{Code: 0, Msg: "设置成功"}
+	data, _ := proto.Marshal(resp)
+	writeResp(w, 0, "ok", data)
+}
+
 func StartHTTPServer(addr string) {
 	http.HandleFunc("/register", RegisterHandler)
 	http.HandleFunc("/login", LoginHandler)
@@ -286,5 +526,13 @@ func StartHTTPServer(addr string) {
 	http.HandleFunc("/delete_account", DeleteAccountHandler)
 	http.HandleFunc("/user_info", UserInfoHandler)
 	http.HandleFunc("/token_check", TokenCheckHandler)
+	http.HandleFunc("/add_friend", AddFriendHandler)
+	http.HandleFunc("/handle_friend", HandleFriendHandler)
+	http.HandleFunc("/friend_list", FriendListHandler)
+	http.HandleFunc("/delete_friend", DeleteFriendHandler)
+	http.HandleFunc("/friend_request_list", FriendRequestListHandler)
+	http.HandleFunc("/update_remark", UpdateRemarkHandler)
+	http.HandleFunc("/friend_info", FriendInfoHandler)
+	http.HandleFunc("/set_dnd", SetDNDHandler)
 	http.ListenAndServe(addr, nil)
 }

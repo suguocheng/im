@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package protocol;
+
+option go_package = "im/core/protocol/pb;pb";
+
+// 用户信息响应
+message UserInfoResp {
+  string uid = 1;
+  string username = 2;
+  string email = 3;
+  int32 code = 4;
+  string msg = 5;
+} 

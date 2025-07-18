@@ -677,6 +677,91 @@ func (x *SendEmailCodeReq) GetEmail() string {
 	return ""
 }
 
+// 通知消息
+type Notification struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Type          string                 `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`            // 通知类型，如 friend_request
+	From          string                 `protobuf:"bytes,2,opt,name=from,proto3" json:"from,omitempty"`            // 触发方UID
+	To            string                 `protobuf:"bytes,3,opt,name=to,proto3" json:"to,omitempty"`                // 接收方UID
+	Content       string                 `protobuf:"bytes,4,opt,name=content,proto3" json:"content,omitempty"`      // 通知内容（如验证消息）
+	Timestamp     int64                  `protobuf:"varint,5,opt,name=timestamp,proto3" json:"timestamp,omitempty"` // 通知时间
+	Extra         string                 `protobuf:"bytes,6,opt,name=extra,proto3" json:"extra,omitempty"`          // 扩展字段
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Notification) Reset() {
+	*x = Notification{}
+	mi := &file_core_protocol_message_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Notification) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Notification) ProtoMessage() {}
+
+func (x *Notification) ProtoReflect() protoreflect.Message {
+	mi := &file_core_protocol_message_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Notification.ProtoReflect.Descriptor instead.
+func (*Notification) Descriptor() ([]byte, []int) {
+	return file_core_protocol_message_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *Notification) GetType() string {
+	if x != nil {
+		return x.Type
+	}
+	return ""
+}
+
+func (x *Notification) GetFrom() string {
+	if x != nil {
+		return x.From
+	}
+	return ""
+}
+
+func (x *Notification) GetTo() string {
+	if x != nil {
+		return x.To
+	}
+	return ""
+}
+
+func (x *Notification) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	return ""
+}
+
+func (x *Notification) GetTimestamp() int64 {
+	if x != nil {
+		return x.Timestamp
+	}
+	return 0
+}
+
+func (x *Notification) GetExtra() string {
+	if x != nil {
+		return x.Extra
+	}
+	return ""
+}
+
 var File_core_protocol_message_proto protoreflect.FileDescriptor
 
 const file_core_protocol_message_proto_rawDesc = "" +
@@ -721,7 +806,14 @@ const file_core_protocol_message_proto_rawDesc = "" +
 	"\tLogoutReq\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\"(\n" +
 	"\x10SendEmailCodeReq\x12\x14\n" +
-	"\x05email\x18\x01 \x01(\tR\x05emailB\x18Z\x16im/core/protocol/pb;pbb\x06proto3"
+	"\x05email\x18\x01 \x01(\tR\x05email\"\x94\x01\n" +
+	"\fNotification\x12\x12\n" +
+	"\x04type\x18\x01 \x01(\tR\x04type\x12\x12\n" +
+	"\x04from\x18\x02 \x01(\tR\x04from\x12\x0e\n" +
+	"\x02to\x18\x03 \x01(\tR\x02to\x12\x18\n" +
+	"\acontent\x18\x04 \x01(\tR\acontent\x12\x1c\n" +
+	"\ttimestamp\x18\x05 \x01(\x03R\ttimestamp\x12\x14\n" +
+	"\x05extra\x18\x06 \x01(\tR\x05extraB\x18Z\x16im/core/protocol/pb;pbb\x06proto3"
 
 var (
 	file_core_protocol_message_proto_rawDescOnce sync.Once
@@ -735,7 +827,7 @@ func file_core_protocol_message_proto_rawDescGZIP() []byte {
 	return file_core_protocol_message_proto_rawDescData
 }
 
-var file_core_protocol_message_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
+var file_core_protocol_message_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_core_protocol_message_proto_goTypes = []any{
 	(*IMMessage)(nil),         // 0: protocol.IMMessage
 	(*APIResp)(nil),           // 1: protocol.APIResp
@@ -749,6 +841,7 @@ var file_core_protocol_message_proto_goTypes = []any{
 	(*UserInfoReq)(nil),       // 9: protocol.UserInfoReq
 	(*LogoutReq)(nil),         // 10: protocol.LogoutReq
 	(*SendEmailCodeReq)(nil),  // 11: protocol.SendEmailCodeReq
+	(*Notification)(nil),      // 12: protocol.Notification
 }
 var file_core_protocol_message_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
@@ -769,7 +862,7 @@ func file_core_protocol_message_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_core_protocol_message_proto_rawDesc), len(file_core_protocol_message_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   12,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

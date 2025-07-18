@@ -38,6 +38,18 @@ func main() {
 					errMsg := &pb.IMMessage{Type: "error", Content: "对方不在线"}
 					b, _ := proto.Marshal(errMsg)
 					conn.WriteMessage(websocket.BinaryMessage, b)
+				} else {
+					// 聊天通知+免打扰
+					if !protocol.StorageFriendStoreGetDND(msg.To, msg.From) {
+						notif := &pb.Notification{
+							Type:      "chat_message",
+							From:      msg.From,
+							To:        msg.To,
+							Content:   msg.Content,
+							Timestamp: msg.Timestamp,
+						}
+						_ = protocol.SendNotificationToUser(msg.To, notif)
+					}
 				}
 			}
 		})

@@ -66,4 +66,14 @@ message LogoutReq {
 
 message SendEmailCodeReq {
   string email = 1;
+}
+
+// 通知消息
+message Notification {
+  string type = 1;      // 通知类型，如 friend_request
+  string from = 2;      // 触发方UID
+  string to = 3;        // 接收方UID
+  string content = 4;   // 通知内容（如验证消息）
+  int64  timestamp = 5; // 通知时间
+  string extra = 6;     // 扩展字段
 } 

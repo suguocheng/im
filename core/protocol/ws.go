@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"sync"
 
+	"im/core/storage"
+
 	"github.com/gorilla/websocket"
 	"google.golang.org/protobuf/proto"
 )
@@ -100,6 +102,25 @@ func SendToUser(userID string, data []byte) error {
 	return conn.WriteMessage(websocket.BinaryMessage, data)
 }
 
+// 发送通知给指定用户
+func SendNotificationToUser(userID string, notif *pb.Notification) error {
+	v, ok := wsUserConn.Load(userID)
+	if !ok {
+		return fmt.Errorf("用户不在线")
+	}
+	conn := v.(*websocket.Conn)
+	msg := &pb.IMMessage{
+		Type:      "notification",
+		From:      notif.From,
+		To:        notif.To,
+		Content:   notif.Content,
+		Timestamp: notif.Timestamp,
+		Extra:     notif.Extra,
+	}
+	b, _ := proto.Marshal(msg)
+	return conn.WriteMessage(websocket.BinaryMessage, b)
+}
+
 func (w *WSProtocol) Stop() error {
 	// WebSocket 关闭由 http.Server 控制
 	return nil
@@ -111,4 +132,9 @@ func (w *WSProtocol) Send(conn *websocket.Conn, data []byte) error {
 
 func (w *WSProtocol) OnMessage(handler func(conn *websocket.Conn, data []byte)) {
 	w.handler = handler
+}
+
+// 导出免打扰判断
+func StorageFriendStoreGetDND(uid, friendUid string) bool {
+	return storage.FriendStore.GetDND(uid, friendUid)
 }
