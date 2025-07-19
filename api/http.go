@@ -9,13 +9,16 @@ import (
 	"net/http"
 
 	"im/core/protocol"
+	"im/core/service"
 	"im/core/storage"
+	"strings"
 	"time"
 
 	"google.golang.org/protobuf/proto"
 )
 
 var storageManager = storage.GetStorageManager()
+var fileService = service.NewFileService()
 var nextUID = 1
 
 func writeResp(w http.ResponseWriter, code int, msg string, data []byte) {
@@ -547,6 +550,62 @@ func SetDNDHandler(w http.ResponseWriter, r *http.Request) {
 	writeResp(w, 0, "ok", data)
 }
 
+// 文件上传处理器
+func UploadFileHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		writeResp(w, 4001, "只支持POST方法", nil)
+		return
+	}
+
+	// 解析multipart表单
+	if err := r.ParseMultipartForm(50 * 1024 * 1024); err != nil {
+		writeResp(w, 4002, "解析表单失败", nil)
+		return
+	}
+
+	// 获取文件
+	file, header, err := r.FormFile("file")
+	if err != nil {
+		writeResp(w, 4003, "获取文件失败", nil)
+		return
+	}
+	defer file.Close()
+
+	// 调用业务层处理文件上传
+	fileInfo, err := fileService.UploadFile(file, header.Filename, header.Size)
+	if err != nil {
+		writeResp(w, 4004, err.Error(), nil)
+		return
+	}
+
+	// 返回文件信息
+	data, _ := proto.Marshal(fileInfo)
+	writeResp(w, 0, "上传成功", data)
+}
+
+// 文件下载处理器
+func DownloadFileHandler(w http.ResponseWriter, r *http.Request) {
+	filename := strings.TrimPrefix(r.URL.Path, "/uploads/")
+	if filename == "" {
+		http.NotFound(w, r)
+		return
+	}
+
+	// 调用业务层获取文件路径
+	filePath, err := fileService.GetFilePath(filename)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	// 设置响应头
+	w.Header().Set("Content-Type", fileService.GetMimeType(filename))
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename))
+
+	// 发送文件
+	http.ServeFile(w, r, filePath)
+}
+
 func StartHTTPServer(addr string) {
 	http.HandleFunc("/register", RegisterHandler)
 	http.HandleFunc("/login", LoginHandler)
@@ -565,5 +624,10 @@ func StartHTTPServer(addr string) {
 	http.HandleFunc("/update_remark", UpdateRemarkHandler)
 	http.HandleFunc("/friend_info", FriendInfoHandler)
 	http.HandleFunc("/set_dnd", SetDNDHandler)
+
+	// 文件上传和下载路由
+	http.HandleFunc("/upload", UploadFileHandler)
+	http.HandleFunc("/uploads/", DownloadFileHandler)
+
 	http.ListenAndServe(addr, nil)
 }

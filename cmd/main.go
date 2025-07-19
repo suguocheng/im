@@ -49,7 +49,8 @@ func main() {
 				conn.WriteMessage(websocket.BinaryMessage, b)
 				return
 			}
-			if msg.Type == "chat" && msg.To != "" {
+			// 支持多种消息类型：chat, emoji, image, file
+			if (msg.Type == "chat" || msg.Type == "emoji" || msg.Type == "image" || msg.Type == "file") && msg.To != "" {
 				b, _ := proto.Marshal(&msg)
 				err := protocol.SendToUser(msg.To, b)
 				if err != nil {

@@ -23,13 +23,17 @@ const (
 
 type IMMessage struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Type          string                 `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`            // 消息类型: text, image, etc.
-	From          string                 `protobuf:"bytes,2,opt,name=from,proto3" json:"from,omitempty"`            // 发送方UID
-	To            string                 `protobuf:"bytes,3,opt,name=to,proto3" json:"to,omitempty"`                // 接收方UID
-	Content       string                 `protobuf:"bytes,4,opt,name=content,proto3" json:"content,omitempty"`      // 文本内容或图片URL等
-	Timestamp     int64                  `protobuf:"varint,5,opt,name=timestamp,proto3" json:"timestamp,omitempty"` // 消息时间戳
-	Extra         string                 `protobuf:"bytes,6,opt,name=extra,proto3" json:"extra,omitempty"`          // 扩展字段（如图片缩略图、文件名等）
-	Token         string                 `protobuf:"bytes,7,opt,name=token,proto3" json:"token,omitempty"`          // 登录鉴权token
+	Type          string                 `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`                          // 消息类型: text, emoji, image, file, etc.
+	From          string                 `protobuf:"bytes,2,opt,name=from,proto3" json:"from,omitempty"`                          // 发送方UID
+	To            string                 `protobuf:"bytes,3,opt,name=to,proto3" json:"to,omitempty"`                              // 接收方UID
+	Content       string                 `protobuf:"bytes,4,opt,name=content,proto3" json:"content,omitempty"`                    // 文本内容、表情代码、图片URL、文件URL等
+	Timestamp     int64                  `protobuf:"varint,5,opt,name=timestamp,proto3" json:"timestamp,omitempty"`               // 消息时间戳
+	Extra         string                 `protobuf:"bytes,6,opt,name=extra,proto3" json:"extra,omitempty"`                        // 扩展字段（如图片缩略图、文件名、文件大小等）
+	Token         string                 `protobuf:"bytes,7,opt,name=token,proto3" json:"token,omitempty"`                        // 登录鉴权token
+	Data          []byte                 `protobuf:"bytes,8,opt,name=data,proto3" json:"data,omitempty"`                          // 二进制数据（图片、文件等）
+	Filename      string                 `protobuf:"bytes,9,opt,name=filename,proto3" json:"filename,omitempty"`                  // 文件名
+	Filesize      int64                  `protobuf:"varint,10,opt,name=filesize,proto3" json:"filesize,omitempty"`                // 文件大小（字节）
+	MimeType      string                 `protobuf:"bytes,11,opt,name=mime_type,json=mimeType,proto3" json:"mime_type,omitempty"` // MIME类型
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -109,6 +113,34 @@ func (x *IMMessage) GetExtra() string {
 func (x *IMMessage) GetToken() string {
 	if x != nil {
 		return x.Token
+	}
+	return ""
+}
+
+func (x *IMMessage) GetData() []byte {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+func (x *IMMessage) GetFilename() string {
+	if x != nil {
+		return x.Filename
+	}
+	return ""
+}
+
+func (x *IMMessage) GetFilesize() int64 {
+	if x != nil {
+		return x.Filesize
+	}
+	return 0
+}
+
+func (x *IMMessage) GetMimeType() string {
+	if x != nil {
+		return x.MimeType
 	}
 	return ""
 }
@@ -762,11 +794,88 @@ func (x *Notification) GetExtra() string {
 	return ""
 }
 
+// 文件信息
+type FileInfo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Filename      string                 `protobuf:"bytes,1,opt,name=filename,proto3" json:"filename,omitempty"`                             // 服务器文件名
+	OriginalName  string                 `protobuf:"bytes,2,opt,name=original_name,json=originalName,proto3" json:"original_name,omitempty"` // 原始文件名
+	Size          int64                  `protobuf:"varint,3,opt,name=size,proto3" json:"size,omitempty"`                                    // 文件大小
+	Type          string                 `protobuf:"bytes,4,opt,name=type,proto3" json:"type,omitempty"`                                     // 文件类型
+	Url           string                 `protobuf:"bytes,5,opt,name=url,proto3" json:"url,omitempty"`                                       // 文件URL
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FileInfo) Reset() {
+	*x = FileInfo{}
+	mi := &file_core_protocol_message_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FileInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FileInfo) ProtoMessage() {}
+
+func (x *FileInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_core_protocol_message_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FileInfo.ProtoReflect.Descriptor instead.
+func (*FileInfo) Descriptor() ([]byte, []int) {
+	return file_core_protocol_message_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *FileInfo) GetFilename() string {
+	if x != nil {
+		return x.Filename
+	}
+	return ""
+}
+
+func (x *FileInfo) GetOriginalName() string {
+	if x != nil {
+		return x.OriginalName
+	}
+	return ""
+}
+
+func (x *FileInfo) GetSize() int64 {
+	if x != nil {
+		return x.Size
+	}
+	return 0
+}
+
+func (x *FileInfo) GetType() string {
+	if x != nil {
+		return x.Type
+	}
+	return ""
+}
+
+func (x *FileInfo) GetUrl() string {
+	if x != nil {
+		return x.Url
+	}
+	return ""
+}
+
 var File_core_protocol_message_proto protoreflect.FileDescriptor
 
 const file_core_protocol_message_proto_rawDesc = "" +
 	"\n" +
-	"\x1bcore/protocol/message.proto\x12\bprotocol\"\xa7\x01\n" +
+	"\x1bcore/protocol/message.proto\x12\bprotocol\"\x90\x02\n" +
 	"\tIMMessage\x12\x12\n" +
 	"\x04type\x18\x01 \x01(\tR\x04type\x12\x12\n" +
 	"\x04from\x18\x02 \x01(\tR\x04from\x12\x0e\n" +
@@ -774,7 +883,12 @@ const file_core_protocol_message_proto_rawDesc = "" +
 	"\acontent\x18\x04 \x01(\tR\acontent\x12\x1c\n" +
 	"\ttimestamp\x18\x05 \x01(\x03R\ttimestamp\x12\x14\n" +
 	"\x05extra\x18\x06 \x01(\tR\x05extra\x12\x14\n" +
-	"\x05token\x18\a \x01(\tR\x05token\"C\n" +
+	"\x05token\x18\a \x01(\tR\x05token\x12\x12\n" +
+	"\x04data\x18\b \x01(\fR\x04data\x12\x1a\n" +
+	"\bfilename\x18\t \x01(\tR\bfilename\x12\x1a\n" +
+	"\bfilesize\x18\n" +
+	" \x01(\x03R\bfilesize\x12\x1b\n" +
+	"\tmime_type\x18\v \x01(\tR\bmimeType\"C\n" +
 	"\aAPIResp\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x10\n" +
 	"\x03msg\x18\x02 \x01(\tR\x03msg\x12\x12\n" +
@@ -813,7 +927,13 @@ const file_core_protocol_message_proto_rawDesc = "" +
 	"\x02to\x18\x03 \x01(\tR\x02to\x12\x18\n" +
 	"\acontent\x18\x04 \x01(\tR\acontent\x12\x1c\n" +
 	"\ttimestamp\x18\x05 \x01(\x03R\ttimestamp\x12\x14\n" +
-	"\x05extra\x18\x06 \x01(\tR\x05extraB\x18Z\x16im/core/protocol/pb;pbb\x06proto3"
+	"\x05extra\x18\x06 \x01(\tR\x05extra\"\x85\x01\n" +
+	"\bFileInfo\x12\x1a\n" +
+	"\bfilename\x18\x01 \x01(\tR\bfilename\x12#\n" +
+	"\roriginal_name\x18\x02 \x01(\tR\foriginalName\x12\x12\n" +
+	"\x04size\x18\x03 \x01(\x03R\x04size\x12\x12\n" +
+	"\x04type\x18\x04 \x01(\tR\x04type\x12\x10\n" +
+	"\x03url\x18\x05 \x01(\tR\x03urlB\x18Z\x16im/core/protocol/pb;pbb\x06proto3"
 
 var (
 	file_core_protocol_message_proto_rawDescOnce sync.Once
@@ -827,7 +947,7 @@ func file_core_protocol_message_proto_rawDescGZIP() []byte {
 	return file_core_protocol_message_proto_rawDescData
 }
 
-var file_core_protocol_message_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
+var file_core_protocol_message_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_core_protocol_message_proto_goTypes = []any{
 	(*IMMessage)(nil),         // 0: protocol.IMMessage
 	(*APIResp)(nil),           // 1: protocol.APIResp
@@ -842,6 +962,7 @@ var file_core_protocol_message_proto_goTypes = []any{
 	(*LogoutReq)(nil),         // 10: protocol.LogoutReq
 	(*SendEmailCodeReq)(nil),  // 11: protocol.SendEmailCodeReq
 	(*Notification)(nil),      // 12: protocol.Notification
+	(*FileInfo)(nil),          // 13: protocol.FileInfo
 }
 var file_core_protocol_message_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
@@ -862,7 +983,7 @@ func file_core_protocol_message_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_core_protocol_message_proto_rawDesc), len(file_core_protocol_message_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   13,
+			NumMessages:   14,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

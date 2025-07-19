@@ -254,7 +254,7 @@ func friendDetailMenu(_ interface{}, friendUid string) {
 			set := setStr == "y" || setStr == "Y"
 			setDND(savedUID, friendUid, set, savedToken)
 		case 4:
-			wsChatWithFriend(nil, friendUid)
+			wsChatWithFriendExtended(nil, friendUid)
 		case 5:
 			deleteFriend(savedUID, friendUid, savedToken)
 			return
