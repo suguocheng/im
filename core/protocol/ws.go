@@ -136,5 +136,10 @@ func (w *WSProtocol) OnMessage(handler func(conn *websocket.Conn, data []byte)) 
 
 // 导出免打扰判断
 func StorageFriendStoreGetDND(uid, friendUid string) bool {
-	return storage.FriendStore.GetDND(uid, friendUid)
+	storageManager := storage.GetStorageManager()
+	dnd, err := storageManager.GetFriendDND(uid, friendUid)
+	if err != nil {
+		return false
+	}
+	return dnd
 }

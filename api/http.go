@@ -15,8 +15,7 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-var userStore = &auth.MemUserStore{}
-
+var storageManager = storage.GetStorageManager()
 var nextUID = 1
 
 func writeResp(w http.ResponseWriter, code int, msg string, data []byte) {
@@ -43,7 +42,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	uid := fmt.Sprintf("%d", nextUID)
 	nextUID++
-	_, err = userStore.Register(uid, req.Username, req.Password, req.Email)
+	err = storageManager.CreateUser(uid, req.Username, req.Password, req.Email)
 	if err != nil {
 		writeResp(w, 1004, err.Error(), nil)
 		return
@@ -70,9 +69,14 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		writeResp(w, 2003, "该账号已在其他地方登录", nil)
 		return
 	}
-	user, err := userStore.Login(req.Uid, req.Password)
+	user, err := storageManager.GetUserByUID(req.Uid)
 	if err != nil {
-		writeResp(w, 2004, err.Error(), nil)
+		writeResp(w, 2004, "用户不存在", nil)
+		return
+	}
+	// 验证密码（这里需要实现密码验证逻辑）
+	if user.Password != req.Password {
+		writeResp(w, 2004, "密码错误", nil)
 		return
 	}
 	onlineAccounts[req.Uid] = true
@@ -106,7 +110,12 @@ func ResetPwdHandler(w http.ResponseWriter, r *http.Request) {
 		writeResp(w, 1, "验证码错误(模拟)", nil)
 		return
 	}
-	err = userStore.ResetPasswordByEmail(req.Email, req.NewPwd)
+	user, err := storageManager.GetUserByEmail(req.Email)
+	if err != nil {
+		writeResp(w, 1, "用户不存在", nil)
+		return
+	}
+	err = storageManager.UpdatePassword(user.UID, req.NewPwd)
 	if err != nil {
 		writeResp(w, 1, err.Error(), nil)
 		return
@@ -129,7 +138,7 @@ func UpdateUsernameHandler(w http.ResponseWriter, r *http.Request) {
 		writeResp(w, 1, "UID和新昵称不能为空", nil)
 		return
 	}
-	err = userStore.UpdateUsername(req.Uid, req.NewUsername)
+	err = storageManager.UpdateUsername(req.Uid, req.NewUsername)
 	if err != nil {
 		writeResp(w, 1, err.Error(), nil)
 		return
@@ -152,7 +161,17 @@ func UpdatePwdHandler(w http.ResponseWriter, r *http.Request) {
 		writeResp(w, 1, "UID、原密码和新密码不能为空", nil)
 		return
 	}
-	err = userStore.UpdatePassword(req.Uid, req.OldPwd, req.NewPwd)
+	// 先验证旧密码
+	user, err := storageManager.GetUserByUID(req.Uid)
+	if err != nil {
+		writeResp(w, 1, "用户不存在", nil)
+		return
+	}
+	if user.Password != req.OldPwd {
+		writeResp(w, 1, "原密码错误", nil)
+		return
+	}
+	err = storageManager.UpdatePassword(req.Uid, req.NewPwd)
 	if err != nil {
 		writeResp(w, 1, err.Error(), nil)
 		return
@@ -198,7 +217,7 @@ func DeleteAccountHandler(w http.ResponseWriter, r *http.Request) {
 		writeResp(w, 1, "UID不能为空", nil)
 		return
 	}
-	err = userStore.DeleteAccount(req.Uid)
+	err = storageManager.DeleteUser(req.Uid)
 	if err != nil {
 		writeResp(w, 1, err.Error(), nil)
 		return
@@ -226,7 +245,7 @@ func UserInfoHandler(w http.ResponseWriter, r *http.Request) {
 		writeResp(w, 1, "token无效", nil)
 		return
 	}
-	user, err := userStore.GetByUID(uid)
+	user, err := storageManager.GetUserByUID(uid)
 	if err != nil {
 		writeResp(w, 1, err.Error(), nil)
 		return
@@ -306,7 +325,7 @@ func AddFriendHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// TODO: 校验token
-	storage.FriendStore.AddFriendRequest(req.FromUid, req.ToUid, req.VerifyMsg)
+	storageManager.AddFriendRequest(req.FromUid, req.ToUid, req.VerifyMsg)
 	// 推送好友请求通知
 	notif := &pb.Notification{
 		Type:      "friend_request",
@@ -340,7 +359,7 @@ func HandleFriendHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// TODO: 校验token
-	storage.FriendStore.HandleFriendRequest(req.FromUid, req.ToUid, req.Accept)
+	storageManager.HandleFriendRequest(req.FromUid, req.ToUid, req.Accept)
 	resp := &pb.HandleFriendResp{Code: 0, Msg: "处理成功"}
 	data, _ := proto.Marshal(resp)
 	writeResp(w, 0, "ok", data)
@@ -363,17 +382,25 @@ func FriendListHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// TODO: 校验token
-	friends := storage.FriendStore.GetFriends(req.Uid)
+	friends, err := storageManager.GetFriends(req.Uid)
+	if err != nil {
+		writeResp(w, 1, "获取好友列表失败", nil)
+		return
+	}
 	var friendUsernames []string
 	for _, f := range friends {
-		user, err := userStore.GetByUID(f)
+		user, err := storageManager.GetUserByUID(f)
 		if err != nil {
 			friendUsernames = append(friendUsernames, "<未知>")
 		} else {
 			friendUsernames = append(friendUsernames, user.Username)
 		}
 	}
-	remarks := storage.FriendStore.GetRemarks(req.Uid, friends)
+	var remarks []string
+	for _, f := range friends {
+		remark, _ := storageManager.GetFriendRemark(req.Uid, f)
+		remarks = append(remarks, remark)
+	}
 	resp := &pb.FriendListResp{FriendUids: friends, FriendUsernames: friendUsernames, Remarks: remarks, Code: 0, Msg: "ok"}
 	data, _ := proto.Marshal(resp)
 	writeResp(w, 0, "ok", data)
@@ -396,7 +423,7 @@ func UpdateRemarkHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// TODO: 校验token
-	storage.FriendStore.SetRemark(req.Uid, req.FriendUid, req.Remark)
+	storageManager.SetFriendRemark(req.Uid, req.FriendUid, req.Remark)
 	resp := &pb.UpdateRemarkResp{Code: 0, Msg: "备注设置成功"}
 	data, _ := proto.Marshal(resp)
 	writeResp(w, 0, "ok", data)
@@ -419,13 +446,13 @@ func FriendInfoHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// TODO: 校验token
-	user, err := userStore.GetByUID(req.FriendUid)
+	user, err := storageManager.GetUserByUID(req.FriendUid)
 	if err != nil {
 		writeResp(w, 1, "好友不存在", nil)
 		return
 	}
-	remark := storage.FriendStore.GetRemark(req.Uid, req.FriendUid)
-	dnd := storage.FriendStore.GetDND(req.Uid, req.FriendUid)
+	remark, _ := storageManager.GetFriendRemark(req.Uid, req.FriendUid)
+	dnd, _ := storageManager.GetFriendDND(req.Uid, req.FriendUid)
 	resp := &pb.FriendInfoResp{
 		Uid:      user.UID,
 		Username: user.Username,
@@ -457,7 +484,7 @@ func DeleteFriendHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// TODO: 校验token
-	storage.FriendStore.DeleteFriend(req.Uid, req.FriendUid)
+	storageManager.DeleteFriendship(req.Uid, req.FriendUid)
 	resp := &pb.DeleteFriendResp{Code: 0, Msg: "已删除"}
 	data, _ := proto.Marshal(resp)
 	writeResp(w, 0, "ok", data)
@@ -476,12 +503,16 @@ func FriendRequestListHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// TODO: 校验token
-	reqs := storage.FriendStore.GetFriendRequests(req.Uid)
+	reqs, err := storageManager.GetFriendRequests(req.Uid)
+	if err != nil {
+		writeResp(w, 1, "获取好友请求失败", nil)
+		return
+	}
 	var fromUids, fromUsernames, msgs []string
 	for from, msg := range reqs {
 		fromUids = append(fromUids, from)
 		msgs = append(msgs, msg)
-		user, err := userStore.GetByUID(from)
+		user, err := storageManager.GetUserByUID(from)
 		if err != nil {
 			fromUsernames = append(fromUsernames, "<未知>")
 		} else {
@@ -510,7 +541,7 @@ func SetDNDHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// TODO: 校验token
-	storage.FriendStore.SetDND(req.Uid, req.FriendUid, req.Dnd)
+	storageManager.SetFriendDND(req.Uid, req.FriendUid, req.Dnd)
 	resp := &pb.SetDNDResp{Code: 0, Msg: "设置成功"}
 	data, _ := proto.Marshal(resp)
 	writeResp(w, 0, "ok", data)

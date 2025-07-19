@@ -6,12 +6,30 @@ import (
 	"im/core/plugin"
 	"im/core/protocol"
 	pb "im/core/protocol/pb"
+	"im/core/storage"
+	"log"
 
 	"github.com/gorilla/websocket"
 	"google.golang.org/protobuf/proto"
 )
 
 func main() {
+	// 获取存储管理器
+	storageManager := storage.GetStorageManager()
+
+	// 初始化MySQL存储
+	log.Println("正在初始化MySQL存储...")
+	if err := storageManager.InitMySQL(); err != nil {
+		log.Fatal("MySQL存储初始化失败:", err)
+	}
+	log.Println("MySQL存储初始化成功")
+
+	// 程序结束时关闭存储
+	defer func() {
+		if err := storageManager.Close(); err != nil {
+			log.Printf("关闭存储时出错: %v", err)
+		}
+	}()
 	for _, p := range plugin.All() {
 		p.Init()
 	}

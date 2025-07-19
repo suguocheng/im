@@ -306,6 +306,31 @@ func wsChatWithFriend(_ interface{}, friendUid string) {
 		fmt.Println("请先登录获取token")
 		return
 	}
+
+	// 先进行WebSocket登录
+	loginMsg := &pb.IMMessage{Type: "login", Token: savedToken}
+	b, _ := proto.Marshal(loginMsg)
+	if err := c.WriteMessage(websocket.BinaryMessage, b); err != nil {
+		fmt.Println("WebSocket登录失败:", err)
+		return
+	}
+
+	// 等待登录响应
+	_, loginResp, err := c.ReadMessage()
+	if err != nil {
+		fmt.Println("读取登录响应失败:", err)
+		return
+	}
+	var loginResponse pb.IMMessage
+	if err := proto.Unmarshal(loginResp, &loginResponse); err != nil {
+		fmt.Println("解析登录响应失败:", err)
+		return
+	}
+	if loginResponse.Type == "error" {
+		fmt.Println("WebSocket登录失败:", loginResponse.Content)
+		return
+	}
+
 	fmt.Printf("已进入与 %s 的私聊，直接输入消息内容发送，输入 /exit 返回\n", friendUid)
 	quit := make(chan struct{})
 	go func() {
@@ -326,6 +351,8 @@ func wsChatWithFriend(_ interface{}, friendUid string) {
 				fmt.Println("收到非Protobuf消息：", string(msg))
 			} else if im.Type == "chat" && im.From == friendUid {
 				fmt.Printf("%s: %s\n", im.From, im.Content)
+			} else if im.Type == "error" {
+				fmt.Println("错误消息：", im.Content)
 			}
 		}
 	}()
@@ -348,10 +375,12 @@ func wsChatWithFriend(_ interface{}, friendUid string) {
 				To:        friendUid,
 				Content:   text,
 				Timestamp: time.Now().Unix(),
-				Token:     savedToken,
 			}
 			b, _ := proto.Marshal(msg)
-			c.WriteMessage(websocket.BinaryMessage, b)
+			if err := c.WriteMessage(websocket.BinaryMessage, b); err != nil {
+				fmt.Println("发送消息失败:", err)
+				return
+			}
 		}
 	}
 }

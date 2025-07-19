@@ -8,7 +8,7 @@ import (
 
 type IMServer struct {
 	Proto protocol.Protocol
-	Store storage.Storage
+	Store *storage.StorageManager
 	Auth  auth.Authenticator
 }
 
