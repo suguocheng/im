@@ -1,0 +1,334 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "im/core/protocol/pb";
+
+// 群组信息
+message Group {
+  string group_id = 1;
+  string name = 2;
+  string description = 3;
+  string owner_uid = 4;
+  repeated string member_uids = 5;
+  int64 created_at = 6;
+  int64 updated_at = 7;
+}
+
+// 群组成员信息
+message GroupMember {
+  string uid = 1;
+  string username = 2;
+  string nickname = 3;  // 群内昵称
+  string role = 4;      // owner, admin, member
+  int64 join_time = 5;
+}
+
+// 群聊消息
+message GroupMessage {
+  string message_id = 1;
+  string group_id = 2;
+  string from_uid = 3;
+  string from_username = 4;
+  string content = 5;
+  string message_type = 6;  // text, image, file, emoji
+  int64 timestamp = 7;
+}
+
+// 创建群组请求
+message CreateGroupReq {
+  string name = 1;
+  string description = 2;
+  string owner_uid = 3;
+  repeated string member_uids = 4;
+}
+
+// 创建群组响应
+message CreateGroupResp {
+  int32 code = 1;
+  string msg = 2;
+  string group_id = 3;
+}
+
+// 加入群组请求
+message JoinGroupReq {
+  string group_id = 1;
+  string uid = 2;
+}
+
+// 加入群组响应
+message JoinGroupResp {
+  int32 code = 1;
+  string msg = 2;
+}
+
+// 退出群组请求
+message LeaveGroupReq {
+  string group_id = 1;
+  string uid = 2;
+}
+
+// 退出群组响应
+message LeaveGroupResp {
+  int32 code = 1;
+  string msg = 2;
+}
+
+// 获取群组列表请求
+message GroupListReq {
+  string uid = 1;
+}
+
+// 获取群组列表响应
+message GroupListResp {
+  int32 code = 1;
+  string msg = 2;
+  repeated Group groups = 3;
+}
+
+// 获取群组成员请求
+message GroupMembersReq {
+  string group_id = 1;
+}
+
+// 获取群组成员响应
+message GroupMembersResp {
+  int32 code = 1;
+  string msg = 2;
+  repeated GroupMember members = 3;
+}
+
+// 获取群组信息请求
+message GroupInfoReq {
+  string group_id = 1;
+}
+
+// 获取群组信息响应
+message GroupInfoResp {
+  int32 code = 1;
+  string msg = 2;
+  Group group = 3;
+}
+
+// 发送群聊消息请求
+message SendGroupMessageReq {
+  string group_id = 1;
+  string from_uid = 2;
+  string content = 3;
+  string message_type = 4;
+}
+
+// 发送群聊消息响应
+message SendGroupMessageResp {
+  int32 code = 1;
+  string msg = 2;
+  string message_id = 3;
+}
+
+// 获取群聊消息历史请求
+message GroupMessageHistoryReq {
+  string group_id = 1;
+  int32 limit = 2;
+  int64 before_timestamp = 3;
+}
+
+// 获取群聊消息历史响应
+message GroupMessageHistoryResp {
+  int32 code = 1;
+  string msg = 2;
+  repeated GroupMessage messages = 3;
+}
+
+// 邀请好友入群请求
+message InviteToGroupReq {
+  string group_id = 1;
+  string inviter_uid = 2;
+  repeated string invitee_uids = 3;
+}
+
+// 邀请好友入群响应
+message InviteToGroupResp {
+  int32 code = 1;
+  string msg = 2;
+}
+
+// 踢出群成员请求
+message KickFromGroupReq {
+  string group_id = 1;
+  string operator_uid = 2;
+  string target_uid = 3;
+}
+
+// 踢出群成员响应
+message KickFromGroupResp {
+  int32 code = 1;
+  string msg = 2;
+}
+
+// 设置群内昵称请求
+message SetGroupNicknameReq {
+  string group_id = 1;
+  string uid = 2;
+  string nickname = 3;
+}
+
+// 设置群内昵称响应
+message SetGroupNicknameResp {
+  int32 code = 1;
+  string msg = 2;
+}
+
+// 新增：修改群名请求
+message UpdateGroupNameReq {
+  string group_id = 1;
+  string operator_uid = 2;
+  string new_name = 3;
+}
+message UpdateGroupNameResp {
+  int32 code = 1;
+  string msg = 2;
+}
+
+// 新增：设置群备注请求
+message SetGroupRemarkReq {
+  string group_id = 1;
+  string uid = 2;
+  string remark = 3;
+}
+message SetGroupRemarkResp {
+  int32 code = 1;
+  string msg = 2;
+}
+
+// 新增：设置群免打扰请求
+message SetGroupDNDReq {
+  string group_id = 1;
+  string uid = 2;
+  bool dnd = 3;
+}
+message SetGroupDNDResp {
+  int32 code = 1;
+  string msg = 2;
+}
+
+// 新增：设置/取消禁言请求
+message SetGroupMuteReq {
+  string group_id = 1;
+  string operator_uid = 2;
+  string target_uid = 3;
+  bool mute = 4; // true为禁言, false为取消
+}
+message SetGroupMuteResp {
+  int32 code = 1;
+  string msg = 2;
+}
+
+// 设置/取消管理员请求
+message SetGroupAdminReq {
+  string group_id = 1;
+  string operator_uid = 2;
+  string target_uid = 3;
+  bool set_admin = 4;
+}
+
+// 新增：设置/取消管理员响应
+message SetGroupAdminResp {
+  int32 code = 1;
+  string msg = 2;
+}
+
+// 新增：解散群组请求
+message DismissGroupReq {
+  string group_id = 1;
+  string operator_uid = 2;
+}
+
+// 新增：解散群组响应
+message DismissGroupResp {
+  int32 code = 1;
+  string msg = 2;
+}
+
+// 群组通知
+message GroupNotification {
+  string type = 1;           // member_joined, member_left, message
+  string group_id = 2;
+  string group_name = 3;
+  string from_uid = 4;
+  string from_username = 5;
+  string content = 6;
+  int64 timestamp = 7;
+}
+
+// 获取群组成员角色请求
+message GroupMemberRoleReq {
+  string group_id = 1;
+  string uid = 2;
+}
+
+// 获取群组成员角色响应
+message GroupMemberRoleResp {
+  int32 code = 1;
+  string msg = 2;
+  string role = 3;  // owner, admin, member
+}
+
+// 获取群组成员信息请求
+message GroupMemberInfoReq {
+  string group_id = 1;
+  string uid = 2;
+}
+
+// 获取群组成员信息响应
+message GroupMemberInfoResp {
+  int32 code = 1;
+  string msg = 2;
+  string uid = 3;
+  string username = 4;
+  string nickname = 5;
+  string role = 6;
+  int64 join_time = 7;
+}
+
+// ---- 群组邀请/申请相关 ----
+
+// 单条群组邀请/申请信息
+message GroupInviteItem {
+  string id = 1;
+  string group_id = 2;
+  string group_name = 3;
+  string inviter_uid = 4; // 邀请人
+  string invitee_uid = 5; // 被邀请人
+  string status = 6;      // pending, accepted, rejected
+  string created_at = 7;
+  string inviter_username = 8;
+  string invitee_username = 9;
+}
+
+// 获取待处理群组邀请/申请列表请求
+message GroupInviteListReq {
+  string uid = 1; // 当前用户的UID
+  string token = 2;
+}
+
+// 获取待处理群组邀请/申请列表响应
+message GroupInviteListResp {
+  int32 code = 1;
+  string msg = 2;
+  repeated GroupInviteItem items = 3;
+}
+
+// 处理群组邀请/申请请求
+message HandleGroupInviteReq {
+  string id = 1;          // 邀请记录的ID
+  string token = 2;       // 操作者的token
+  bool approve = 3;       // true为同意, false为拒绝
+  string group_id = 4;    // 群组ID
+  string invitee_uid = 5; // 被邀请人UID
+}
+
+// 处理群组邀请/申请响应 (可以简化，复用通用响应)
+// message HandleGroupInviteResp {
+//   int32 code = 1;
+//   string msg = 2;
+// } 

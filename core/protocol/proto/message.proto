@@ -16,6 +16,7 @@ message IMMessage {
   string filename = 9;  // 文件名
   int64  filesize = 10; // 文件大小（字节）
   string mime_type = 11; // MIME类型
+  string group_id = 12; // 新增：群组ID
 }
 
 message APIResp {
