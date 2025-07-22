@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package pb;
+package protocol;
 
 option go_package = "im/core/protocol/pb";
 
@@ -23,17 +23,6 @@ message GroupMember {
   string nickname = 3;  // 群内昵称
   string role = 4;      // owner, admin, member
   int64 join_time = 5;
-}
-
-// 群聊消息
-message GroupMessage {
-  string message_id = 1;
-  string group_id = 2;
-  string from_uid = 3;
-  string from_username = 4;
-  string content = 5;
-  string message_type = 6;  // text, image, file, emoji
-  int64 timestamp = 7;
 }
 
 // 创建群组请求
@@ -109,35 +98,6 @@ message GroupInfoResp {
   int32 code = 1;
   string msg = 2;
   Group group = 3;
-}
-
-// 发送群聊消息请求
-message SendGroupMessageReq {
-  string group_id = 1;
-  string from_uid = 2;
-  string content = 3;
-  string message_type = 4;
-}
-
-// 发送群聊消息响应
-message SendGroupMessageResp {
-  int32 code = 1;
-  string msg = 2;
-  string message_id = 3;
-}
-
-// 获取群聊消息历史请求
-message GroupMessageHistoryReq {
-  string group_id = 1;
-  int32 limit = 2;
-  int64 before_timestamp = 3;
-}
-
-// 获取群聊消息历史响应
-message GroupMessageHistoryResp {
-  int32 code = 1;
-  string msg = 2;
-  repeated GroupMessage messages = 3;
 }
 
 // 邀请好友入群请求

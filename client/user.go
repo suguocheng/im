@@ -19,10 +19,12 @@ func register(username, password, email string) {
 		fmt.Println("注册请求失败:", err)
 		return
 	}
-	fmt.Println("注册响应:", resp.Msg)
-	if resp.Code == 0 {
-		fmt.Println("分配的UID:", string(resp.Data))
+	if resp.Code != 0 {
+		fmt.Printf("注册失败: %s\n", resp.Msg)
+		return
 	}
+	fmt.Println("注册响应:", resp.Msg)
+	fmt.Println("分配的UID:", string(resp.Data))
 }
 
 func login(uid, password string) {
@@ -34,6 +36,10 @@ func login(uid, password string) {
 	resp, err := sendRequest("/login", req)
 	if err != nil {
 		fmt.Println("登录请求失败:", err)
+		return
+	}
+	if resp.Code != 0 {
+		fmt.Printf("登录失败: %s\n", resp.Msg)
 		return
 	}
 	fmt.Println("登录响应:", resp.Msg)
@@ -92,6 +98,10 @@ func updateUsername(uid, newUsername string) {
 		fmt.Println("修改昵称请求失败:", err)
 		return
 	}
+	if resp.Code != 0 {
+		fmt.Printf("修改昵称失败: %s\n", resp.Msg)
+		return
+	}
 	fmt.Println("修改昵称响应:", resp.Msg)
 }
 
@@ -104,6 +114,10 @@ func updatePwd(uid, oldPwd, newPwd string) {
 	resp, err := sendRequest("/update_pwd", req)
 	if err != nil {
 		fmt.Println("修改密码请求失败:", err)
+		return
+	}
+	if resp.Code != 0 {
+		fmt.Printf("修改密码失败: %s\n", resp.Msg)
 		return
 	}
 	fmt.Println("修改密码响应:", resp.Msg)
@@ -120,6 +134,10 @@ func deleteAccount(uid string) {
 		fmt.Println("注销账号请求失败:", err)
 		return
 	}
+	if resp.Code != 0 {
+		fmt.Printf("注销账号失败: %s\n", resp.Msg)
+		return
+	}
 	fmt.Println("注销账号响应:", resp.Msg)
 }
 
@@ -132,6 +150,10 @@ func userInfo() {
 	resp, err := sendRequest("/user_info", req)
 	if err != nil {
 		fmt.Println("用户信息请求失败:", err)
+		return
+	}
+	if resp.Code != 0 {
+		fmt.Printf("获取用户信息失败: %s\n", resp.Msg)
 		return
 	}
 	var info pb.UserInfoResp
@@ -151,6 +173,10 @@ func logout() {
 	resp, err := sendRequest("/logout", req)
 	if err != nil {
 		fmt.Println("登出请求失败:", err)
+		return
+	}
+	if resp.Code != 0 {
+		fmt.Printf("登出失败: %s\n", resp.Msg)
 		return
 	}
 	fmt.Println("登出响应:", resp.Msg)

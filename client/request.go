@@ -69,6 +69,10 @@ func getFriendRequestListWithNames(uid, token string) ([]string, []string, []str
 		fmt.Println("获取好友请求列表失败:", err)
 		return nil, nil, nil
 	}
+	if resp.Code != 0 {
+		fmt.Printf("获取好友请求列表失败: %s\n", resp.Msg)
+		return nil, nil, nil
+	}
 	var list pb.FriendRequestListResp
 	if err := proto.Unmarshal(resp.Data, &list); err != nil {
 		fmt.Println("好友请求列表解析失败:", err)
@@ -87,6 +91,10 @@ func handleFriend(fromUid, toUid string, accept bool, token string) {
 	resp, err := sendRequest("/handle_friend", req)
 	if err != nil {
 		fmt.Println("处理好友请求失败:", err)
+		return
+	}
+	if resp.Code != 0 {
+		fmt.Printf("处理好友请求失败: %s\n", resp.Msg)
 		return
 	}
 	fmt.Println("处理好友请求响应:", resp.Msg)
@@ -137,6 +145,10 @@ func getGroupInviteRequests(uid, token string) []*pb.GroupInviteItem {
 	resp, err := sendRequest("/group_invite_requests", req)
 	if err != nil {
 		fmt.Println("获取群组邀请列表失败:", err)
+		return nil
+	}
+	if resp.Code != 0 {
+		fmt.Printf("获取群组邀请列表失败: %s\n", resp.Msg)
 		return nil
 	}
 	var list pb.GroupInviteListResp

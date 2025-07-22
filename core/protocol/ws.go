@@ -103,34 +103,22 @@ func SendToUser(userID string, data []byte) error {
 }
 
 // 发送群聊消息给群组所有在线成员
-func SendGroupMessageToMembers(groupID string, groupMsg *pb.GroupMessage) error {
+func SendGroupMessageToMembers(msg *pb.IMMessage) error {
 	storageManager := storage.GetStorageManager()
-	group, err := storageManager.GetGroup(groupID)
+	group, err := storageManager.GetGroup(msg.GroupId)
 	if err != nil {
 		return fmt.Errorf("获取群组信息失败: %v", err)
 	}
 
-	// 构建群聊消息
-	msg := &pb.IMMessage{
-		Type:      "chat", // 应该与客户端发送的类型一致
-		From:      groupMsg.FromUid,
-		GroupId:   groupID, // 关键：必须给 GroupId 字段赋值
-		Content:   groupMsg.Content,
-		Timestamp: groupMsg.Timestamp,
-		Extra:     fmt.Sprintf("group_id:%s,from_username:%s,message_type:%s", groupMsg.GroupId, groupMsg.FromUsername, groupMsg.MessageType),
-	}
 	b, _ := proto.Marshal(msg)
-
-	// 发送给所有在线成员
 	var sentCount int
 	for _, memberUID := range group.MemberUids {
-		if memberUID != groupMsg.FromUid { // 不发送给发送者自己
+		if memberUID != msg.From { // 不发给自己
 			if err := SendToUser(memberUID, b); err == nil {
 				sentCount++
 			}
 		}
 	}
-
 	fmt.Printf("群聊消息发送给 %d 个在线成员\n", sentCount)
 	return nil
 }

@@ -39,6 +39,10 @@ func showFriendList() {
 		fmt.Println("获取好友列表失败:", err)
 		return
 	}
+	if resp.Code != 0 {
+		fmt.Printf("获取好友列表失败: %s\n", resp.Msg)
+		return
+	}
 	var list pb.FriendListResp
 	if err := proto.Unmarshal(resp.Data, &list); err != nil {
 		fmt.Println("好友列表解析失败:", err)
@@ -82,6 +86,10 @@ func addFriend(fromUid, toUid, verifyMsg, token string) {
 	resp, err := sendRequest("/add_friend", req)
 	if err != nil {
 		fmt.Println("添加好友请求失败:", err)
+		return
+	}
+	if resp.Code != 0 {
+		fmt.Printf("添加好友失败: %s\n", resp.Msg)
 		return
 	}
 	fmt.Println("添加好友响应:", resp.Msg)
@@ -137,13 +145,13 @@ func getFriendInfo(uid, friendUid, token string) *pb.FriendInfoResp {
 		fmt.Println("获取好友信息失败:", err)
 		return nil
 	}
+	if resp.Code != 0 {
+		fmt.Printf("获取好友信息失败: %s\n", resp.Msg)
+		return nil
+	}
 	var info pb.FriendInfoResp
 	if err := proto.Unmarshal(resp.Data, &info); err != nil {
 		fmt.Println("好友信息解析失败:", err)
-		return nil
-	}
-	if info.Code != 0 {
-		fmt.Println("获取好友信息失败:", info.Msg)
 		return nil
 	}
 	return &info
@@ -156,6 +164,10 @@ func setFriendRemark(uid, friendUid, remark, token string) {
 		fmt.Println("设置备注失败:", err)
 		return
 	}
+	if resp.Code != 0 {
+		fmt.Printf("设置备注失败: %s\n", resp.Msg)
+		return
+	}
 	fmt.Println(resp.Msg)
 }
 
@@ -164,6 +176,10 @@ func setDND(uid, friendUid string, dnd bool, token string) {
 	resp, err := sendRequest("/set_dnd", req)
 	if err != nil {
 		fmt.Println("设置免打扰失败:", err)
+		return
+	}
+	if resp.Code != 0 {
+		fmt.Printf("设置免打扰失败: %s\n", resp.Msg)
 		return
 	}
 	fmt.Println(resp.Msg)
@@ -179,6 +195,10 @@ func deleteFriend(uid, friendUid, token string) {
 	resp, err := sendRequest("/delete_friend", req)
 	if err != nil {
 		fmt.Println("删除好友请求失败:", err)
+		return
+	}
+	if resp.Code != 0 {
+		fmt.Printf("删除好友失败: %s\n", resp.Msg)
 		return
 	}
 	fmt.Println("删除好友响应:", resp.Msg)

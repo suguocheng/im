@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IM 极简客户端</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="login-panel" class="center-panel">
+    <h2>IM 登录</h2>
+    <input id="login-uid" type="text" placeholder="UID" autocomplete="username">
+    <input id="login-pwd" type="password" placeholder="密码" autocomplete="current-password">
+    <button id="login-btn">登录</button>
+    <div class="switch-link">没有账号？<a id="to-register" href="#">注册</a></div>
+    <div id="login-error" class="error"></div>
+  </div>
+  <div id="register-panel" class="center-panel" style="display:none;">
+    <h2>IM 注册</h2>
+    <input id="reg-username" type="text" placeholder="昵称">
+    <input id="reg-email" type="email" placeholder="邮箱">
+    <input id="reg-pwd" type="password" placeholder="密码">
+    <button id="register-btn">注册</button>
+    <div class="switch-link">已有账号？<a id="to-login" href="#">登录</a></div>
+    <div id="register-error" class="error"></div>
+  </div>
+  <div id="main-panel" style="display:none;">
+    <header>
+      <span id="user-info"></span>
+      <button id="notify-btn">🔔 通知</button>
+      <button id="logout-btn">退出</button>
+      <div id="notify-popup" style="display:none;position:absolute;right:32px;top:60px;min-width:260px;max-width:340px;z-index:999;"></div>
+    </header>
+    <div class="main-content">
+      <aside>
+        <div class="tab-bar">
+          <button id="tab-friends" class="tab active">好友</button>
+          <button id="tab-groups" class="tab">群组</button>
+        </div>
+        <div id="friend-list" class="list"></div>
+        <div id="group-list" class="list" style="display:none;"></div>
+      </aside>
+      <section id="chat-section">
+        <div id="chat-title"></div>
+        <div id="chat-history"></div>
+        <div id="chat-input-bar">
+          <button id="emoji-btn" title="表情">😊</button>
+          <input id="chat-input" type="text" placeholder="输入消息...">
+          <input id="file-input" type="file" style="display:none;">
+          <button id="img-btn" title="发送图片">🖼️</button>
+          <button id="file-btn" title="发送文件">📎</button>
+          <button id="send-btn">发送</button>
+        </div>
+      </section>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/protobufjs/dist/protobuf.min.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
+ 

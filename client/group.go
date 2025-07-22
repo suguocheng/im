@@ -44,13 +44,13 @@ func showMyGroups() {
 		fmt.Println("获取群组列表失败:", err)
 		return
 	}
+	if resp.Code != 0 {
+		fmt.Printf("获取群组列表失败: %s\n", resp.Msg)
+		return
+	}
 	var listResp pb.GroupListResp
 	if err := proto.Unmarshal(resp.Data, &listResp); err != nil {
 		fmt.Println("解析响应失败:", err)
-		return
-	}
-	if listResp.Code != 0 {
-		fmt.Printf("获取群组列表失败: %s\n", listResp.Msg)
 		return
 	}
 	if len(listResp.Groups) == 0 {
@@ -65,6 +65,9 @@ func showMyGroups() {
 		roleReq := &pb.GroupMemberRoleReq{GroupId: group.GroupId, Uid: savedUID}
 		roleResp, err := sendRequest("/group_member_role", roleReq)
 		if err != nil {
+			continue
+		}
+		if roleResp.Code != 0 {
 			continue
 		}
 		var roleRespData pb.GroupMemberRoleResp
@@ -147,6 +150,10 @@ func createGroup() {
 		fmt.Println("创建群组失败:", err)
 		return
 	}
+	if resp.Code != 0 {
+		fmt.Printf("创建群组失败: %s\n", resp.Msg)
+		return
+	}
 
 	var createResp pb.CreateGroupResp
 	if err := proto.Unmarshal(resp.Data, &createResp); err != nil {
@@ -154,11 +161,7 @@ func createGroup() {
 		return
 	}
 
-	if createResp.Code == 0 {
-		fmt.Printf("群组创建成功！群组ID: %s\n", createResp.GroupId)
-	} else {
-		fmt.Printf("创建群组失败: %s\n", createResp.Msg)
-	}
+	fmt.Printf("群组创建成功！群组ID: %s\n", createResp.GroupId)
 }
 
 // 加入群组
@@ -181,6 +184,10 @@ func joinGroup() {
 		fmt.Println("申请加入群组失败:", err)
 		return
 	}
+	if resp.Code != 0 {
+		fmt.Printf("申请加入群组失败: %s\n", resp.Msg)
+		return
+	}
 
 	var joinResp pb.JoinGroupResp
 	if err := proto.Unmarshal(resp.Data, &joinResp); err != nil {
@@ -188,11 +195,7 @@ func joinGroup() {
 		return
 	}
 
-	if joinResp.Code == 0 {
-		fmt.Println("申请加入群组成功！")
-	} else {
-		fmt.Printf("申请加入群组失败: %s\n", joinResp.Msg)
-	}
+	fmt.Println("申请加入群组成功！")
 }
 
 // 退出群组
@@ -209,6 +212,10 @@ func leaveGroup(groupId string) {
 		fmt.Println("退出群组失败:", err)
 		return
 	}
+	if resp.Code != 0 {
+		fmt.Printf("退出群组失败: %s\n", resp.Msg)
+		return
+	}
 
 	var leaveResp pb.LeaveGroupResp
 	if err := proto.Unmarshal(resp.Data, &leaveResp); err != nil {
@@ -216,11 +223,7 @@ func leaveGroup(groupId string) {
 		return
 	}
 
-	if leaveResp.Code == 0 {
-		fmt.Println("退出群组成功！")
-	} else {
-		fmt.Printf("退出群组失败: %s\n", leaveResp.Msg)
-	}
+	fmt.Println("退出群组成功！")
 }
 
 // 群组详情页，按角色显示不同菜单
@@ -233,6 +236,10 @@ func showGroupDetail(group *pb.Group) {
 	roleResp, err := sendRequest("/group_member_role", roleReq)
 	role := "member"
 	if err == nil {
+		if roleResp.Code != 0 {
+			fmt.Printf("获取角色失败: %s\n", roleResp.Msg)
+			return
+		}
 		var roleRespData pb.GroupMemberRoleResp
 		if err := proto.Unmarshal(roleResp.Data, &roleRespData); err == nil {
 			role = roleRespData.Role
@@ -324,6 +331,10 @@ func showGroupMembersDetail(group *pb.Group) {
 			fmt.Printf("%d. %s (UID: %s) - 角色: 未知\n", i+1, "未知用户", member)
 			continue
 		}
+		if memberInfoResp.Code != 0 {
+			fmt.Printf("%d. %s (UID: %s) - 角色: 未知\n", i+1, "未知用户", member)
+			continue
+		}
 		var memberInfoRespData pb.GroupMemberInfoResp
 		if err := proto.Unmarshal(memberInfoResp.Data, &memberInfoRespData); err != nil {
 			fmt.Printf("%d. %s (UID: %s) - 角色: 未知\n", i+1, "未知用户", member)
@@ -344,6 +355,10 @@ func inviteToGroup(groupId string) {
 	resp, err := sendRequest("/friend_list", req)
 	if err != nil {
 		fmt.Println("获取好友列表失败:", err)
+		return
+	}
+	if resp.Code != 0 {
+		fmt.Printf("获取好友列表失败: %s\n", resp.Msg)
 		return
 	}
 	var list pb.FriendListResp
@@ -396,6 +411,10 @@ func inviteToGroup(groupId string) {
 		fmt.Println("邀请失败:", err)
 		return
 	}
+	if inviteResp.Code != 0 {
+		fmt.Printf("邀请失败: %s\n", inviteResp.Msg)
+		return
+	}
 	fmt.Println(inviteResp.Msg)
 }
 
@@ -416,6 +435,10 @@ func setGroupNickname(groupId string) {
 		fmt.Println("设置失败:", err)
 		return
 	}
+	if resp.Code != 0 {
+		fmt.Printf("设置失败: %s\n", resp.Msg)
+		return
+	}
 	fmt.Println(resp.Msg)
 }
 
@@ -430,6 +453,10 @@ func setGroupRemark(groupId string) {
 	resp, err := sendRequest("/set_group_remark", req)
 	if err != nil {
 		fmt.Println("设置失败:", err)
+		return
+	}
+	if resp.Code != 0 {
+		fmt.Printf("设置失败: %s\n", resp.Msg)
 		return
 	}
 	fmt.Println(resp.Msg)
@@ -448,6 +475,10 @@ func setGroupDND(groupId string) {
 	resp, err := sendRequest("/set_group_dnd", req)
 	if err != nil {
 		fmt.Println("设置失败:", err)
+		return
+	}
+	if resp.Code != 0 {
+		fmt.Printf("设置失败: %s\n", resp.Msg)
 		return
 	}
 	fmt.Println(resp.Msg)
@@ -470,6 +501,10 @@ func updateGroupName(groupId string) {
 		fmt.Println("修改失败:", err)
 		return
 	}
+	if resp.Code != 0 {
+		fmt.Printf("修改失败: %s\n", resp.Msg)
+		return
+	}
 	fmt.Println(resp.Msg)
 }
 
@@ -480,6 +515,10 @@ func setGroupMute(groupId, operatorRole string) {
 	resp, err := sendRequest("/group_members", req)
 	if err != nil {
 		fmt.Println("获取群成员失败:", err)
+		return
+	}
+	if resp.Code != 0 {
+		fmt.Printf("获取群成员失败: %s\n", resp.Msg)
 		return
 	}
 	var membersResp pb.GroupMembersResp
@@ -526,6 +565,10 @@ func setGroupMute(groupId, operatorRole string) {
 		fmt.Println("设置禁言失败:", err)
 		return
 	}
+	if respMute.Code != 0 {
+		fmt.Printf("设置禁言失败: %s\n", respMute.Msg)
+		return
+	}
 	fmt.Println(respMute.Msg)
 }
 
@@ -536,6 +579,10 @@ func kickFromGroup(groupId, operatorRole string) {
 	resp, err := sendRequest("/group_members", req)
 	if err != nil {
 		fmt.Println("获取群成员失败:", err)
+		return
+	}
+	if resp.Code != 0 {
+		fmt.Printf("获取群成员失败: %s\n", resp.Msg)
 		return
 	}
 	var membersResp pb.GroupMembersResp
@@ -580,7 +627,11 @@ func kickFromGroup(groupId, operatorRole string) {
 		if err != nil {
 			fmt.Println("移除失败:", err)
 		} else {
-			fmt.Println(kickResp.Msg)
+			if kickResp.Code != 0 {
+				fmt.Printf("移除失败: %s\n", kickResp.Msg)
+			} else {
+				fmt.Println(kickResp.Msg)
+			}
 		}
 	} else {
 		fmt.Println("编号超出范围")
@@ -594,6 +645,10 @@ func setGroupAdmin(groupId string) {
 	resp, err := sendRequest("/group_members", req)
 	if err != nil {
 		fmt.Println("获取群成员失败:", err)
+		return
+	}
+	if resp.Code != 0 {
+		fmt.Printf("获取群成员失败: %s\n", resp.Msg)
 		return
 	}
 	var membersResp pb.GroupMembersResp
@@ -666,11 +721,11 @@ func dismissGroup(groupId string) {
 		fmt.Println("操作失败:", err)
 		return
 	}
-
-	if resp.Code == 0 {
-		fmt.Println("操作成功:", resp.Msg)
-		// 可以在这里加一个标记，返回到上上层菜单
-	} else {
-		fmt.Println("操作失败:", resp.Msg)
+	if resp.Code != 0 {
+		fmt.Printf("操作失败: %s\n", resp.Msg)
+		return
 	}
+
+	fmt.Println("操作成功:", resp.Msg)
+	// 可以在这里加一个标记，返回到上上层菜单
 }

@@ -77,8 +77,8 @@ func main() {
 
 			// --- 新增：处理群聊消息 ---
 			if isChatMessage && msg.GroupId != "" {
-				storageManager := storage.GetStorageManager()
 				// 新增禁言校验
+				storageManager := storage.GetStorageManager()
 				isMuted := false
 				if muteStatus, err := storageManager.GetGroupMuteStatus(msg.GroupId, msg.From); err == nil {
 					isMuted = muteStatus
@@ -89,23 +89,9 @@ func main() {
 					conn.WriteMessage(websocket.BinaryMessage, b)
 					return
 				}
-				sender, err := storageManager.GetUserByUID(msg.From)
-				if err != nil {
-					// 用户不存在，忽略消息
-					return
-				}
-
-				groupMsg := &pb.GroupMessage{
-					GroupId:      msg.GroupId,
-					FromUid:      msg.From,
-					FromUsername: sender.Username, // 使用查询到的真实用户名
-					Content:      msg.Content,
-					MessageType:  msg.Type,
-					Timestamp:    msg.Timestamp,
-				}
 
 				// 1. 发送实时消息到群聊
-				err = protocol.SendGroupMessageToMembers(msg.GroupId, groupMsg)
+				err := protocol.SendGroupMessageToMembers(&msg)
 				if err != nil {
 					errMsg := &pb.IMMessage{Type: "error", Content: "群消息发送失败: " + err.Error()}
 					b, _ := proto.Marshal(errMsg)
@@ -121,7 +107,7 @@ func main() {
 				notif := &pb.Notification{
 					Type:         "group_chat_message",
 					From:         msg.From,
-					FromUsername: sender.Username,
+					FromUsername: senderUsername(storageManager, msg.From),
 					GroupId:      group.GroupId,
 					GroupName:    group.Name,
 					Content:      msg.Content,
