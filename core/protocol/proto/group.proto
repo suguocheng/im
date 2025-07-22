@@ -13,6 +13,7 @@ message Group {
   repeated string member_uids = 5;
   int64 created_at = 6;
   int64 updated_at = 7;
+  string remark = 8; // 当前用户在该群的备注（每个人都不同）
 }
 
 // 群组成员信息
@@ -249,17 +250,6 @@ message DismissGroupResp {
   string msg = 2;
 }
 
-// 群组通知
-message GroupNotification {
-  string type = 1;           // member_joined, member_left, message
-  string group_id = 2;
-  string group_name = 3;
-  string from_uid = 4;
-  string from_username = 5;
-  string content = 6;
-  int64 timestamp = 7;
-}
-
 // 获取群组成员角色请求
 message GroupMemberRoleReq {
   string group_id = 1;
@@ -288,7 +278,7 @@ message GroupMemberInfoResp {
   string nickname = 5;
   string role = 6;
   int64 join_time = 7;
-}
+} 
 
 // ---- 群组邀请/申请相关 ----
 

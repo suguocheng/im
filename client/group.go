@@ -11,7 +11,7 @@ import (
 )
 
 // 群组主菜单
-func ShowMenu() {
+func GroupMenu() {
 	for {
 		fmt.Println("\n=== 群组功能 ===")
 		fmt.Println("1. 查看群组")
@@ -85,7 +85,11 @@ func showMyGroups() {
 	if len(ownerGroups) > 0 {
 		fmt.Println("\n【我创建的群组】")
 		for _, g := range ownerGroups {
-			fmt.Printf("%d. %s(%s)\n", idx, g.Name, g.GroupId)
+			displayName := g.Name
+			if g.Remark != "" {
+				displayName = g.Remark
+			}
+			fmt.Printf("%d. %s(%s)\n", idx, displayName, g.GroupId)
 			allGroups = append(allGroups, g)
 			idx++
 		}
@@ -93,7 +97,11 @@ func showMyGroups() {
 	if len(adminGroups) > 0 {
 		fmt.Println("\n【我管理的群组】")
 		for _, g := range adminGroups {
-			fmt.Printf("%d. %s(%s)\n", idx, g.Name, g.GroupId)
+			displayName := g.Name
+			if g.Remark != "" {
+				displayName = g.Remark
+			}
+			fmt.Printf("%d. %s(%s)\n", idx, displayName, g.GroupId)
 			allGroups = append(allGroups, g)
 			idx++
 		}
@@ -101,7 +109,11 @@ func showMyGroups() {
 	if len(memberGroups) > 0 {
 		fmt.Println("\n【我加入的群组】")
 		for _, g := range memberGroups {
-			fmt.Printf("%d. %s(%s)\n", idx, g.Name, g.GroupId)
+			displayName := g.Name
+			if g.Remark != "" {
+				displayName = g.Remark
+			}
+			fmt.Printf("%d. %s(%s)\n", idx, displayName, g.GroupId)
 			allGroups = append(allGroups, g)
 			idx++
 		}
@@ -166,7 +178,7 @@ func joinGroup() {
 
 	resp, err := sendRequest("/join_group", req)
 	if err != nil {
-		fmt.Println("加入群组失败:", err)
+		fmt.Println("申请加入群组失败:", err)
 		return
 	}
 
@@ -177,9 +189,9 @@ func joinGroup() {
 	}
 
 	if joinResp.Code == 0 {
-		fmt.Println("加入群组成功！")
+		fmt.Println("申请加入群组成功！")
 	} else {
-		fmt.Printf("加入群组失败: %s\n", joinResp.Msg)
+		fmt.Printf("申请加入群组失败: %s\n", joinResp.Msg)
 	}
 }
 
@@ -317,7 +329,11 @@ func showGroupMembersDetail(group *pb.Group) {
 			fmt.Printf("%d. %s (UID: %s) - 角色: 未知\n", i+1, "未知用户", member)
 			continue
 		}
-		fmt.Printf("%d. %s (UID: %s) - 角色: %s - 昵称: %s\n", i+1, memberInfoRespData.Username, member, memberInfoRespData.Role, memberInfoRespData.Nickname)
+		displayName := memberInfoRespData.Username
+		if memberInfoRespData.Nickname != "" {
+			displayName = memberInfoRespData.Nickname
+		}
+		fmt.Printf("%d. %s (UID: %s) - 角色: %s\n", i+1, displayName, member, memberInfoRespData.Role)
 	}
 }
 
@@ -459,8 +475,58 @@ func updateGroupName(groupId string) {
 
 // 设置/取消禁言
 func setGroupMute(groupId, operatorRole string) {
-	// (获取可禁言成员列表)
-	fmt.Println("设置禁言功能开发中...")
+	// 获取群成员列表
+	req := &pb.GroupMembersReq{GroupId: groupId}
+	resp, err := sendRequest("/group_members", req)
+	if err != nil {
+		fmt.Println("获取群成员失败:", err)
+		return
+	}
+	var membersResp pb.GroupMembersResp
+	if err := proto.Unmarshal(resp.Data, &membersResp); err != nil {
+		fmt.Println("解析群成员失败:", err)
+		return
+	}
+	if len(membersResp.Members) == 0 {
+		fmt.Println("群成员为空")
+		return
+	}
+	fmt.Println("可设置禁言的成员：")
+	memberOptions := make([]*pb.GroupMember, 0)
+	for _, m := range membersResp.Members {
+		if m.Uid == savedUID {
+			continue // 跳过自己
+		}
+		fmt.Printf("%d. %s(%s)\n", len(memberOptions)+1, m.Username, m.Uid)
+		memberOptions = append(memberOptions, m)
+	}
+	if len(memberOptions) == 0 {
+		fmt.Println("无可禁言的成员")
+		return
+	}
+	idxStr := readLine("选择成员编号(0返回): ", nil)
+	var idx int
+	fmt.Sscanf(idxStr, "%d", &idx)
+	if idx <= 0 || idx > len(memberOptions) {
+		return
+	}
+	target := memberOptions[idx-1]
+	setStr := readLine("是否禁言该成员? (y=禁言/n=取消禁言): ", nil)
+	mute := setStr == "y" || setStr == "Y"
+
+	// 调用后端接口
+	reqMute := &pb.SetGroupMuteReq{
+		GroupId:     groupId,
+		OperatorUid: savedUID,
+		TargetUid:   target.Uid,
+		Mute:        mute,
+	}
+	respMute, err := sendRequest("/set_group_mute", reqMute)
+	if err != nil {
+		fmt.Println("设置禁言失败:", err)
+		return
+	}
+	fmt.Println(respMute.Msg)
 }
 
 // 移除群成员

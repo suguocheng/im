@@ -42,6 +42,9 @@ func (m *MySQLGroupStorage) InitTables() error {
 		"nickname VARCHAR(100)," +
 		"role VARCHAR(20) DEFAULT 'member'," +
 		"join_time BIGINT NOT NULL," +
+		"remark VARCHAR(255) DEFAULT NULL," +
+		"dnd TINYINT(1) DEFAULT 0," +
+		"mute_until BIGINT DEFAULT 0," +
 		"PRIMARY KEY (group_id, uid)," +
 		"INDEX idx_group (group_id)," +
 		"INDEX idx_uid (uid)," +
@@ -49,23 +52,6 @@ func (m *MySQLGroupStorage) InitTables() error {
 		")")
 	if err != nil {
 		return fmt.Errorf("创建群组成员表失败: %v", err)
-	}
-
-	// 群聊消息表
-	_, err = m.db.Exec("CREATE TABLE IF NOT EXISTS group_messages (" +
-		"message_id VARCHAR(50) PRIMARY KEY," +
-		"group_id VARCHAR(50) NOT NULL," +
-		"from_uid VARCHAR(50) NOT NULL," +
-		"from_username VARCHAR(100) NOT NULL," +
-		"content TEXT NOT NULL," +
-		"message_type VARCHAR(20) DEFAULT 'text'," +
-		"timestamp BIGINT NOT NULL," +
-		"INDEX idx_group_time (group_id, timestamp)," +
-		"INDEX idx_from (from_uid)," +
-		"FOREIGN KEY (group_id) REFERENCES `groups`(group_id) ON DELETE CASCADE" +
-		")")
-	if err != nil {
-		return fmt.Errorf("创建群聊消息表失败: %v", err)
 	}
 
 	// 群组邀请请求表
@@ -234,41 +220,60 @@ func (m *MySQLGroupStorage) SetGroupNickname(groupID, userID, nickname string) e
 
 // 新增：修改群名
 func (m *MySQLGroupStorage) UpdateGroupName(groupID, newName string) error {
-	_, err := m.db.Exec("UPDATE groups SET name = ? WHERE group_id = ?", newName, groupID)
+	_, err := m.db.Exec("UPDATE `groups` SET name = ? WHERE group_id = ?", newName, groupID)
 	return err
 }
 
 // 新增：设置群备注 (假设我们有一个 group_members 表，并且其中有 remark 字段)
 func (m *MySQLGroupStorage) SetGroupRemark(groupID, userID, remark string) error {
-	// 注意：这需要你的 group_members 表有一个 remark 字段
-	// _, err := m.db.Exec("UPDATE group_members SET remark = ? WHERE group_id = ? AND uid = ?", remark, groupID, userID)
-	// return err
-	return fmt.Errorf("group_members 表中缺少 remark 字段，功能未实现")
+	_, err := m.db.Exec("UPDATE group_members SET remark = ? WHERE group_id = ? AND uid = ?", remark, groupID, userID)
+	return err
 }
 
 // 新增：设置群免打扰 (假设我们有一个 group_members 表，并且其中有 dnd 字段)
 func (m *MySQLGroupStorage) SetGroupDND(groupID, userID string, dnd bool) error {
-	// 注意：这需要你的 group_members 表有一个 dnd 字段
-	// _, err := m.db.Exec("UPDATE group_members SET dnd = ? WHERE group_id = ? AND uid = ?", dnd, groupID, userID)
-	// return err
-	return fmt.Errorf("group_members 表中缺少 dnd 字段，功能未实现")
+	_, err := m.db.Exec("UPDATE group_members SET dnd = ? WHERE group_id = ? AND uid = ?", dnd, groupID, userID)
+	return err
 }
 
 // 新增：设置/取消禁言 (假设我们有一个 group_members 表，并且其中有 mute_until 字段)
 func (m *MySQLGroupStorage) SetGroupMute(groupID, userID string, mute bool) error {
-	// 注意：这需要你的 group_members 表有一个 mute_until 字段 (或类似)
-	// var muteUntil int64 = 0
-	// if mute {
-	//   muteUntil = time.Now().Add(24 * time.Hour).Unix() // 示例：禁言24小时
-	// }
-	// _, err := m.db.Exec("UPDATE group_members SET mute_until = ? WHERE group_id = ? AND uid = ?", muteUntil, groupID, userID)
-	// return err
-	return fmt.Errorf("group_members 表中缺少 mute_until 字段，功能未实现")
+	var muteUntil int64 = 0
+	if mute {
+		muteUntil = time.Now().Add(24 * time.Hour).Unix() // 示例：禁言24小时
+	}
+	_, err := m.db.Exec("UPDATE group_members SET mute_until = ? WHERE group_id = ? AND uid = ?", muteUntil, groupID, userID)
+	return err
+}
+
+// 新增：解散群组（删除群组及其所有成员）
+func (m *MySQLGroupStorage) DisbandGroup(groupID string) error {
+	tx, err := m.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// 删除 group_members 表中该群的所有成员
+	_, err = tx.Exec("DELETE FROM group_members WHERE group_id = ?", groupID)
+	if err != nil {
+		return err
+	}
+	// 删除 groups 表中的群组
+	_, err = tx.Exec("DELETE FROM `groups` WHERE group_id = ?", groupID)
+	if err != nil {
+		return err
+	}
+	return tx.Commit()
 }
 
 // 获取用户的群组列表（按角色分类）
 func (m *MySQLGroupStorage) GetUserGroupsByRole(uid string) (map[string][]*pb.Group, error) {
-	rows, err := m.db.Query("SELECT g.group_id, g.name, g.description, g.owner_uid, g.created_at, g.updated_at, gm.role FROM `groups` g INNER JOIN group_members gm ON g.group_id = gm.group_id WHERE gm.uid = ? ORDER BY g.updated_at DESC", uid)
+	rows, err := m.db.Query("SELECT g.group_id, g.name, g.description, g.owner_uid, g.created_at, g.updated_at, gm.role, gm.remark FROM `groups` g INNER JOIN group_members gm ON g.group_id = gm.group_id WHERE gm.uid = ? ORDER BY g.updated_at DESC", uid)
 	if err != nil {
 		return nil, fmt.Errorf("查询用户群组失败: %v", err)
 	}
@@ -282,7 +287,8 @@ func (m *MySQLGroupStorage) GetUserGroupsByRole(uid string) (map[string][]*pb.Gr
 	for rows.Next() {
 		group := &pb.Group{}
 		var role string
-		err := rows.Scan(&group.GroupId, &group.Name, &group.Description, &group.OwnerUid, &group.CreatedAt, &group.UpdatedAt, &role)
+		var remark sql.NullString
+		err := rows.Scan(&group.GroupId, &group.Name, &group.Description, &group.OwnerUid, &group.CreatedAt, &group.UpdatedAt, &role, &remark)
 		if err != nil {
 			return nil, err
 		}
@@ -292,7 +298,12 @@ func (m *MySQLGroupStorage) GetUserGroupsByRole(uid string) (map[string][]*pb.Gr
 			return nil, err
 		}
 		group.MemberUids = members
-
+		// 只把当前用户的 remark 放到 pb.Group.remark
+		if remark.Valid {
+			group.Remark = remark.String
+		} else {
+			group.Remark = ""
+		}
 		// 根据角色分类
 		if role == "owner" {
 			groupsByRole["owner"] = append(groupsByRole["owner"], group)
@@ -394,64 +405,6 @@ func (m *MySQLGroupStorage) LeaveGroup(groupID, uid string) error {
 	return nil
 }
 
-// 保存群聊消息
-func (m *MySQLGroupStorage) SaveGroupMessage(messageID, groupID, fromUID, fromUsername, content, messageType string) error {
-	_, err := m.db.Exec(`
-		INSERT INTO group_messages (message_id, group_id, from_uid, from_username, content, message_type, timestamp)
-		VALUES (?, ?, ?, ?, ?, ?, ?)
-	`, messageID, groupID, fromUID, fromUsername, content, messageType, time.Now().Unix())
-	if err != nil {
-		return fmt.Errorf("保存群聊消息失败: %v", err)
-	}
-	return nil
-}
-
-// 获取群聊消息历史
-func (m *MySQLGroupStorage) GetGroupMessageHistory(groupID string, limit int, beforeTimestamp int64) ([]*pb.GroupMessage, error) {
-	var rows *sql.Rows
-	var err error
-
-	if beforeTimestamp > 0 {
-		rows, err = m.db.Query(`
-			SELECT message_id, group_id, from_uid, from_username, content, message_type, timestamp
-			FROM group_messages 
-			WHERE group_id = ? AND timestamp < ?
-			ORDER BY timestamp DESC
-			LIMIT ?
-		`, groupID, beforeTimestamp, limit)
-	} else {
-		rows, err = m.db.Query(`
-			SELECT message_id, group_id, from_uid, from_username, content, message_type, timestamp
-			FROM group_messages 
-			WHERE group_id = ?
-			ORDER BY timestamp DESC
-			LIMIT ?
-		`, groupID, limit)
-	}
-
-	if err != nil {
-		return nil, fmt.Errorf("查询群聊消息失败: %v", err)
-	}
-	defer rows.Close()
-
-	var messages []*pb.GroupMessage
-	for rows.Next() {
-		msg := &pb.GroupMessage{}
-		err := rows.Scan(&msg.MessageId, &msg.GroupId, &msg.FromUid, &msg.FromUsername, &msg.Content, &msg.MessageType, &msg.Timestamp)
-		if err != nil {
-			return nil, err
-		}
-		messages = append(messages, msg)
-	}
-
-	// 反转顺序，让最新的消息在后面
-	for i, j := 0, len(messages)-1; i < j; i, j = i+1, j-1 {
-		messages[i], messages[j] = messages[j], messages[i]
-	}
-
-	return messages, nil
-}
-
 // 新增：获取群组的管理员和群主
 func (m *MySQLGroupStorage) GetGroupAdminsAndOwner(groupID string) ([]string, error) {
 	rows, err := m.db.Query(`
@@ -472,6 +425,32 @@ func (m *MySQLGroupStorage) GetGroupAdminsAndOwner(groupID string) ([]string, er
 		uids = append(uids, uid)
 	}
 	return uids, nil
+}
+
+// 获取群免打扰状态
+func (m *MySQLGroupStorage) GetGroupDND(groupID, userID string) (bool, error) {
+	var dnd int
+	err := m.db.QueryRow("SELECT dnd FROM group_members WHERE group_id = ? AND uid = ?", groupID, userID).Scan(&dnd)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return false, nil // 没有记录视为未开启免打扰
+		}
+		return false, err
+	}
+	return dnd == 1, nil
+}
+
+// 获取群成员禁言状态
+func (m *MySQLGroupStorage) GetGroupMuteStatus(groupID, userID string) (bool, error) {
+	var muteUntil int64
+	err := m.db.QueryRow("SELECT mute_until FROM group_members WHERE group_id = ? AND uid = ?", groupID, userID).Scan(&muteUntil)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return false, nil // 没有记录视为未禁言
+		}
+		return false, err
+	}
+	return muteUntil > time.Now().Unix(), nil
 }
 
 // 新增：用于结构化返回待审批请求

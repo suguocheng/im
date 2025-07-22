@@ -326,19 +326,18 @@ func AddFriendHandler(w http.ResponseWriter, r *http.Request) {
 		writeResp(w, 1, "缺少UID", nil)
 		return
 	}
-	// TODO: 校验token
+	fromUser, _ := storageManager.GetUserByUID(req.FromUid)
 	storageManager.AddFriendRequest(req.FromUid, req.ToUid, req.VerifyMsg)
-	// 推送好友请求通知
+	// 结构化通知
 	notif := &pb.Notification{
-		Type:      "friend_request",
-		From:      req.FromUid,
-		To:        req.ToUid,
-		Content:   req.VerifyMsg,
-		Timestamp: time.Now().Unix(),
+		Type:         "friend_request",
+		From:         req.FromUid,
+		FromUsername: fromUser.Username,
+		To:           req.ToUid,
+		Content:      "",
+		Extra:        "", // 只放特殊参数
 	}
-	fmt.Println("准备推送通知给", req.ToUid)
-	err = protocol.SendNotificationToUser(req.ToUid, notif)
-	fmt.Println("推送结果：", err)
+	protocol.SendNotificationToUser(req.ToUid, notif)
 	resp := &pb.AddFriendResp{Code: 0, Msg: "好友请求已发送"}
 	data, _ := proto.Marshal(resp)
 	writeResp(w, 0, "ok", data)
@@ -698,10 +697,14 @@ func JoinGroupHandler(w http.ResponseWriter, r *http.Request) {
 	adminsAndOwner, _ := storageManager.GetGroupAdminsAndOwner(req.GroupId)
 	for _, adminUID := range adminsAndOwner {
 		notif := &pb.Notification{
-			Type:    "group_application_pending",
-			From:    req.Uid,
-			To:      adminUID,
-			Content: fmt.Sprintf("用户 %s(%s) 申请加入群聊 [%s]，请尽快审批。", applicant.Username, req.Uid, group.Name),
+			Type:         "group_application_pending",
+			From:         req.Uid,
+			FromUsername: applicant.Username,
+			To:           adminUID,
+			GroupId:      group.GroupId,
+			GroupName:    group.Name,
+			Content:      "",
+			Extra:        "", // 只放特殊参数
 		}
 		protocol.SendNotificationToUser(adminUID, notif)
 	}
@@ -907,16 +910,21 @@ func InviteToGroupHandler(w http.ResponseWriter, r *http.Request) {
 
 			// --- 新增通知逻辑 ---
 			group, _ := storageManager.GetGroup(req.GroupId)
-			// 只通知所有管理员和群主
+			inviter, _ := storageManager.GetUserByUID(req.InviterUid)
+			inviteeUser, _ := storageManager.GetUserByUID(invitee)
 			adminsAndOwner, _ := storageManager.GetGroupAdminsAndOwner(req.GroupId)
 			for _, adminUID := range adminsAndOwner {
-				notifToAdmin := &pb.Notification{
-					Type:    "group_application_pending",
-					From:    invitee,
-					To:      adminUID,
-					Content: fmt.Sprintf("用户 %s 申请加入群聊 [%s]，请尽快审批。", invitee, group.Name),
+				notif := &pb.Notification{
+					Type:         "group_invite",
+					From:         req.InviterUid,
+					FromUsername: inviter.Username,
+					To:           adminUID,
+					GroupId:      group.GroupId,
+					GroupName:    group.Name,
+					Content:      "",
+					Extra:        fmt.Sprintf("invitee_uid:%s,invitee_username:%s", invitee, inviteeUser.Username),
 				}
-				protocol.SendNotificationToUser(adminUID, notifToAdmin)
+				protocol.SendNotificationToUser(adminUID, notif)
 			}
 		}
 	}
@@ -1017,9 +1025,13 @@ func HandleGroupInviteHandler(w http.ResponseWriter, r *http.Request) {
 		// --- 新增通知逻辑 ---
 		group, _ := storageManager.GetGroup(req.GroupId)
 		notif := &pb.Notification{
-			Type:    "group_invite_approved",
-			To:      req.InviteeUid,
-			Content: fmt.Sprintf("你已成功加入群聊 [%s]", group.Name),
+			Type:      "group_invite_approved",
+			From:      "system",
+			To:        req.InviteeUid,
+			GroupId:   group.GroupId,
+			GroupName: group.Name,
+			Content:   "",
+			Extra:     "", // 只放特殊参数
 		}
 		protocol.SendNotificationToUser(req.InviteeUid, notif)
 
@@ -1088,11 +1100,16 @@ func KickFromGroupHandler(w http.ResponseWriter, r *http.Request) {
 
 	// --- 新增通知逻辑 ---
 	group, _ := storageManager.GetGroup(req.GroupId)
+	operator, _ := storageManager.GetUserByUID(req.OperatorUid)
 	notif := &pb.Notification{
-		Type:    "group_kicked",
-		From:    req.OperatorUid,
-		To:      req.TargetUid,
-		Content: fmt.Sprintf("你已被移出群聊 [%s]", group.Name),
+		Type:         "group_kicked",
+		From:         req.OperatorUid,
+		FromUsername: operator.Username,
+		To:           req.TargetUid,
+		GroupId:      group.GroupId,
+		GroupName:    group.Name,
+		Content:      "",
+		Extra:        "", // 只放特殊参数
 	}
 	protocol.SendNotificationToUser(req.TargetUid, notif)
 
@@ -1142,15 +1159,16 @@ func SetGroupAdminHandler(w http.ResponseWriter, r *http.Request) {
 
 	// --- 新增通知逻辑 ---
 	group, _ := storageManager.GetGroup(req.GroupId)
-	content := fmt.Sprintf("你在群聊 [%s] 中被取消了管理员权限", group.Name)
-	if req.SetAdmin {
-		content = fmt.Sprintf("你在群聊 [%s] 中被设置为了管理员", group.Name)
-	}
+	operator, _ := storageManager.GetUserByUID(req.OperatorUid)
 	notif := &pb.Notification{
-		Type:    "group_admin_change",
-		From:    req.OperatorUid,
-		To:      req.TargetUid,
-		Content: content,
+		Type:         "group_admin_change",
+		From:         req.OperatorUid,
+		FromUsername: operator.Username,
+		To:           req.TargetUid,
+		GroupId:      group.GroupId,
+		GroupName:    group.Name,
+		Content:      "",
+		Extra:        fmt.Sprintf("set_admin:%v", req.SetAdmin),
 	}
 	protocol.SendNotificationToUser(req.TargetUid, notif)
 
@@ -1175,18 +1193,43 @@ func DismissGroupHandler(w http.ResponseWriter, r *http.Request) {
 		writeResp(w, 1, "缺少参数", nil)
 		return
 	}
+	// 权限校验：只有群主可以解散群组
 	role, err := storageManager.GetUserRoleInGroup(req.GroupId, req.OperatorUid)
 	if err != nil || role != "owner" {
 		writeResp(w, 1, "只有群主可以解散群组", nil)
 		return
 	}
-	db := storageManager.GetDB()
-	_, err = db.Exec("DELETE FROM groups WHERE group_id = ?", req.GroupId)
+	// 获取群名和操作者用户名
+	group, _ := storageManager.GetGroup(req.GroupId)
+	operator, _ := storageManager.GetUserByUID(req.OperatorUid)
+
+	err = storageManager.DisbandGroup(req.GroupId)
 	if err != nil {
-		writeResp(w, 1, "删除群组失败: "+err.Error(), nil)
+		writeResp(w, 1, "解散群组失败: "+err.Error(), nil)
 		return
 	}
-	// 级联删除成员、邀请等（外键已设置）
+
+	// 用群组通知方式通知所有成员
+	if group != nil && operator != nil {
+		for _, memberUID := range group.MemberUids {
+			if memberUID == req.OperatorUid {
+				continue
+			}
+			notif := &pb.Notification{
+				Type:         "dismissed",
+				From:         req.OperatorUid,
+				FromUsername: operator.Username,
+				To:           memberUID,
+				GroupId:      group.GroupId,
+				GroupName:    group.Name,
+				Content:      "",
+				Timestamp:    time.Now().Unix(),
+				Extra:        "", // 只放特殊参数
+			}
+			_ = protocol.SendNotificationToUser(memberUID, notif)
+		}
+	}
+
 	resp := &pb.DismissGroupResp{Code: 0, Msg: "群组已解散"}
 	data, _ := proto.Marshal(resp)
 	writeResp(w, 0, "ok", data)
@@ -1337,9 +1380,29 @@ func SetGroupMuteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 权限校验
-	role, err := storageManager.GetUserRoleInGroup(req.GroupId, req.TargetUid)
-	if err != nil || role != "owner" {
-		writeResp(w, 1, "只有群主可以设置群禁言", nil)
+	operatorRole, err := storageManager.GetUserRoleInGroup(req.GroupId, req.OperatorUid)
+	if err != nil {
+		writeResp(w, 1, "无法获取操作者身份", nil)
+		return
+	}
+	targetRole, err := storageManager.GetUserRoleInGroup(req.GroupId, req.TargetUid)
+	if err != nil {
+		writeResp(w, 1, "无法获取目标身份", nil)
+		return
+	}
+	if req.TargetUid == req.OperatorUid {
+		writeResp(w, 1, "不能禁言自己", nil)
+		return
+	}
+	if operatorRole == "owner" {
+		// 群主可以禁言任何人（除了自己）
+	} else if operatorRole == "admin" {
+		if targetRole != "member" {
+			writeResp(w, 1, "管理员只能禁言普通成员，不能禁言群主或其他管理员", nil)
+			return
+		}
+	} else {
+		writeResp(w, 1, "无权限操作", nil)
 		return
 	}
 	err = storageManager.SetGroupMute(req.GroupId, req.TargetUid, req.Mute)

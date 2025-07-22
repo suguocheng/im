@@ -213,526 +213,25 @@ func (x *APIResp) GetData() []byte {
 	return nil
 }
 
-type RegisterReq struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Username      string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
-	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
-	Email         string                 `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *RegisterReq) Reset() {
-	*x = RegisterReq{}
-	mi := &file_core_protocol_proto_message_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *RegisterReq) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*RegisterReq) ProtoMessage() {}
-
-func (x *RegisterReq) ProtoReflect() protoreflect.Message {
-	mi := &file_core_protocol_proto_message_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use RegisterReq.ProtoReflect.Descriptor instead.
-func (*RegisterReq) Descriptor() ([]byte, []int) {
-	return file_core_protocol_proto_message_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *RegisterReq) GetUsername() string {
-	if x != nil {
-		return x.Username
-	}
-	return ""
-}
-
-func (x *RegisterReq) GetPassword() string {
-	if x != nil {
-		return x.Password
-	}
-	return ""
-}
-
-func (x *RegisterReq) GetEmail() string {
-	if x != nil {
-		return x.Email
-	}
-	return ""
-}
-
-type LoginReq struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Uid           string                 `protobuf:"bytes,1,opt,name=uid,proto3" json:"uid,omitempty"`
-	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *LoginReq) Reset() {
-	*x = LoginReq{}
-	mi := &file_core_protocol_proto_message_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *LoginReq) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*LoginReq) ProtoMessage() {}
-
-func (x *LoginReq) ProtoReflect() protoreflect.Message {
-	mi := &file_core_protocol_proto_message_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use LoginReq.ProtoReflect.Descriptor instead.
-func (*LoginReq) Descriptor() ([]byte, []int) {
-	return file_core_protocol_proto_message_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *LoginReq) GetUid() string {
-	if x != nil {
-		return x.Uid
-	}
-	return ""
-}
-
-func (x *LoginReq) GetPassword() string {
-	if x != nil {
-		return x.Password
-	}
-	return ""
-}
-
-type ResetPwdReq struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
-	NewPwd        string                 `protobuf:"bytes,2,opt,name=new_pwd,json=newPwd,proto3" json:"new_pwd,omitempty"`
-	Code          string                 `protobuf:"bytes,3,opt,name=code,proto3" json:"code,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ResetPwdReq) Reset() {
-	*x = ResetPwdReq{}
-	mi := &file_core_protocol_proto_message_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ResetPwdReq) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ResetPwdReq) ProtoMessage() {}
-
-func (x *ResetPwdReq) ProtoReflect() protoreflect.Message {
-	mi := &file_core_protocol_proto_message_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ResetPwdReq.ProtoReflect.Descriptor instead.
-func (*ResetPwdReq) Descriptor() ([]byte, []int) {
-	return file_core_protocol_proto_message_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *ResetPwdReq) GetEmail() string {
-	if x != nil {
-		return x.Email
-	}
-	return ""
-}
-
-func (x *ResetPwdReq) GetNewPwd() string {
-	if x != nil {
-		return x.NewPwd
-	}
-	return ""
-}
-
-func (x *ResetPwdReq) GetCode() string {
-	if x != nil {
-		return x.Code
-	}
-	return ""
-}
-
-type UpdateUsernameReq struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Uid           string                 `protobuf:"bytes,1,opt,name=uid,proto3" json:"uid,omitempty"`
-	NewUsername   string                 `protobuf:"bytes,2,opt,name=new_username,json=newUsername,proto3" json:"new_username,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UpdateUsernameReq) Reset() {
-	*x = UpdateUsernameReq{}
-	mi := &file_core_protocol_proto_message_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UpdateUsernameReq) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UpdateUsernameReq) ProtoMessage() {}
-
-func (x *UpdateUsernameReq) ProtoReflect() protoreflect.Message {
-	mi := &file_core_protocol_proto_message_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UpdateUsernameReq.ProtoReflect.Descriptor instead.
-func (*UpdateUsernameReq) Descriptor() ([]byte, []int) {
-	return file_core_protocol_proto_message_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *UpdateUsernameReq) GetUid() string {
-	if x != nil {
-		return x.Uid
-	}
-	return ""
-}
-
-func (x *UpdateUsernameReq) GetNewUsername() string {
-	if x != nil {
-		return x.NewUsername
-	}
-	return ""
-}
-
-type UpdatePwdReq struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Uid           string                 `protobuf:"bytes,1,opt,name=uid,proto3" json:"uid,omitempty"`
-	OldPwd        string                 `protobuf:"bytes,2,opt,name=old_pwd,json=oldPwd,proto3" json:"old_pwd,omitempty"`
-	NewPwd        string                 `protobuf:"bytes,3,opt,name=new_pwd,json=newPwd,proto3" json:"new_pwd,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UpdatePwdReq) Reset() {
-	*x = UpdatePwdReq{}
-	mi := &file_core_protocol_proto_message_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UpdatePwdReq) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UpdatePwdReq) ProtoMessage() {}
-
-func (x *UpdatePwdReq) ProtoReflect() protoreflect.Message {
-	mi := &file_core_protocol_proto_message_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UpdatePwdReq.ProtoReflect.Descriptor instead.
-func (*UpdatePwdReq) Descriptor() ([]byte, []int) {
-	return file_core_protocol_proto_message_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *UpdatePwdReq) GetUid() string {
-	if x != nil {
-		return x.Uid
-	}
-	return ""
-}
-
-func (x *UpdatePwdReq) GetOldPwd() string {
-	if x != nil {
-		return x.OldPwd
-	}
-	return ""
-}
-
-func (x *UpdatePwdReq) GetNewPwd() string {
-	if x != nil {
-		return x.NewPwd
-	}
-	return ""
-}
-
-type TokenCheckReq struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *TokenCheckReq) Reset() {
-	*x = TokenCheckReq{}
-	mi := &file_core_protocol_proto_message_proto_msgTypes[7]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *TokenCheckReq) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*TokenCheckReq) ProtoMessage() {}
-
-func (x *TokenCheckReq) ProtoReflect() protoreflect.Message {
-	mi := &file_core_protocol_proto_message_proto_msgTypes[7]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use TokenCheckReq.ProtoReflect.Descriptor instead.
-func (*TokenCheckReq) Descriptor() ([]byte, []int) {
-	return file_core_protocol_proto_message_proto_rawDescGZIP(), []int{7}
-}
-
-func (x *TokenCheckReq) GetToken() string {
-	if x != nil {
-		return x.Token
-	}
-	return ""
-}
-
-type DeleteAccountReq struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Uid           string                 `protobuf:"bytes,1,opt,name=uid,proto3" json:"uid,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *DeleteAccountReq) Reset() {
-	*x = DeleteAccountReq{}
-	mi := &file_core_protocol_proto_message_proto_msgTypes[8]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *DeleteAccountReq) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DeleteAccountReq) ProtoMessage() {}
-
-func (x *DeleteAccountReq) ProtoReflect() protoreflect.Message {
-	mi := &file_core_protocol_proto_message_proto_msgTypes[8]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DeleteAccountReq.ProtoReflect.Descriptor instead.
-func (*DeleteAccountReq) Descriptor() ([]byte, []int) {
-	return file_core_protocol_proto_message_proto_rawDescGZIP(), []int{8}
-}
-
-func (x *DeleteAccountReq) GetUid() string {
-	if x != nil {
-		return x.Uid
-	}
-	return ""
-}
-
-type UserInfoReq struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UserInfoReq) Reset() {
-	*x = UserInfoReq{}
-	mi := &file_core_protocol_proto_message_proto_msgTypes[9]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UserInfoReq) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UserInfoReq) ProtoMessage() {}
-
-func (x *UserInfoReq) ProtoReflect() protoreflect.Message {
-	mi := &file_core_protocol_proto_message_proto_msgTypes[9]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UserInfoReq.ProtoReflect.Descriptor instead.
-func (*UserInfoReq) Descriptor() ([]byte, []int) {
-	return file_core_protocol_proto_message_proto_rawDescGZIP(), []int{9}
-}
-
-func (x *UserInfoReq) GetToken() string {
-	if x != nil {
-		return x.Token
-	}
-	return ""
-}
-
-type LogoutReq struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *LogoutReq) Reset() {
-	*x = LogoutReq{}
-	mi := &file_core_protocol_proto_message_proto_msgTypes[10]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *LogoutReq) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*LogoutReq) ProtoMessage() {}
-
-func (x *LogoutReq) ProtoReflect() protoreflect.Message {
-	mi := &file_core_protocol_proto_message_proto_msgTypes[10]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use LogoutReq.ProtoReflect.Descriptor instead.
-func (*LogoutReq) Descriptor() ([]byte, []int) {
-	return file_core_protocol_proto_message_proto_rawDescGZIP(), []int{10}
-}
-
-func (x *LogoutReq) GetToken() string {
-	if x != nil {
-		return x.Token
-	}
-	return ""
-}
-
-type SendEmailCodeReq struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *SendEmailCodeReq) Reset() {
-	*x = SendEmailCodeReq{}
-	mi := &file_core_protocol_proto_message_proto_msgTypes[11]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SendEmailCodeReq) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SendEmailCodeReq) ProtoMessage() {}
-
-func (x *SendEmailCodeReq) ProtoReflect() protoreflect.Message {
-	mi := &file_core_protocol_proto_message_proto_msgTypes[11]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SendEmailCodeReq.ProtoReflect.Descriptor instead.
-func (*SendEmailCodeReq) Descriptor() ([]byte, []int) {
-	return file_core_protocol_proto_message_proto_rawDescGZIP(), []int{11}
-}
-
-func (x *SendEmailCodeReq) GetEmail() string {
-	if x != nil {
-		return x.Email
-	}
-	return ""
-}
-
-// 通知消息
+// 通用通知消息（兼容好友、群组、系统等所有场景）
 type Notification struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Type          string                 `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`            // 通知类型，如 friend_request
-	From          string                 `protobuf:"bytes,2,opt,name=from,proto3" json:"from,omitempty"`            // 触发方UID
-	To            string                 `protobuf:"bytes,3,opt,name=to,proto3" json:"to,omitempty"`                // 接收方UID
-	Content       string                 `protobuf:"bytes,4,opt,name=content,proto3" json:"content,omitempty"`      // 通知内容（如验证消息）
-	Timestamp     int64                  `protobuf:"varint,5,opt,name=timestamp,proto3" json:"timestamp,omitempty"` // 通知时间
-	Extra         string                 `protobuf:"bytes,6,opt,name=extra,proto3" json:"extra,omitempty"`          // 扩展字段
+	Type          string                 `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`                                     // 通知类型，如 friend_request, group_kicked, group_dismissed, group_message
+	From          string                 `protobuf:"bytes,2,opt,name=from,proto3" json:"from,omitempty"`                                     // 触发方UID
+	FromUsername  string                 `protobuf:"bytes,3,opt,name=from_username,json=fromUsername,proto3" json:"from_username,omitempty"` // 触发方用户名
+	To            string                 `protobuf:"bytes,4,opt,name=to,proto3" json:"to,omitempty"`                                         // 接收方UID（可选，群通知可为空）
+	GroupId       string                 `protobuf:"bytes,5,opt,name=group_id,json=groupId,proto3" json:"group_id,omitempty"`                // 群ID（可选）
+	GroupName     string                 `protobuf:"bytes,6,opt,name=group_name,json=groupName,proto3" json:"group_name,omitempty"`          // 群名（可选）
+	Content       string                 `protobuf:"bytes,7,opt,name=content,proto3" json:"content,omitempty"`                               // 通知内容（如验证消息、群聊消息文本等）
+	Timestamp     int64                  `protobuf:"varint,8,opt,name=timestamp,proto3" json:"timestamp,omitempty"`                          // 通知时间
+	Extra         string                 `protobuf:"bytes,9,opt,name=extra,proto3" json:"extra,omitempty"`                                   // 扩展字段（结构化key:value,逗号分隔，便于未来扩展）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Notification) Reset() {
 	*x = Notification{}
-	mi := &file_core_protocol_proto_message_proto_msgTypes[12]
+	mi := &file_core_protocol_proto_message_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -744,7 +243,7 @@ func (x *Notification) String() string {
 func (*Notification) ProtoMessage() {}
 
 func (x *Notification) ProtoReflect() protoreflect.Message {
-	mi := &file_core_protocol_proto_message_proto_msgTypes[12]
+	mi := &file_core_protocol_proto_message_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -757,7 +256,7 @@ func (x *Notification) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Notification.ProtoReflect.Descriptor instead.
 func (*Notification) Descriptor() ([]byte, []int) {
-	return file_core_protocol_proto_message_proto_rawDescGZIP(), []int{12}
+	return file_core_protocol_proto_message_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *Notification) GetType() string {
@@ -774,9 +273,30 @@ func (x *Notification) GetFrom() string {
 	return ""
 }
 
+func (x *Notification) GetFromUsername() string {
+	if x != nil {
+		return x.FromUsername
+	}
+	return ""
+}
+
 func (x *Notification) GetTo() string {
 	if x != nil {
 		return x.To
+	}
+	return ""
+}
+
+func (x *Notification) GetGroupId() string {
+	if x != nil {
+		return x.GroupId
+	}
+	return ""
+}
+
+func (x *Notification) GetGroupName() string {
+	if x != nil {
+		return x.GroupName
 	}
 	return ""
 }
@@ -816,7 +336,7 @@ type FileInfo struct {
 
 func (x *FileInfo) Reset() {
 	*x = FileInfo{}
-	mi := &file_core_protocol_proto_message_proto_msgTypes[13]
+	mi := &file_core_protocol_proto_message_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -828,7 +348,7 @@ func (x *FileInfo) String() string {
 func (*FileInfo) ProtoMessage() {}
 
 func (x *FileInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_core_protocol_proto_message_proto_msgTypes[13]
+	mi := &file_core_protocol_proto_message_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -841,7 +361,7 @@ func (x *FileInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FileInfo.ProtoReflect.Descriptor instead.
 func (*FileInfo) Descriptor() ([]byte, []int) {
-	return file_core_protocol_proto_message_proto_rawDescGZIP(), []int{13}
+	return file_core_protocol_proto_message_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *FileInfo) GetFilename() string {
@@ -901,42 +421,18 @@ const file_core_protocol_proto_message_proto_rawDesc = "" +
 	"\aAPIResp\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x10\n" +
 	"\x03msg\x18\x02 \x01(\tR\x03msg\x12\x12\n" +
-	"\x04data\x18\x03 \x01(\fR\x04data\"[\n" +
-	"\vRegisterReq\x12\x1a\n" +
-	"\busername\x18\x01 \x01(\tR\busername\x12\x1a\n" +
-	"\bpassword\x18\x02 \x01(\tR\bpassword\x12\x14\n" +
-	"\x05email\x18\x03 \x01(\tR\x05email\"8\n" +
-	"\bLoginReq\x12\x10\n" +
-	"\x03uid\x18\x01 \x01(\tR\x03uid\x12\x1a\n" +
-	"\bpassword\x18\x02 \x01(\tR\bpassword\"P\n" +
-	"\vResetPwdReq\x12\x14\n" +
-	"\x05email\x18\x01 \x01(\tR\x05email\x12\x17\n" +
-	"\anew_pwd\x18\x02 \x01(\tR\x06newPwd\x12\x12\n" +
-	"\x04code\x18\x03 \x01(\tR\x04code\"H\n" +
-	"\x11UpdateUsernameReq\x12\x10\n" +
-	"\x03uid\x18\x01 \x01(\tR\x03uid\x12!\n" +
-	"\fnew_username\x18\x02 \x01(\tR\vnewUsername\"R\n" +
-	"\fUpdatePwdReq\x12\x10\n" +
-	"\x03uid\x18\x01 \x01(\tR\x03uid\x12\x17\n" +
-	"\aold_pwd\x18\x02 \x01(\tR\x06oldPwd\x12\x17\n" +
-	"\anew_pwd\x18\x03 \x01(\tR\x06newPwd\"%\n" +
-	"\rTokenCheckReq\x12\x14\n" +
-	"\x05token\x18\x01 \x01(\tR\x05token\"$\n" +
-	"\x10DeleteAccountReq\x12\x10\n" +
-	"\x03uid\x18\x01 \x01(\tR\x03uid\"#\n" +
-	"\vUserInfoReq\x12\x14\n" +
-	"\x05token\x18\x01 \x01(\tR\x05token\"!\n" +
-	"\tLogoutReq\x12\x14\n" +
-	"\x05token\x18\x01 \x01(\tR\x05token\"(\n" +
-	"\x10SendEmailCodeReq\x12\x14\n" +
-	"\x05email\x18\x01 \x01(\tR\x05email\"\x94\x01\n" +
+	"\x04data\x18\x03 \x01(\fR\x04data\"\xf3\x01\n" +
 	"\fNotification\x12\x12\n" +
 	"\x04type\x18\x01 \x01(\tR\x04type\x12\x12\n" +
-	"\x04from\x18\x02 \x01(\tR\x04from\x12\x0e\n" +
-	"\x02to\x18\x03 \x01(\tR\x02to\x12\x18\n" +
-	"\acontent\x18\x04 \x01(\tR\acontent\x12\x1c\n" +
-	"\ttimestamp\x18\x05 \x01(\x03R\ttimestamp\x12\x14\n" +
-	"\x05extra\x18\x06 \x01(\tR\x05extra\"\x85\x01\n" +
+	"\x04from\x18\x02 \x01(\tR\x04from\x12#\n" +
+	"\rfrom_username\x18\x03 \x01(\tR\ffromUsername\x12\x0e\n" +
+	"\x02to\x18\x04 \x01(\tR\x02to\x12\x19\n" +
+	"\bgroup_id\x18\x05 \x01(\tR\agroupId\x12\x1d\n" +
+	"\n" +
+	"group_name\x18\x06 \x01(\tR\tgroupName\x12\x18\n" +
+	"\acontent\x18\a \x01(\tR\acontent\x12\x1c\n" +
+	"\ttimestamp\x18\b \x01(\x03R\ttimestamp\x12\x14\n" +
+	"\x05extra\x18\t \x01(\tR\x05extra\"\x85\x01\n" +
 	"\bFileInfo\x12\x1a\n" +
 	"\bfilename\x18\x01 \x01(\tR\bfilename\x12#\n" +
 	"\roriginal_name\x18\x02 \x01(\tR\foriginalName\x12\x12\n" +
@@ -956,22 +452,12 @@ func file_core_protocol_proto_message_proto_rawDescGZIP() []byte {
 	return file_core_protocol_proto_message_proto_rawDescData
 }
 
-var file_core_protocol_proto_message_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_core_protocol_proto_message_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_core_protocol_proto_message_proto_goTypes = []any{
-	(*IMMessage)(nil),         // 0: protocol.IMMessage
-	(*APIResp)(nil),           // 1: protocol.APIResp
-	(*RegisterReq)(nil),       // 2: protocol.RegisterReq
-	(*LoginReq)(nil),          // 3: protocol.LoginReq
-	(*ResetPwdReq)(nil),       // 4: protocol.ResetPwdReq
-	(*UpdateUsernameReq)(nil), // 5: protocol.UpdateUsernameReq
-	(*UpdatePwdReq)(nil),      // 6: protocol.UpdatePwdReq
-	(*TokenCheckReq)(nil),     // 7: protocol.TokenCheckReq
-	(*DeleteAccountReq)(nil),  // 8: protocol.DeleteAccountReq
-	(*UserInfoReq)(nil),       // 9: protocol.UserInfoReq
-	(*LogoutReq)(nil),         // 10: protocol.LogoutReq
-	(*SendEmailCodeReq)(nil),  // 11: protocol.SendEmailCodeReq
-	(*Notification)(nil),      // 12: protocol.Notification
-	(*FileInfo)(nil),          // 13: protocol.FileInfo
+	(*IMMessage)(nil),    // 0: protocol.IMMessage
+	(*APIResp)(nil),      // 1: protocol.APIResp
+	(*Notification)(nil), // 2: protocol.Notification
+	(*FileInfo)(nil),     // 3: protocol.FileInfo
 }
 var file_core_protocol_proto_message_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
@@ -992,7 +478,7 @@ func file_core_protocol_proto_message_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_core_protocol_proto_message_proto_rawDesc), len(file_core_protocol_proto_message_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   14,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

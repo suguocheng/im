@@ -55,29 +55,40 @@ func main() {
 			// --- 处理私聊消息 ---
 			if isChatMessage && msg.To != "" {
 				b, _ := proto.Marshal(&msg)
-				err := protocol.SendToUser(msg.To, b)
+				err := protocol.SendToUser(msg.To, b) // 始终推送消息
 				if err != nil {
 					errMsg := &pb.IMMessage{Type: "error", Content: "对方不在线"}
 					b, _ := proto.Marshal(errMsg)
 					conn.WriteMessage(websocket.BinaryMessage, b)
-				} else {
-					// 聊天通知+免打扰
-					if !protocol.StorageFriendStoreGetDND(msg.To, msg.From) {
-						notif := &pb.Notification{
-							Type:      "chat_message",
-							From:      msg.From,
-							To:        msg.To,
-							Content:   msg.Content,
-							Timestamp: msg.Timestamp,
-						}
-						_ = protocol.SendNotificationToUser(msg.To, notif)
+				}
+				// 聊天通知+免打扰
+				if !protocol.StorageFriendStoreGetDND(msg.To, msg.From) {
+					notif := &pb.Notification{
+						Type:         "private_chat_message",
+						From:         msg.From,
+						FromUsername: senderUsername(storageManager, msg.From),
+						To:           msg.To,
+						Content:      msg.Content,
+						Timestamp:    msg.Timestamp,
 					}
+					_ = protocol.SendNotificationToUser(msg.To, notif)
 				}
 			}
 
 			// --- 新增：处理群聊消息 ---
 			if isChatMessage && msg.GroupId != "" {
 				storageManager := storage.GetStorageManager()
+				// 新增禁言校验
+				isMuted := false
+				if muteStatus, err := storageManager.GetGroupMuteStatus(msg.GroupId, msg.From); err == nil {
+					isMuted = muteStatus
+				}
+				if isMuted {
+					errMsg := &pb.IMMessage{Type: "error", Content: "你已被禁言，无法发送消息"}
+					b, _ := proto.Marshal(errMsg)
+					conn.WriteMessage(websocket.BinaryMessage, b)
+					return
+				}
 				sender, err := storageManager.GetUserByUID(msg.From)
 				if err != nil {
 					// 用户不存在，忽略消息
@@ -107,17 +118,24 @@ func main() {
 				if err != nil {
 					return
 				}
+				notif := &pb.Notification{
+					Type:         "group_chat_message",
+					From:         msg.From,
+					FromUsername: sender.Username,
+					GroupId:      group.GroupId,
+					GroupName:    group.Name,
+					Content:      msg.Content,
+					Timestamp:    msg.Timestamp,
+					Extra:        "", // 可扩展结构化内容
+				}
 				for _, memberUID := range group.MemberUids {
 					if memberUID == msg.From {
-						continue // 不给自己发通知
+						continue
 					}
-					// TODO: 增加群聊免打扰判断
-					notif := &pb.Notification{
-						Type:      "group_chat_message",
-						From:      msg.From,
-						To:        memberUID,
-						Content:   fmt.Sprintf("[%s] %s", group.Name, msg.Content), // 通知内容包含群名
-						Timestamp: msg.Timestamp,
+					// 判断群聊免打扰
+					dnd, err := storageManager.GetGroupDND(group.GroupId, memberUID)
+					if err == nil && dnd {
+						continue // 跳过免打扰成员
 					}
 					_ = protocol.SendNotificationToUser(memberUID, notif)
 				}
@@ -128,4 +146,13 @@ func main() {
 	}()
 
 	select {} // 阻塞主进程，防止退出
+}
+
+// senderUsername辅助函数
+func senderUsername(storageManager *storage.StorageManager, uid string) string {
+	user, err := storageManager.GetUserByUID(uid)
+	if err != nil {
+		return uid
+	}
+	return user.Username
 }

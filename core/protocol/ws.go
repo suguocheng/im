@@ -102,25 +102,6 @@ func SendToUser(userID string, data []byte) error {
 	return conn.WriteMessage(websocket.BinaryMessage, data)
 }
 
-// 发送通知给指定用户
-func SendNotificationToUser(userID string, notif *pb.Notification) error {
-	v, ok := wsUserConn.Load(userID)
-	if !ok {
-		return fmt.Errorf("用户不在线")
-	}
-	conn := v.(*websocket.Conn)
-	msg := &pb.IMMessage{
-		Type:      "notification",
-		From:      notif.From,
-		To:        notif.To,
-		Content:   notif.Content,
-		Timestamp: notif.Timestamp,
-		Extra:     notif.Extra,
-	}
-	b, _ := proto.Marshal(msg)
-	return conn.WriteMessage(websocket.BinaryMessage, b)
-}
-
 // 发送群聊消息给群组所有在线成员
 func SendGroupMessageToMembers(groupID string, groupMsg *pb.GroupMessage) error {
 	storageManager := storage.GetStorageManager()
@@ -154,37 +135,15 @@ func SendGroupMessageToMembers(groupID string, groupMsg *pb.GroupMessage) error 
 	return nil
 }
 
-// 发送群组通知给群组所有在线成员
-func SendGroupNotificationToMembers(groupID string, notif *pb.GroupNotification) error {
-	storageManager := storage.GetStorageManager()
-	group, err := storageManager.GetGroup(groupID)
-	if err != nil {
-		return fmt.Errorf("获取群组信息失败: %v", err)
+// 发送通知给指定用户
+func SendNotificationToUser(userID string, notif *pb.Notification) error {
+	v, ok := wsUserConn.Load(userID)
+	if !ok {
+		return fmt.Errorf("用户不在线")
 	}
-
-	// 构建通知消息
-	msg := &pb.IMMessage{
-		Type:      "group_notification",
-		From:      notif.FromUid,
-		To:        groupID,
-		Content:   notif.Content,
-		Timestamp: notif.Timestamp,
-		Extra:     fmt.Sprintf("group_id:%s,group_name:%s,from_username:%s,notif_type:%s", notif.GroupId, notif.GroupName, notif.FromUsername, notif.Type),
-	}
-	b, _ := proto.Marshal(msg)
-
-	// 发送给所有在线成员
-	var sentCount int
-	for _, memberUID := range group.MemberUids {
-		if memberUID != notif.FromUid { // 不发送给发送者自己
-			if err := SendToUser(memberUID, b); err == nil {
-				sentCount++
-			}
-		}
-	}
-
-	fmt.Printf("群组通知发送给 %d 个在线成员\n", sentCount)
-	return nil
+	conn := v.(*websocket.Conn)
+	b, _ := proto.Marshal(notif)
+	return conn.WriteMessage(websocket.BinaryMessage, b)
 }
 
 func (w *WSProtocol) Stop() error {

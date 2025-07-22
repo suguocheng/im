@@ -431,21 +431,80 @@ func uploadFile(filePath string) (*pb.FileInfo, error) {
 	return &fileInfo, nil
 }
 
+// 获取群聊成员显示名（优先群昵称，没有则用户名）
+func getGroupDisplayName(groupId, uid string) string {
+	// 自己不用查
+	if uid == savedUID {
+		return "我"
+	}
+	memberInfoReq := &pb.GroupMemberInfoReq{
+		GroupId: groupId,
+		Uid:     uid,
+	}
+	resp, err := sendRequest("/group_member_info", memberInfoReq)
+	if err != nil {
+		return uid // 查不到就显示UID
+	}
+	var memberInfo pb.GroupMemberInfoResp
+	if err := proto.Unmarshal(resp.Data, &memberInfo); err != nil {
+		return uid
+	}
+	if memberInfo.Nickname != "" {
+		return memberInfo.Nickname
+	}
+	if memberInfo.Username != "" {
+		return memberInfo.Username
+	}
+	return uid
+}
+
+// 获取好友显示名（优先备注，没有则用户名）
+func getFriendDisplayName(uid string) string {
+	if uid == savedUID {
+		return "我"
+	}
+	friendInfoReq := &pb.FriendInfoReq{
+		Uid:       savedUID,
+		FriendUid: uid,
+	}
+	resp, err := sendRequest("/friend_info", friendInfoReq)
+	if err != nil {
+		return uid
+	}
+	var friendInfo pb.FriendInfoResp
+	if err := proto.Unmarshal(resp.Data, &friendInfo); err != nil {
+		return uid
+	}
+	if friendInfo.Remark != "" {
+		return friendInfo.Remark
+	}
+	if friendInfo.Username != "" {
+		return friendInfo.Username
+	}
+	return uid
+}
+
 // 显示消息
 func displayMessage(msg *pb.IMMessage) {
+	var displayName string
+	if msg.GroupId != "" { // 群聊
+		displayName = getGroupDisplayName(msg.GroupId, msg.From)
+	} else { // 单聊
+		displayName = getFriendDisplayName(msg.From)
+	}
 	switch msg.Type {
 	case "chat":
-		fmt.Printf("%s: %s\n", msg.From, msg.Content)
+		fmt.Printf("%s: %s\n", displayName, msg.Content)
 	case "emoji":
-		fmt.Printf("%s: %s\n", msg.From, msg.Content)
+		fmt.Printf("%s: %s\n", displayName, msg.Content)
 	case "image":
-		fmt.Printf("%s: [图片] %s\n", msg.From, msg.Extra)
+		fmt.Printf("%s: [图片] %s\n", displayName, msg.Extra)
 		fmt.Printf("  下载链接: http://localhost:8081%s\n", msg.Content)
 	case "file":
-		fmt.Printf("%s: [文件] %s\n", msg.From, msg.Extra)
+		fmt.Printf("%s: [文件] %s\n", displayName, msg.Extra)
 		fmt.Printf("  下载链接: http://localhost:8081%s\n", msg.Content)
 	default:
-		fmt.Printf("%s: [%s] %s\n", msg.From, msg.Type, msg.Content)
+		fmt.Printf("%s: [%s] %s\n", displayName, msg.Type, msg.Content)
 	}
 }
 

@@ -65,7 +65,7 @@ func showFriendList() {
 	}
 }
 
-// 添加好友
+// 添加好友菜单
 func addFriendMenu() {
 	toUid := readLine("对方UID: ", nil)
 	msg := readLine("验证消息: ", nil)

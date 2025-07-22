@@ -25,62 +25,17 @@ message APIResp {
   bytes data = 3;
 }
 
-message RegisterReq {
-  string username = 1;
-  string password = 2;
-  string email = 3;
-}
-
-message LoginReq {
-  string uid = 1;
-  string password = 2;
-}
-
-message ResetPwdReq {
-  string email = 1;
-  string new_pwd = 2;
-  string code = 3;
-}
-
-message UpdateUsernameReq {
-  string uid = 1;
-  string new_username = 2;
-}
-
-message UpdatePwdReq {
-  string uid = 1;
-  string old_pwd = 2;
-  string new_pwd = 3;
-}
-
-message TokenCheckReq {
-  string token = 1;
-}
-
-message DeleteAccountReq {
-  string uid = 1;
-}
-
-message UserInfoReq {
-  string token = 1;
-}
-
-message LogoutReq {
-  string token = 1;
-}
-
-message SendEmailCodeReq {
-  string email = 1;
-}
-
-// 通知消息
+// 通用通知消息（兼容好友、群组、系统等所有场景）
 message Notification {
-  string type = 1;      // 通知类型，如 friend_request
+  string type = 1;      // 通知类型，如 friend_request, group_kicked, group_dismissed, group_message
   string from = 2;      // 触发方UID
-  string to = 3;        // 接收方UID
-  string content = 4;   // 通知内容（如验证消息）
-  int64  timestamp = 5; // 通知时间
-  string extra = 6;     // 扩展字段
+  string from_username = 3; // 触发方用户名
+  string to = 4;        // 接收方UID（可选，群通知可为空）
+  string group_id = 5;  // 群ID（可选）
+  string group_name = 6;// 群名（可选）
+  string content = 7;   // 通知内容（如验证消息、群聊消息文本等）
+  int64  timestamp = 8; // 通知时间
+  string extra = 9;     // 扩展字段（结构化key:value,逗号分隔，便于未来扩展）
 }
 
 // 文件信息

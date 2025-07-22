@@ -358,28 +358,6 @@ func (sm *StorageManager) LeaveGroup(groupID, uid string) error {
 	return sm.groupStorage.LeaveGroup(groupID, uid)
 }
 
-// 保存群聊消息
-func (sm *StorageManager) SaveGroupMessage(messageID, groupID, fromUID, fromUsername, content, messageType string) error {
-	sm.mu.RLock()
-	defer sm.mu.RUnlock()
-
-	if !sm.useMySQL || sm.groupStorage == nil {
-		return fmt.Errorf("MySQL存储未初始化")
-	}
-	return sm.groupStorage.SaveGroupMessage(messageID, groupID, fromUID, fromUsername, content, messageType)
-}
-
-// 获取群聊消息历史
-func (sm *StorageManager) GetGroupMessageHistory(groupID string, limit int, beforeTimestamp int64) ([]*pb.GroupMessage, error) {
-	sm.mu.RLock()
-	defer sm.mu.RUnlock()
-
-	if !sm.useMySQL || sm.groupStorage == nil {
-		return nil, fmt.Errorf("MySQL存储未初始化")
-	}
-	return sm.groupStorage.GetGroupMessageHistory(groupID, limit, beforeTimestamp)
-}
-
 // 生成群组ID
 func (sm *StorageManager) GenerateGroupID() string {
 	sm.mu.RLock()
@@ -484,6 +462,16 @@ func (sm *StorageManager) GetGroupAdminsAndOwner(groupID string) ([]string, erro
 	return sm.groupStorage.GetGroupAdminsAndOwner(groupID)
 }
 
+// 解散群组
+func (sm *StorageManager) DisbandGroup(groupID string) error {
+	sm.mu.RLock()
+	defer sm.mu.RUnlock()
+	if !sm.useMySQL || sm.groupStorage == nil {
+		return fmt.Errorf("MySQL存储未初始化")
+	}
+	return sm.groupStorage.DisbandGroup(groupID)
+}
+
 // 获取底层数据库连接
 func (sm *StorageManager) GetDB() *sql.DB {
 	sm.mu.RLock()
@@ -544,4 +532,24 @@ func (sm *StorageManager) SetGroupMute(groupID, userID string, mute bool) error 
 		return fmt.Errorf("MySQL存储未初始化")
 	}
 	return sm.groupStorage.SetGroupMute(groupID, userID, mute)
+}
+
+// 获取群免打扰状态
+func (sm *StorageManager) GetGroupDND(groupID, userID string) (bool, error) {
+	sm.mu.RLock()
+	defer sm.mu.RUnlock()
+	if !sm.useMySQL || sm.groupStorage == nil {
+		return false, fmt.Errorf("MySQL存储未初始化")
+	}
+	return sm.groupStorage.GetGroupDND(groupID, userID)
+}
+
+// 获取群成员禁言状态
+func (sm *StorageManager) GetGroupMuteStatus(groupID, userID string) (bool, error) {
+	sm.mu.RLock()
+	defer sm.mu.RUnlock()
+	if !sm.useMySQL || sm.groupStorage == nil {
+		return false, fmt.Errorf("MySQL存储未初始化")
+	}
+	return sm.groupStorage.GetGroupMuteStatus(groupID, userID)
 }
