@@ -1,3 +1,92 @@
+// ========== 通用居中弹窗 ==========
+function showModal({ title = '', content = '', inputs = [], okText = '确定', cancelText = '取消', onOk }) {
+  const mask = document.getElementById('modal-mask');
+  const dialog = document.getElementById('modal-dialog');
+  const titleDiv = document.getElementById('modal-title');
+  const contentDiv = document.getElementById('modal-content');
+  const actionsDiv = document.getElementById('modal-actions');
+  // 清空
+  titleDiv.textContent = title;
+  contentDiv.innerHTML = '';
+  if (content) {
+    const contentHtml = document.createElement('div');
+    contentHtml.innerHTML = content;
+    contentDiv.appendChild(contentHtml);
+  }
+  actionsDiv.innerHTML = '';
+  // 输入框
+  const inputEls = [];
+  for (const inp of inputs) {
+    const label = document.createElement('div');
+    label.textContent = inp.label || '';
+    label.style.margin = '8px 0 2px 0';
+    label.style.fontSize = '0.98em';
+    contentDiv.appendChild(label);
+    const input = document.createElement('input');
+    input.type = inp.type || 'text';
+    input.value = inp.value || '';
+    input.placeholder = inp.placeholder || '';
+    input.style.width = '100%';
+    input.style.boxSizing = 'border-box';
+    input.style.marginBottom = '6px';
+    input.style.padding = '7px 10px';
+    input.style.border = '1px solid #ddd';
+    input.style.borderRadius = '4px';
+    input.style.fontSize = '1em';
+    contentDiv.appendChild(input);
+    inputEls.push(input);
+  }
+  // 按钮
+  const okBtn = document.createElement('button');
+  okBtn.textContent = okText;
+  okBtn.style.background = '#409eff';
+  okBtn.style.color = '#fff';
+  okBtn.style.border = 'none';
+  okBtn.style.borderRadius = '4px';
+  okBtn.style.padding = '7px 18px';
+  okBtn.style.fontSize = '1em';
+  okBtn.style.cursor = 'pointer';
+  okBtn.onmouseenter = () => okBtn.style.background = '#1976d2';
+  okBtn.onmouseleave = () => okBtn.style.background = '#409eff';
+  okBtn.onclick = () => {
+    mask.style.display = dialog.style.display = 'none';
+    if (onOk) onOk(inputEls.map(i => i.value));
+  };
+  actionsDiv.appendChild(okBtn);
+  if (cancelText) {
+    const cancelBtn = document.createElement('button');
+    cancelBtn.textContent = cancelText;
+    cancelBtn.style.background = '#eee';
+    cancelBtn.style.color = '#222';
+    cancelBtn.style.border = 'none';
+    cancelBtn.style.borderRadius = '4px';
+    cancelBtn.style.padding = '7px 18px';
+    cancelBtn.style.fontSize = '1em';
+    cancelBtn.style.cursor = 'pointer';
+    cancelBtn.onclick = () => {
+      mask.style.display = dialog.style.display = 'none';
+      // No onCancel callback for now
+    };
+    actionsDiv.appendChild(cancelBtn);
+  }
+  mask.style.display = dialog.style.display = 'block';
+  // ESC关闭
+  function escListener(e) {
+    if (e.key === 'Escape') {
+      mask.style.display = dialog.style.display = 'none';
+      document.removeEventListener('keydown', escListener);
+    }
+  }
+  document.addEventListener('keydown', escListener);
+  // 点击遮罩关闭
+  mask.onclick = () => {
+    mask.style.display = dialog.style.display = 'none';
+    document.removeEventListener('keydown', escListener);
+  };
+  // 聚焦第一个输入
+  if (inputEls.length) setTimeout(() => inputEls[0].focus(), 50);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   protobuf.load('protobuf/bundle.json', function(err, root) {
     if (err) {
@@ -18,6 +107,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const groupListDiv = document.getElementById('group-list');
     const tabFriends = document.getElementById('tab-friends');
     const tabGroups = document.getElementById('tab-groups');
+    const friendListHeader = document.getElementById('friend-list-header');
+    const groupListHeader = document.getElementById('group-list-header');
 
     let currentFriend = null;
     let currentGroup = null;
@@ -25,6 +116,9 @@ document.addEventListener('DOMContentLoaded', function() {
     let myUid = null;
     let myUsername = null;
     let token = null;
+    let unreadMap = {};
+    let friendListCache = null;
+    let groupListCache = null;
 
     document.getElementById('to-register').onclick = e => {
       e.preventDefault();
@@ -53,6 +147,39 @@ document.addEventListener('DOMContentLoaded', function() {
     // ========== 登录/注册逻辑 ==========
     const loginBtn = document.getElementById('login-btn');
     const loginError = document.getElementById('login-error');
+    // 自动登录/会话恢复
+    const savedToken = window.localStorage.getItem('token');
+    if (savedToken) {
+      // 调用 /user_info 校验token
+      const UserInfoReq = root.lookupType('protocol.UserInfoReq');
+      const APIResp = root.lookupType('protocol.APIResp');
+      const UserInfoResp = root.lookupType('protocol.UserInfoResp');
+      (async function() {
+        try {
+          const req = UserInfoReq.encode(UserInfoReq.create({ token: savedToken })).finish();
+          const resp = await fetch('http://localhost:8081/user_info', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-protobuf' },
+            body: req
+          });
+          if (!resp.ok) throw new Error('自动登录失败');
+          const buf = await resp.arrayBuffer();
+          const apiMsg = APIResp.decode(new Uint8Array(buf));
+          if (apiMsg.code !== 0) throw new Error(apiMsg.msg);
+          const userInfo = UserInfoResp.decode(apiMsg.data);
+          myUid = userInfo.uid;
+          myUsername = userInfo.username;
+          token = savedToken;
+          showMainPanel();
+          await fetchUserInfoAndFriends(token);
+          connectWebSocket();
+        } catch (e) {
+          window.localStorage.removeItem('token');
+          window.localStorage.removeItem('uid');
+          showLoginPanel();
+        }
+      })();
+    }
     loginBtn.onclick = async () => {
       loginError.textContent = '';
       const uid = document.getElementById('login-uid').value.trim();
@@ -77,6 +204,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // token在data字段
         token = new TextDecoder().decode(msg.data);
         window.localStorage.setItem('token', token);
+        window.localStorage.setItem('uid', uid);
         showMainPanel();
         await fetchUserInfoAndFriends(token);
         connectWebSocket();
@@ -152,6 +280,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const apiMsg = APIResp.decode(new Uint8Array(buf));
         if (apiMsg.code !== 0) throw new Error(apiMsg.msg);
         const friendList = FriendListResp.decode(apiMsg.data);
+        friendListCache = friendList; // 缓存
         renderFriendList(friendList);
       } catch (e) {
         friendListDiv.innerHTML = '<div class="error">好友列表获取失败: ' + (e.message || e) + '</div>';
@@ -173,7 +302,132 @@ document.addEventListener('DOMContentLoaded', function() {
         const remark = friendList.remarks && friendList.remarks[i] ? friendList.remarks[i] : '';
         const div = document.createElement('div');
         div.className = 'list-item';
-        div.textContent = remark ? `${name}（${remark}）` : name;
+        div.style.display = 'flex';
+        div.style.alignItems = 'center';
+        div.style.justifyContent = 'space-between';
+        // 左侧：名称
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = remark ? `${name}（${remark}）` : name;
+        nameSpan.style.flex = '1';
+        // 右侧：...按钮
+        const moreBtn = document.createElement('button');
+        moreBtn.className = 'circle-more-btn';
+        moreBtn.title = '好友详情';
+        moreBtn.innerHTML = '&#x22EE;'; // 竖向省略号
+        moreBtn.onclick = async (e) => {
+          e.stopPropagation();
+          // 获取好友详细信息
+          const FriendInfoReq = root.lookupType('protocol.FriendInfoReq');
+          const APIResp = root.lookupType('protocol.APIResp');
+          const FriendInfoResp = root.lookupType('protocol.FriendInfoResp');
+          const reqBuf = FriendInfoReq.encode(FriendInfoReq.create({ uid: myUid, friendUid: uid, token })).finish();
+          try {
+            const resp = await fetch('http://localhost:8081/friend_info', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/x-protobuf' },
+              body: reqBuf
+            });
+            const buf = await resp.arrayBuffer();
+            const apiMsg = APIResp.decode(new Uint8Array(buf));
+            if (apiMsg.code !== 0) throw new Error(apiMsg.msg);
+            const info = FriendInfoResp.decode(apiMsg.data);
+            // 弹窗内容
+            let html = `<div style='margin-bottom:8px;'><b>UID:</b> ${info.uid}</div>`;
+            html += `<div style='margin-bottom:8px;'><b>用户名:</b> ${info.username}</div>`;
+            html += `<div style='margin-bottom:8px;'><b>邮箱:</b> ${info.email}</div>`;
+            html += `<div style='margin-bottom:8px;'><b>备注:</b> ${info.remark || ''}</div>`;
+            html += `<div style='margin-bottom:8px;'><b>免打扰:</b> ${info.dnd ? '已开启' : '未开启'}</div>`;
+            showModal({
+              title: '好友详情',
+              content: html,
+              okText: '关闭',
+              cancelText: '',
+              onOk: null
+            });
+            // 额外操作按钮
+            const actionsDiv = document.getElementById('modal-actions');
+            // 设置备注按钮
+            const remarkBtn = document.createElement('button');
+            remarkBtn.textContent = '设置备注';
+            remarkBtn.style.marginRight = '8px';
+            remarkBtn.onclick = function() {
+              showModal({
+                title: '设置备注',
+                inputs: [{ label: '备注', value: info.remark || '', placeholder: '输入备注' }],
+                okText: '保存',
+                onOk: async ([remark]) => {
+                  const UpdateRemarkReq = root.lookupType('protocol.UpdateRemarkReq');
+                  const reqBuf = UpdateRemarkReq.encode(UpdateRemarkReq.create({ uid: myUid, friendUid: uid, remark, token })).finish();
+                  const resp = await fetch('http://localhost:8081/update_remark', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-protobuf' },
+                    body: reqBuf
+                  });
+                  const buf = await resp.arrayBuffer();
+                  const apiMsg = APIResp.decode(new Uint8Array(buf));
+                  alert(apiMsg.msg || (apiMsg.code === 0 ? '备注已更新' : '设置失败'));
+                  fetchFriendList(myUid, token);
+                }
+              });
+            };
+            actionsDiv.insertBefore(remarkBtn, actionsDiv.firstChild);
+            // 设置免打扰按钮
+            const dndBtn = document.createElement('button');
+            dndBtn.textContent = info.dnd ? '关闭免打扰' : '开启免打扰';
+            dndBtn.style.marginRight = '8px';
+            dndBtn.onclick = async function() {
+              const SetDNDReq = root.lookupType('protocol.SetDNDReq');
+              const reqBuf = SetDNDReq.encode(SetDNDReq.create({ uid: myUid, friendUid: uid, dnd: !info.dnd, token })).finish();
+              const resp = await fetch('http://localhost:8081/set_dnd', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-protobuf' },
+                body: reqBuf
+              });
+              const buf = await resp.arrayBuffer();
+              const apiMsg = APIResp.decode(new Uint8Array(buf));
+              alert(apiMsg.msg || (apiMsg.code === 0 ? '设置成功' : '设置失败'));
+              fetchFriendList(myUid, token);
+            };
+            actionsDiv.insertBefore(dndBtn, actionsDiv.firstChild);
+            // 删除好友按钮
+            const delBtn = document.createElement('button');
+            delBtn.textContent = '删除好友';
+            delBtn.style.background = '#e74c3c';
+            delBtn.style.color = '#fff';
+            delBtn.onclick = async function() {
+              if (!confirm('确定要删除该好友吗？')) return;
+              const DeleteFriendReq = root.lookupType('protocol.DeleteFriendReq');
+              const reqBuf = DeleteFriendReq.encode(DeleteFriendReq.create({ uid: myUid, friendUid: uid, token })).finish();
+              const resp = await fetch('http://localhost:8081/delete_friend', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-protobuf' },
+                body: reqBuf
+              });
+              const buf = await resp.arrayBuffer();
+              const apiMsg = APIResp.decode(new Uint8Array(buf));
+              alert(apiMsg.msg || (apiMsg.code === 0 ? '已删除' : '删除失败'));
+              fetchFriendList(myUid, token);
+            };
+            actionsDiv.insertBefore(delBtn, actionsDiv.firstChild);
+          } catch (e) {
+            alert('获取好友信息失败: ' + (e.message || e));
+          }
+        };
+        // 未读红点
+        if (unreadMap[uid] > 0) {
+          const badge = document.createElement('span');
+          badge.textContent = unreadMap[uid] > 99 ? '99+' : unreadMap[uid];
+          badge.style.background = '#e74c3c';
+          badge.style.color = '#fff';
+          badge.style.fontSize = '0.85em';
+          badge.style.borderRadius = '10px';
+          badge.style.padding = '2px 7px';
+          badge.style.marginLeft = '8px';
+          badge.style.verticalAlign = 'middle';
+          nameSpan.appendChild(badge);
+        }
+        div.appendChild(nameSpan);
+        div.appendChild(moreBtn);
         div.onclick = () => {
           selectFriend(uid, name, remark);
         };
@@ -187,6 +441,11 @@ document.addEventListener('DOMContentLoaded', function() {
     function selectFriend(uid, name, remark) {
       currentFriend = { uid, name, remark };
       currentGroup = null; // 选择好友时清空群组
+      unreadMap[uid] = 0; // 清除未读
+      // 修复：用缓存的好友列表数据刷新
+      if (friendListCache) {
+        renderFriendList(friendListCache);
+      }
       // 高亮
       const items = friendListDiv.querySelectorAll('.list-item');
       items.forEach(item => {
@@ -216,7 +475,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const apiMsg = APIResp.decode(new Uint8Array(buf));
         if (apiMsg.code !== 0) throw new Error(apiMsg.msg);
         const groupList = GroupListResp.decode(apiMsg.data);
-        renderGroupList(groupList.groups || []);
+        groupListCache = groupList.groups || [];
+        renderGroupList(groupListCache);
       } catch (e) {
         groupListDiv.innerHTML = '<div class="error">群组列表获取失败: ' + (e.message || e) + '</div>';
       }
@@ -232,7 +492,421 @@ document.addEventListener('DOMContentLoaded', function() {
         const groupId = group.groupId || group.group_id || group.id || '';
         const div = document.createElement('div');
         div.className = 'list-item';
-        div.textContent = groupName;
+        div.style.display = 'flex';
+        div.style.alignItems = 'center';
+        div.style.justifyContent = 'space-between';
+        // 左侧：群名
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = groupName;
+        nameSpan.style.flex = '1';
+        // 右侧：...按钮
+        const moreBtn = document.createElement('button');
+        moreBtn.className = 'circle-more-btn';
+        moreBtn.title = '群组详情';
+        moreBtn.innerHTML = '&#x22EE;';
+        moreBtn.onclick = async (e) => {
+          e.stopPropagation();
+          // 获取群组详细信息
+          const GroupInfoReq = root.lookupType('protocol.GroupInfoReq');
+          const APIResp = root.lookupType('protocol.APIResp');
+          const GroupInfoResp = root.lookupType('protocol.GroupInfoResp');
+          const reqBuf = GroupInfoReq.encode(GroupInfoReq.create({ groupId })).finish();
+          try {
+            const resp = await fetch('http://localhost:8081/group_info', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/x-protobuf' },
+              body: reqBuf
+            });
+            const buf = await resp.arrayBuffer();
+            const apiMsg = APIResp.decode(new Uint8Array(buf));
+            if (apiMsg.code !== 0) throw new Error(apiMsg.msg);
+            const info = GroupInfoResp.decode(apiMsg.data).group;
+            // 获取角色
+            const GroupMemberRoleReq = root.lookupType('protocol.GroupMemberRoleReq');
+            const GroupMemberRoleResp = root.lookupType('protocol.GroupMemberRoleResp');
+            const roleReqBuf = GroupMemberRoleReq.encode(GroupMemberRoleReq.create({ groupId, uid: myUid })).finish();
+            let role = 'member';
+            try {
+              const roleResp = await fetch('http://localhost:8081/group_member_role', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-protobuf' },
+                body: roleReqBuf
+              });
+              const roleBuf = await roleResp.arrayBuffer();
+              const roleApiMsg = APIResp.decode(new Uint8Array(roleBuf));
+              if (roleApiMsg.code === 0) {
+                const roleData = GroupMemberRoleResp.decode(roleApiMsg.data);
+                role = roleData.role;
+              }
+            } catch {}
+            // 获取备注、免打扰
+            let remark = group.remark || '';
+            let dnd = false;
+            try {
+              const GroupRemarkReq = root.lookupType('protocol.SetGroupRemarkReq');
+              const GroupDNDReq = root.lookupType('protocol.SetGroupDNDReq');
+              const GroupDNDResp = root.lookupType('protocol.SetGroupDNDResp');
+              // 备注直接用group.remark
+              // 免打扰需查接口
+              const dndReq = GroupDNDReq.encode(GroupDNDReq.create({ groupId, uid: myUid })).finish();
+              // 这里假设有获取群免打扰状态的接口，若无则跳过
+            } catch {}
+            // 弹窗内容
+            let html = `<div style='margin-bottom:8px;'><b>群ID:</b> ${info.groupId}</div>`;
+            html += `<div style='margin-bottom:8px;'><b>群名:</b> ${info.name}</div>`;
+            html += `<div style='margin-bottom:8px;'><b>群主:</b> ${info.ownerUid}</div>`;
+            html += `<div style='margin-bottom:8px;'><b>成员数:</b> ${info.memberUids.length}</div>`;
+            html += `<div style='margin-bottom:8px;'><b>备注:</b> ${remark}</div>`;
+            // html += `<div style='margin-bottom:8px;'><b>免打扰:</b> ${dnd ? '已开启' : '未开启'}</div>`;
+            showModal({
+              title: '群组详情',
+              content: html,
+              okText: '关闭',
+              cancelText: '',
+              onOk: null
+            });
+            // 额外操作按钮
+            const actionsDiv = document.getElementById('modal-actions');
+            // 设置备注按钮
+            const remarkBtn = document.createElement('button');
+            remarkBtn.textContent = '设置备注';
+            remarkBtn.style.marginRight = '8px';
+            remarkBtn.onclick = function() {
+              showModal({
+                title: '设置群备注',
+                inputs: [{ label: '备注', value: remark || '', placeholder: '输入备注' }],
+                okText: '保存',
+                onOk: async ([newRemark]) => {
+                  const SetGroupRemarkReq = root.lookupType('protocol.SetGroupRemarkReq');
+                  const reqBuf = SetGroupRemarkReq.encode(SetGroupRemarkReq.create({ groupId, uid: myUid, remark: newRemark })).finish();
+                  const resp = await fetch('http://localhost:8081/set_group_remark', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-protobuf' },
+                    body: reqBuf
+                  });
+                  const buf = await resp.arrayBuffer();
+                  const apiMsg = APIResp.decode(new Uint8Array(buf));
+                  alert(apiMsg.msg || (apiMsg.code === 0 ? '备注已更新' : '设置失败'));
+                  fetchGroupList(token);
+                }
+              });
+            };
+            actionsDiv.insertBefore(remarkBtn, actionsDiv.firstChild);
+            // 退出群组按钮（非owner）
+            if (role !== 'owner') {
+              const leaveBtn = document.createElement('button');
+              leaveBtn.textContent = '退出群组';
+              leaveBtn.style.background = '#e74c3c';
+              leaveBtn.style.color = '#fff';
+              leaveBtn.onclick = async function() {
+                if (!confirm('确定要退出该群组吗？')) return;
+                const LeaveGroupReq = root.lookupType('protocol.LeaveGroupReq');
+                const reqBuf = LeaveGroupReq.encode(LeaveGroupReq.create({ groupId, uid: myUid })).finish();
+                const resp = await fetch('http://localhost:8081/leave_group', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/x-protobuf' },
+                  body: reqBuf
+                });
+                const buf = await resp.arrayBuffer();
+                const apiMsg = APIResp.decode(new Uint8Array(buf));
+                alert(apiMsg.msg || (apiMsg.code === 0 ? '已退出' : '操作失败'));
+                fetchGroupList(token);
+              };
+              actionsDiv.insertBefore(leaveBtn, actionsDiv.firstChild);
+            }
+            // 解散群组按钮（owner）
+            if (role === 'owner') {
+              const dismissBtn = document.createElement('button');
+              dismissBtn.textContent = '解散群组';
+              dismissBtn.style.background = '#e74c3c';
+              dismissBtn.style.color = '#fff';
+              dismissBtn.onclick = async function() {
+                if (!confirm('确定要解散该群组吗？')) return;
+                const DismissGroupReq = root.lookupType('protocol.DismissGroupReq');
+                const reqBuf = DismissGroupReq.encode(DismissGroupReq.create({ groupId, operatorUid: myUid })).finish();
+                const resp = await fetch('http://localhost:8081/dismiss_group', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/x-protobuf' },
+                  body: reqBuf
+                });
+                const buf = await resp.arrayBuffer();
+                const apiMsg = APIResp.decode(new Uint8Array(buf));
+                alert(apiMsg.msg || (apiMsg.code === 0 ? '群组已解散' : '操作失败'));
+                fetchGroupList(token);
+              };
+              actionsDiv.insertBefore(dismissBtn, actionsDiv.firstChild);
+            }
+            // 设置群昵称按钮
+            const nicknameBtn = document.createElement('button');
+            nicknameBtn.textContent = '设置群昵称';
+            nicknameBtn.style.marginRight = '8px';
+            nicknameBtn.onclick = function() {
+              showModal({
+                title: '设置群昵称',
+                inputs: [{ label: '群昵称', value: '', placeholder: '输入群昵称' }],
+                okText: '保存',
+                onOk: async ([nickname]) => {
+                  const SetGroupNicknameReq = root.lookupType('protocol.SetGroupNicknameReq');
+                  const reqBuf = SetGroupNicknameReq.encode(SetGroupNicknameReq.create({ groupId, uid: myUid, nickname })).finish();
+                  const resp = await fetch('http://localhost:8081/set_group_nickname', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-protobuf' },
+                    body: reqBuf
+                  });
+                  const buf = await resp.arrayBuffer();
+                  const apiMsg = APIResp.decode(new Uint8Array(buf));
+                  alert(apiMsg.msg || (apiMsg.code === 0 ? '群昵称已更新' : '设置失败'));
+                  fetchGroupList(token);
+                }
+              });
+            };
+            actionsDiv.insertBefore(nicknameBtn, actionsDiv.firstChild);
+            // 设置群免打扰按钮
+            const dndBtn = document.createElement('button');
+            dndBtn.textContent = dnd ? '关闭群免打扰' : '开启群免打扰';
+            dndBtn.style.marginRight = '8px';
+            dndBtn.onclick = async function() {
+              const SetGroupDNDReq = root.lookupType('protocol.SetGroupDNDReq');
+              const reqBuf = SetGroupDNDReq.encode(SetGroupDNDReq.create({ groupId, uid: myUid, dnd: !dnd })).finish();
+              const resp = await fetch('http://localhost:8081/set_group_dnd', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-protobuf' },
+                body: reqBuf
+              });
+              const buf = await resp.arrayBuffer();
+              const apiMsg = APIResp.decode(new Uint8Array(buf));
+              alert(apiMsg.msg || (apiMsg.code === 0 ? '设置成功' : '设置失败'));
+              fetchGroupList(token);
+            };
+            actionsDiv.insertBefore(dndBtn, actionsDiv.firstChild);
+            // 邀请新成员按钮
+            const inviteBtn = document.createElement('button');
+            inviteBtn.textContent = '邀请新成员';
+            inviteBtn.style.marginRight = '8px';
+            inviteBtn.onclick = function() {
+              showModal({
+                title: '邀请新成员',
+                inputs: [{ label: '成员UID(多个用逗号分隔)', placeholder: '输入UID' }],
+                okText: '邀请',
+                onOk: async ([uids]) => {
+                  const InviteToGroupReq = root.lookupType('protocol.InviteToGroupReq');
+                  const reqBuf = InviteToGroupReq.encode(InviteToGroupReq.create({ groupId, inviterUid: myUid, inviteeUids: uids.split(',').map(s => s.trim()).filter(Boolean) })).finish();
+                  const resp = await fetch('http://localhost:8081/invite_to_group', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-protobuf' },
+                    body: reqBuf
+                  });
+                  const buf = await resp.arrayBuffer();
+                  const apiMsg = APIResp.decode(new Uint8Array(buf));
+                  alert(apiMsg.msg || (apiMsg.code === 0 ? '邀请已发送' : '邀请失败'));
+                }
+              });
+            };
+            actionsDiv.insertBefore(inviteBtn, actionsDiv.firstChild);
+            // 管理员/群主操作
+            if (role === 'admin' || role === 'owner') {
+              // 修改群名
+              const updateNameBtn = document.createElement('button');
+              updateNameBtn.textContent = '修改群名';
+              updateNameBtn.style.marginRight = '8px';
+              updateNameBtn.onclick = function() {
+                showModal({
+                  title: '修改群名',
+                  inputs: [{ label: '新群名', value: info.name, placeholder: '输入新群名' }],
+                  okText: '保存',
+                  onOk: async ([newName]) => {
+                    const UpdateGroupNameReq = root.lookupType('protocol.UpdateGroupNameReq');
+                    const reqBuf = UpdateGroupNameReq.encode(UpdateGroupNameReq.create({ groupId, operatorUid: myUid, newName })).finish();
+                    const resp = await fetch('http://localhost:8081/update_group_name', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/x-protobuf' },
+                      body: reqBuf
+                    });
+                    const buf = await resp.arrayBuffer();
+                    const apiMsg = APIResp.decode(new Uint8Array(buf));
+                    alert(apiMsg.msg || (apiMsg.code === 0 ? '群名已更新' : '设置失败'));
+                    fetchGroupList(token);
+                  }
+                });
+              };
+              actionsDiv.insertBefore(updateNameBtn, actionsDiv.firstChild);
+              // 移除成员
+              const kickBtn = document.createElement('button');
+              kickBtn.textContent = '移除成员';
+              kickBtn.style.marginRight = '8px';
+              kickBtn.onclick = function() {
+                showModal({
+                  title: '移除成员',
+                  inputs: [{ label: '成员UID', placeholder: '输入要移除的成员UID' }],
+                  okText: '移除',
+                  onOk: async ([targetUid]) => {
+                    const KickFromGroupReq = root.lookupType('protocol.KickFromGroupReq');
+                    const reqBuf = KickFromGroupReq.encode(KickFromGroupReq.create({ groupId, operatorUid: myUid, targetUid })).finish();
+                    const resp = await fetch('http://localhost:8081/kick_from_group', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/x-protobuf' },
+                      body: reqBuf
+                    });
+                    const buf = await resp.arrayBuffer();
+                    const apiMsg = APIResp.decode(new Uint8Array(buf));
+                    alert(apiMsg.msg || (apiMsg.code === 0 ? '已移除' : '操作失败'));
+                  }
+                });
+              };
+              actionsDiv.insertBefore(kickBtn, actionsDiv.firstChild);
+              // 设置禁言
+              const muteBtn = document.createElement('button');
+              muteBtn.textContent = '设置禁言';
+              muteBtn.style.marginRight = '8px';
+              muteBtn.onclick = function() {
+                showModal({
+                  title: '设置禁言',
+                  inputs: [
+                    { label: '成员UID', placeholder: '输入要禁言的成员UID' },
+                    { label: '禁言(true=禁言,false=取消)', placeholder: 'true/false' }
+                  ],
+                  okText: '设置',
+                  onOk: async ([targetUid, mute]) => {
+                    const SetGroupMuteReq = root.lookupType('protocol.SetGroupMuteReq');
+                    const reqBuf = SetGroupMuteReq.encode(SetGroupMuteReq.create({ groupId, operatorUid: myUid, targetUid, mute: mute === 'true' })).finish();
+                    const resp = await fetch('http://localhost:8081/set_group_mute', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/x-protobuf' },
+                      body: reqBuf
+                    });
+                    const buf = await resp.arrayBuffer();
+                    const apiMsg = APIResp.decode(new Uint8Array(buf));
+                    alert(apiMsg.msg || (apiMsg.code === 0 ? '设置成功' : '操作失败'));
+                  }
+                });
+              };
+              actionsDiv.insertBefore(muteBtn, actionsDiv.firstChild);
+            }
+            // 群主专属操作
+            if (role === 'owner') {
+              // 设置/取消管理员
+              const adminBtn = document.createElement('button');
+              adminBtn.textContent = '设置/取消管理员';
+              adminBtn.style.marginRight = '8px';
+              adminBtn.onclick = function() {
+                showModal({
+                  title: '设置/取消管理员',
+                  inputs: [
+                    { label: '成员UID', placeholder: '输入成员UID' },
+                    { label: '设置为管理员(true/false)', placeholder: 'true/false' }
+                  ],
+                  okText: '设置',
+                  onOk: async ([targetUid, setAdmin]) => {
+                    const SetGroupAdminReq = root.lookupType('protocol.SetGroupAdminReq');
+                    const reqBuf = SetGroupAdminReq.encode(SetGroupAdminReq.create({ groupId, operatorUid: myUid, targetUid, setAdmin: setAdmin === 'true' })).finish();
+                    const resp = await fetch('http://localhost:8081/set_group_admin', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/x-protobuf' },
+                      body: reqBuf
+                    });
+                    const buf = await resp.arrayBuffer();
+                    const apiMsg = APIResp.decode(new Uint8Array(buf));
+                    alert(apiMsg.msg || (apiMsg.code === 0 ? '设置成功' : '操作失败'));
+                  }
+                });
+              };
+              actionsDiv.insertBefore(adminBtn, actionsDiv.firstChild);
+            }
+            // 查看成员信息按钮
+            const memberInfoBtn = document.createElement('button');
+            memberInfoBtn.textContent = '查看成员信息';
+            memberInfoBtn.style.marginRight = '8px';
+            memberInfoBtn.onclick = function() {
+              showModal({
+                title: '查看成员信息',
+                inputs: [{ label: '成员UID', placeholder: '输入成员UID' }],
+                okText: '查询',
+                onOk: async ([targetUid]) => {
+                  if (!targetUid) return;
+                  const GroupMemberInfoReq = root.lookupType('protocol.GroupMemberInfoReq');
+                  const APIResp = root.lookupType('protocol.APIResp');
+                  const GroupMemberInfoResp = root.lookupType('protocol.GroupMemberInfoResp');
+                  const reqBuf = GroupMemberInfoReq.encode(GroupMemberInfoReq.create({ groupId, uid: targetUid })).finish();
+                  try {
+                    const resp = await fetch('http://localhost:8081/group_member_info', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/x-protobuf' },
+                      body: reqBuf
+                    });
+                    const buf = await resp.arrayBuffer();
+                    const apiMsg = APIResp.decode(new Uint8Array(buf));
+                    if (apiMsg.code !== 0) throw new Error(apiMsg.msg);
+                    const info = GroupMemberInfoResp.decode(apiMsg.data);
+                    let html = `<div style='margin-bottom:8px;'><b>UID:</b> ${info.uid}</div>`;
+                    html += `<div style='margin-bottom:8px;'><b>用户名:</b> ${info.username}</div>`;
+                    html += `<div style='margin-bottom:8px;'><b>昵称:</b> ${info.nickname}</div>`;
+                    html += `<div style='margin-bottom:8px;'><b>角色:</b> ${info.role}</div>`;
+                    html += `<div style='margin-bottom:8px;'><b>加入时间:</b> ${info.joinTime ? new Date(info.joinTime * 1000).toLocaleString() : ''}</div>`;
+                    showModal({ title: '成员信息', content: html, okText: '关闭' });
+                  } catch (e) {
+                    alert('查询失败: ' + (e.message || e));
+                  }
+                }
+              });
+            };
+            actionsDiv.insertBefore(memberInfoBtn, actionsDiv.firstChild);
+            // 成员列表按钮
+            const memberListBtn = document.createElement('button');
+            memberListBtn.textContent = '成员列表';
+            memberListBtn.style.marginRight = '8px';
+            memberListBtn.onclick = async function() {
+              const GroupMembersReq = root.lookupType('protocol.GroupMembersReq');
+              const APIResp = root.lookupType('protocol.APIResp');
+              const GroupMembersResp = root.lookupType('protocol.GroupMembersResp');
+              const reqBuf = GroupMembersReq.encode(GroupMembersReq.create({ groupId })).finish();
+              try {
+                const resp = await fetch('http://localhost:8081/group_members', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/x-protobuf' },
+                  body: reqBuf
+                });
+                const buf = await resp.arrayBuffer();
+                const apiMsg = APIResp.decode(new Uint8Array(buf));
+                if (apiMsg.code !== 0) throw new Error(apiMsg.msg);
+                const members = GroupMembersResp.decode(apiMsg.data).members;
+                let html = `<div style='max-height:320px;overflow:auto;'>`;
+                html += `<table style='width:100%;font-size:0.98em;border-collapse:collapse;'>`;
+                html += `<tr><th style='text-align:left;'>UID</th><th style='text-align:left;'>用户名</th><th style='text-align:left;'>昵称</th><th style='text-align:left;'>角色</th><th style='text-align:left;'>加入时间</th></tr>`;
+                for (const m of members) {
+                  html += `<tr>`;
+                  html += `<td>${m.uid}</td>`;
+                  html += `<td>${m.username || ''}</td>`;
+                  html += `<td>${m.nickname || ''}</td>`;
+                  html += `<td>${m.role || ''}</td>`;
+                  html += `<td>${m.joinTime ? new Date(m.joinTime * 1000).toLocaleString() : ''}</td>`;
+                  html += `</tr>`;
+                }
+                html += `</table></div>`;
+                showModal({ title: '成员列表', content: html, okText: '关闭' });
+              } catch (e) {
+                alert('获取成员列表失败: ' + (e.message || e));
+              }
+            };
+            actionsDiv.insertBefore(memberListBtn, actionsDiv.firstChild);
+          } catch (e) {
+            alert('获取群组信息失败: ' + (e.message || e));
+          }
+        };
+        // 未读红点
+        if (unreadMap[groupId] > 0) {
+          const badge = document.createElement('span');
+          badge.textContent = unreadMap[groupId] > 99 ? '99+' : unreadMap[groupId];
+          badge.style.background = '#e74c3c';
+          badge.style.color = '#fff';
+          badge.style.fontSize = '0.85em';
+          badge.style.borderRadius = '10px';
+          badge.style.padding = '2px 7px';
+          badge.style.marginLeft = '8px';
+          badge.style.verticalAlign = 'middle';
+          nameSpan.appendChild(badge);
+        }
+        div.appendChild(nameSpan);
+        div.appendChild(moreBtn);
         div.style.cursor = 'pointer';
         div.onclick = () => {
           selectGroup(groupId, groupName);
@@ -246,6 +920,11 @@ document.addEventListener('DOMContentLoaded', function() {
     function selectGroup(groupId, name) {
       currentGroup = { groupId, name };
       currentFriend = null; // 选择群组时清空好友
+      unreadMap[groupId] = 0; // 清除未读
+      // 用缓存的群组列表数据刷新
+      if (groupListCache) {
+        renderGroupList(groupListCache);
+      }
       // 高亮
       const items = groupListDiv.querySelectorAll('.list-item');
       items.forEach(item => {
@@ -417,9 +1096,25 @@ document.addEventListener('DOMContentLoaded', function() {
       } else {
         html = `<span style="display:inline-block;padding:6px 14px;border-radius:16px;background:${self ? '#409eff' : '#eee'};color:${self ? '#fff' : '#222'};max-width:60%;word-break:break-all;">${content}</span>`;
       }
+      // 格式化时间
+      const timeStr = timestamp ? formatTime(timestamp) : '';
+      if (timeStr) {
+        html += `<div style="font-size:0.85em;color:#bbb;margin-top:2px;">${timeStr}</div>`;
+      }
       div.innerHTML = html;
       chatHistoryDiv.appendChild(div);
       chatHistoryDiv.scrollTop = chatHistoryDiv.scrollHeight;
+    }
+    function formatTime(ts) {
+      if (!ts) return '';
+      const d = new Date(Number(ts));
+      const y = d.getFullYear();
+      const m = (d.getMonth() + 1).toString().padStart(2, '0');
+      const day = d.getDate().toString().padStart(2, '0');
+      const h = d.getHours().toString().padStart(2, '0');
+      const min = d.getMinutes().toString().padStart(2, '0');
+      const s = d.getSeconds().toString().padStart(2, '0');
+      return `${y}-${m}-${day} ${h}:${min}:${s}`;
     }
 
     function connectWebSocket() {
@@ -438,19 +1133,21 @@ document.addEventListener('DOMContentLoaded', function() {
       ws.onerror = (e) => {
       };
       ws.onmessage = (event) => {
-        console.log('收到ws消息', event.data);
+        console.log('onmessage start');
         try {
           const buf = new Uint8Array(event.data);
-          // 先尝试decode Notification
           let notif = null;
+          console.log('decode尝试');
           try {
             notif = Notification.decode(buf);
           } catch {}
           if (notif && notif.type) {
-            console.log('收到通知', notif);
-            // 解析通知内容
-            let display = '';
-            const extra = parseExtra(notif.extra);
+            console.log('notif分支');
+            console.log('notif对象:', notif);
+            console.log('notif.type:', notif.type, typeof notif.type);
+            console.log('notif所有属性', Object.keys(notif));
+            console.log('notif.type原始:', notif.type, '长度:', notif.type.length, '编码:', Array.from(notif.type).map(c => c.charCodeAt(0)));
+            let display;
             switch (notif.type) {
               case 'friend_request':
                 display = `[好友请求] ${notif.fromUsername}(${notif.from}) 请求加你为好友`;
@@ -459,39 +1156,41 @@ document.addEventListener('DOMContentLoaded', function() {
                 display = `[私聊] ${notif.fromUsername}: ${notif.content}`;
                 break;
               case 'group_chat_message':
-                display = `[群聊][${notif.groupName}] ${notif.fromUsername}: ${notif.content}`;
+                display = `[群聊][${notif.groupName || ''}] ${notif.fromUsername}: ${notif.content}`;
                 break;
               case 'group_application_pending':
-                display = `[群申请] ${notif.fromUsername}(${notif.from}) 申请加入群聊 [${notif.groupName}]`;
+                display = `[群申请] ${notif.fromUsername}(${notif.from}) 申请加入群聊 [${notif.groupName || ''}]`;
                 break;
-              case 'group_invite':
-                display = `[群审批] ${notif.fromUsername} 邀请 ${extra.invitee_username || ''} 加入群聊 [${notif.groupName}]，请审批`;
+              case 'group_invite': {
+                const extra = parseExtra(notif.extra || '');
+                display = `[群审批] ${notif.fromUsername} 邀请 ${extra.invitee_username || ''} 加入群聊 [${notif.groupName || ''}]，请审批`;
                 break;
+              }
               case 'group_invite_approved':
-                display = `[群通知] 你已成功加入群聊 [${notif.groupName}]`;
+                display = `[群通知] 你已成功加入群聊 [${notif.groupName || ''}]`;
                 break;
               case 'group_kicked':
-                display = `[群通知] 你已被 ${notif.fromUsername} 移出群聊 [${notif.groupName}]`;
+                display = `[群通知] 你已被 ${notif.fromUsername} 移出群聊 [${notif.groupName || ''}]`;
                 break;
-              case 'group_admin_change':
+              case 'group_admin_change': {
+                const extra = parseExtra(notif.extra || '');
                 display = extra.set_admin === 'true'
-                  ? `[群通知] 你在群聊 [${notif.groupName}] 被设为管理员`
-                  : `[群通知] 你在群聊 [${notif.groupName}] 被取消管理员`;
+                  ? `[群通知] 你在群聊 [${notif.groupName || ''}] 被设为管理员`
+                  : `[群通知] 你在群聊 [${notif.groupName || ''}] 被取消管理员`;
                 break;
+              }
               case 'dismissed':
-                display = `[群系统][${notif.groupName}] 群已被解散 by ${notif.fromUsername}`;
+                display = `[群系统][${notif.groupName || ''}] 群已被解散 by ${notif.fromUsername}`;
                 break;
               default:
-                display = `[通知] ${notif.type}: ${notif.content}`;
+                return;
             }
             notifyList.unshift(display);
             if (notifyList.length > 30) notifyList.length = 30;
             renderNotifyPopup();
-            console.log('setTimeout已设置');
             setTimeout(() => {
-              console.log('setTimeout回调执行');
               notifyPopup.style.display = 'block';
-              console.log('notifyPopup:', notifyPopup);
+              alert(display);
             }, 10);
             return;
           }
@@ -509,6 +1208,13 @@ document.addEventListener('DOMContentLoaded', function() {
           } else if (msg.type === 'file' && currentFriend && msg.from === currentFriend.uid && msg.to === myUid) {
             appendMessage({ from: msg.from, content: msg.content, self: false, timestamp: msg.timestamp, type: 'file', extra: msg.extra });
           }
+          // 私聊未读
+          else if ((msg.type === 'chat' || msg.type === 'image' || msg.type === 'file') && msg.to === myUid && (!currentFriend || msg.from !== currentFriend.uid)) {
+            unreadMap[msg.from] = (unreadMap[msg.from] || 0) + 1;
+            if (friendListCache) {
+              renderFriendList(friendListCache);
+            }
+          }
           // 群聊消息
           else if (msg.type === 'chat' && currentGroup && msg.groupId === currentGroup.groupId) {
             appendMessage({ from: msg.from, content: replaceEmojis(msg.content), self: msg.from === myUid, timestamp: msg.timestamp, type: 'chat' });
@@ -516,7 +1222,13 @@ document.addEventListener('DOMContentLoaded', function() {
             appendMessage({ from: msg.from, content: msg.content, self: msg.from === myUid, timestamp: msg.timestamp, type: 'image', extra: msg.extra });
           } else if (msg.type === 'file' && currentGroup && msg.groupId === currentGroup.groupId) {
             appendMessage({ from: msg.from, content: msg.content, self: msg.from === myUid, timestamp: msg.timestamp, type: 'file', extra: msg.extra });
-          } else if (msg.type === 'error') {
+          }
+          // 群聊未读
+          else if ((msg.type === 'chat' || msg.type === 'image' || msg.type === 'file') && msg.groupId && (!currentGroup || msg.groupId !== currentGroup.groupId)) {
+            unreadMap[msg.groupId] = (unreadMap[msg.groupId] || 0) + 1;
+            renderGroupList([]);
+          }
+          else if (msg.type === 'error') {
             alert('消息错误: ' + msg.content);
           }
         } catch (e) {}
@@ -527,6 +1239,148 @@ document.addEventListener('DOMContentLoaded', function() {
       loginPanel.style.display = 'none';
       registerPanel.style.display = 'none';
       mainPanel.style.display = '';
+      // 重新绑定个人中心按钮，确保元素已渲染
+      const userCenterBtn = document.getElementById('user-center-btn');
+      if (userCenterBtn) {
+        userCenterBtn.onclick = function() {
+          showModal({
+            title: '个人中心',
+            content: `<div style='margin-bottom:12px;'>
+              <button id='uc-info' style='margin:4px 0;width:100%;padding:7px 0;'>查看个人信息</button><br>
+              <button id='uc-nick' style='margin:4px 0;width:100%;padding:7px 0;'>修改昵称</button><br>
+              <button id='uc-pwd' style='margin:4px 0;width:100%;padding:7px 0;'>修改密码</button><br>
+              <button id='uc-del' style='margin:4px 0;width:100%;padding:7px 0;color:#e74c3c;'>注销账号</button><br>
+              <button id='uc-logout' style='margin:4px 0;width:100%;padding:7px 0;'>登出</button>
+            </div>`,
+            okText: '关闭',
+            cancelText: '',
+            onOk: null
+          });
+          setTimeout(() => {
+            const infoBtn = document.getElementById('uc-info');
+            if (infoBtn) infoBtn.onclick = async function() {
+              const UserInfoReq = root.lookupType('protocol.UserInfoReq');
+              const APIResp = root.lookupType('protocol.APIResp');
+              const UserInfoResp = root.lookupType('protocol.UserInfoResp');
+              const reqBuf = UserInfoReq.encode(UserInfoReq.create({ token })).finish();
+              try {
+                const resp = await fetch('http://localhost:8081/user_info', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/x-protobuf' },
+                  body: reqBuf
+                });
+                const buf = await resp.arrayBuffer();
+                const apiMsg = APIResp.decode(new Uint8Array(buf));
+                if (apiMsg.code !== 0) throw new Error(apiMsg.msg);
+                const info = UserInfoResp.decode(apiMsg.data);
+                let html = `<div style='margin-bottom:8px;'><b>UID:</b> ${info.uid}</div>`;
+                html += `<div style='margin-bottom:8px;'><b>昵称:</b> ${info.username}</div>`;
+                html += `<div style='margin-bottom:8px;'><b>邮箱:</b> ${info.email}</div>`;
+                showModal({ title: '个人信息', content: html, okText: '关闭' });
+              } catch (e) { alert('获取失败: ' + (e.message || e)); }
+            };
+            const nickBtn = document.getElementById('uc-nick');
+            if (nickBtn) nickBtn.onclick = function() {
+              showModal({
+                title: '修改昵称',
+                inputs: [{ label: '新昵称', placeholder: '输入新昵称' }],
+                okText: '保存',
+                onOk: async ([newUsername]) => {
+                  if (!newUsername) return;
+                  const UpdateUsernameReq = root.lookupType('protocol.UpdateUsernameReq');
+                  const APIResp = root.lookupType('protocol.APIResp');
+                  const reqBuf = UpdateUsernameReq.encode(UpdateUsernameReq.create({ uid: myUid, newUsername })).finish();
+                  const resp = await fetch('http://localhost:8081/update_username', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-protobuf' },
+                    body: reqBuf
+                  });
+                  const buf = await resp.arrayBuffer();
+                  const apiMsg = APIResp.decode(new Uint8Array(buf));
+                  alert(apiMsg.msg || (apiMsg.code === 0 ? '昵称已更新' : '设置失败'));
+                }
+              });
+            };
+            const pwdBtn = document.getElementById('uc-pwd');
+            if (pwdBtn) pwdBtn.onclick = function() {
+              showModal({
+                title: '修改密码',
+                inputs: [
+                  { label: '原密码', type: 'password', placeholder: '原密码' },
+                  { label: '新密码', type: 'password', placeholder: '新密码' }
+                ],
+                okText: '保存',
+                onOk: async ([oldPwd, newPwd]) => {
+                  if (!oldPwd || !newPwd) return;
+                  const UpdatePwdReq = root.lookupType('protocol.UpdatePwdReq');
+                  const APIResp = root.lookupType('protocol.APIResp');
+                  const reqBuf = UpdatePwdReq.encode(UpdatePwdReq.create({ uid: myUid, oldPwd, newPwd })).finish();
+                  const resp = await fetch('http://localhost:8081/update_pwd', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-protobuf' },
+                    body: reqBuf
+                  });
+                  const buf = await resp.arrayBuffer();
+                  const apiMsg = APIResp.decode(new Uint8Array(buf));
+                  alert(apiMsg.msg || (apiMsg.code === 0 ? '密码已更新' : '设置失败'));
+                }
+              });
+            };
+            const delBtn = document.getElementById('uc-del');
+            if (delBtn) delBtn.onclick = function() {
+              if (!confirm('确定要注销账号吗？')) return;
+              const DeleteAccountReq = root.lookupType('protocol.DeleteAccountReq');
+              const APIResp = root.lookupType('protocol.APIResp');
+              const reqBuf = DeleteAccountReq.encode(DeleteAccountReq.create({ uid: myUid })).finish();
+              fetch('http://localhost:8081/delete_account', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-protobuf' },
+                body: reqBuf
+              }).then(async resp => {
+                const buf = await resp.arrayBuffer();
+                const apiMsg = APIResp.decode(new Uint8Array(buf));
+                alert(apiMsg.msg || (apiMsg.code === 0 ? '账号已注销' : '注销失败'));
+                if (apiMsg.code === 0) {
+                  window.localStorage.removeItem('token');
+                  window.localStorage.removeItem('uid');
+                  token = null;
+                  myUid = null;
+                  myUsername = null;
+                  if (ws) { ws.close(); ws = null; }
+                  showLoginPanel();
+                }
+              });
+            };
+            const logoutBtn = document.getElementById('uc-logout');
+            if (logoutBtn) logoutBtn.onclick = async function() {
+              if (!token) { showLoginPanel(); return; }
+              try {
+                const LogoutReq = root.lookupType('protocol.LogoutReq');
+                const APIResp = root.lookupType('protocol.APIResp');
+                const reqBuf = LogoutReq.encode(LogoutReq.create({ token })).finish();
+                const resp = await fetch('http://localhost:8081/logout', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/x-protobuf' },
+                  body: reqBuf
+                });
+                if (!resp.ok) throw new Error('网络错误');
+                const buf = await resp.arrayBuffer();
+                const msg = APIResp.decode(new Uint8Array(buf));
+                if (msg.code !== 0) throw new Error(msg.msg);
+              } catch (e) {
+                alert('退出失败: ' + (e.message || e));
+              }
+              window.localStorage.removeItem('token');
+              window.localStorage.removeItem('uid');
+              token = null;
+              myUid = null;
+              myUsername = null;
+              if (ws) { ws.close(); ws = null; }
+              showLoginPanel();
+            };
+          }, 100);
+        };
+      }
     }
     function showLoginPanel() {
       loginPanel.style.display = '';
@@ -545,6 +1399,8 @@ document.addEventListener('DOMContentLoaded', function() {
       chatHistoryDiv.innerHTML = '';
       currentGroup = null;
       currentFriend = null;
+      if (friendListHeader) friendListHeader.style.display = 'none';
+      if (groupListHeader) groupListHeader.style.display = 'flex';
       fetchGroupList(token);
     };
     tabFriends.onclick = () => {
@@ -556,8 +1412,93 @@ document.addEventListener('DOMContentLoaded', function() {
       chatHistoryDiv.innerHTML = '';
       currentGroup = null;
       currentFriend = null;
+      if (friendListHeader) friendListHeader.style.display = 'flex';
+      if (groupListHeader) groupListHeader.style.display = 'none';
       fetchFriendList(myUid, token);
     };
+
+    // ========== 添加好友/群组按钮 ==========
+    const addFriendBtn = document.getElementById('add-friend-btn');
+    if (addFriendBtn) {
+      addFriendBtn.onclick = async function() {
+        showModal({
+          title: '添加好友',
+          inputs: [
+            { label: '对方UID', placeholder: '请输入对方UID' },
+            { label: '验证消息', placeholder: '验证消息(可选)' }
+          ],
+          okText: '发送请求',
+          onOk: async ([toUid, verifyMsg]) => {
+            if (!toUid) return;
+            if (toUid && token) {
+              const AddFriendReq = root.lookupType('protocol.AddFriendReq');
+              const APIResp = root.lookupType('protocol.APIResp');
+              const reqBuf = AddFriendReq.encode(AddFriendReq.create({ fromUid: myUid, toUid, verifyMsg, token })).finish();
+              try {
+                const resp = await fetch('http://localhost:8081/add_friend', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/x-protobuf' },
+                  body: reqBuf
+                });
+                const buf = await resp.arrayBuffer();
+                const msg = APIResp.decode(new Uint8Array(buf));
+                alert(msg.msg || (msg.code === 0 ? '好友请求已发送' : '添加失败'));
+              } catch (e) {
+                alert('添加失败: ' + (e.message || e));
+              }
+            }
+          }
+        });
+      };
+    }
+    const addGroupBtn = document.getElementById('add-group-btn');
+    if (addGroupBtn) {
+      addGroupBtn.onclick = async function() {
+        showModal({
+          title: '创建/加入群组',
+          inputs: [
+            { label: '创建群组（填写群名）', placeholder: '群组名称' },
+            { label: '加入群组（填写群ID）', placeholder: '群组ID' }
+          ],
+          okText: '确定',
+          onOk: async ([groupName, groupId]) => {
+            if (groupName) {
+              const CreateGroupReq = root.lookupType('protocol.CreateGroupReq');
+              const APIResp = root.lookupType('protocol.APIResp');
+              const reqBuf = CreateGroupReq.encode(CreateGroupReq.create({ name: groupName, ownerUid: myUid, token })).finish();
+              try {
+                const resp = await fetch('http://localhost:8081/create_group', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/x-protobuf' },
+                  body: reqBuf
+                });
+                const buf = await resp.arrayBuffer();
+                const msg = APIResp.decode(new Uint8Array(buf));
+                alert(msg.msg || (msg.code === 0 ? '群组创建成功' : '创建失败'));
+              } catch (e) {
+                alert('创建失败: ' + (e.message || e));
+              }
+            } else if (groupId) {
+              const JoinGroupReq = root.lookupType('protocol.JoinGroupReq');
+              const APIResp = root.lookupType('protocol.APIResp');
+              const reqBuf = JoinGroupReq.encode(JoinGroupReq.create({ groupId, uid: myUid, token })).finish();
+              try {
+                const resp = await fetch('http://localhost:8081/join_group', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/x-protobuf' },
+                  body: reqBuf
+                });
+                const buf = await resp.arrayBuffer();
+                const msg = APIResp.decode(new Uint8Array(buf));
+                alert(msg.msg || (msg.code === 0 ? '入群申请已发送' : '加入失败'));
+              } catch (e) {
+                alert('加入失败: ' + (e.message || e));
+              }
+            }
+          }
+        });
+      };
+    }
 
     const notifyBtn = document.getElementById('notify-btn');
     const notifyPopup = document.getElementById('notify-popup');
@@ -585,5 +1526,8 @@ document.addEventListener('DOMContentLoaded', function() {
         notifyPopup.style.display = 'none';
       }
     });
+
+    // ========== 退出按钮 ==========
+    // ...（彻底删除与logoutBtn相关的所有代码，无需保留任何内容）
   });
 }); 

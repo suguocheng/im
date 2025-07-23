@@ -16,6 +16,9 @@ import (
 // 用户与连接映射
 var wsUserConn sync.Map // userID -> *websocket.Conn
 
+// 在线账号管理（确保为包级变量）
+var onlineAccounts = make(map[string]bool)
+
 type WSProtocol struct {
 	upgrader websocket.Upgrader
 	handler  func(conn *websocket.Conn, data []byte)
@@ -42,8 +45,13 @@ func (w *WSProtocol) Start(addr string) error {
 }
 
 func (w *WSProtocol) handleConn(conn *websocket.Conn) {
-	defer conn.Close()
 	var userID string
+	defer func() {
+		if userID != "" {
+			delete(onlineAccounts, userID)
+		}
+		conn.Close()
+	}()
 	for {
 		_, data, err := conn.ReadMessage()
 		if err != nil {

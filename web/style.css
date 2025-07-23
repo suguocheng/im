@@ -115,6 +115,16 @@ aside {
 .list-item:hover, .list-item.selected {
   background: #f0f0f0;
 }
+.friend-list-title, .group-list-title {
+  font-size: 1em;
+  margin-left: 60px;
+  margin-top: 6px;
+  margin-bottom: 8px;
+}
+#friend-list, #group-list {
+  margin-top: 0;
+  padding-top: 0;
+}
 #chat-section {
   flex: 1;
   display: flex;
@@ -160,4 +170,66 @@ aside {
 }
 #send-btn:hover {
   background: #444;
-} 
+}
+.circle-add-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #409eff;
+  color: #fff;
+  font-size: 1.1em;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  cursor: pointer;
+  outline: none;
+  padding: 0;
+  margin: 0;
+}
+.circle-add-btn:hover, .circle-add-btn:focus {
+  background: #1976d2;
+}
+.circle-more-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #e0e0e0;
+  color: #555;
+  font-size: 1.2em;         /* 稍大一点 */
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 22px;         /* 保证内容垂直居中 */
+  transition: background 0.2s;
+  cursor: pointer;
+  outline: none;
+  padding: 0;
+  margin-left: 12px;         /* 让按钮更靠右 */
+  margin-right: 0px;         /* 离右边有点空隙 */
+}
+.circle-more-btn:hover, .circle-more-btn:focus {
+  background: #bdbdbd;
+}
+.circle-user-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #409eff;
+  color: #fff;
+  font-size: 1.1em;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  cursor: pointer;
+  outline: none;
+  padding: 0;
+  margin-left: 8px;
+}
+.circle-user-btn:hover, .circle-user-btn:focus {
+  background: #1976d2;
+}

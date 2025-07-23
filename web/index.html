@@ -28,7 +28,7 @@
     <header>
       <span id="user-info"></span>
       <button id="notify-btn">🔔 通知</button>
-      <button id="logout-btn">退出</button>
+      <button id="user-center-btn" class="circle-user-btn" title="个人中心">👤</button>
       <div id="notify-popup" style="display:none;position:absolute;right:32px;top:60px;min-width:260px;max-width:340px;z-index:999;"></div>
     </header>
     <div class="main-content">
@@ -37,7 +37,15 @@
           <button id="tab-friends" class="tab active">好友</button>
           <button id="tab-groups" class="tab">群组</button>
         </div>
+        <div id="friend-list-header" style="display:flex;align-items:center;justify-content:space-between;padding:0 8px 4px 8px;">
+          <span class="friend-list-title">好友列表</span>
+          <button id="add-friend-btn" class="circle-add-btn" title="添加好友">+</button>
+        </div>
         <div id="friend-list" class="list"></div>
+        <div id="group-list-header" style="display:none;align-items:center;justify-content:space-between;padding:0 8px 4px 8px;">
+          <span class="group-list-title">群组列表</span>
+          <button id="add-group-btn" class="circle-add-btn" title="新建/加入群组">+</button>
+        </div>
         <div id="group-list" class="list" style="display:none;"></div>
       </aside>
       <section id="chat-section">
@@ -54,8 +62,27 @@
       </section>
     </div>
   </div>
+  <div id="modal-mask" style="display:none;position:fixed;z-index:9999;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);"></div>
+  <div id="modal-dialog" style="display:none;position:fixed;z-index:10000;left:50%;top:50%;transform:translate(-50%,-50%);background:#fff;border-radius:8px;box-shadow:0 4px 24px rgba(0,0,0,0.18);min-width:280px;max-width:90vw;padding:0 0 16px 0;">
+    <div id="modal-title" style="font-weight:bold;font-size:1.1em;padding:16px 24px 8px 24px;"></div>
+    <div id="modal-content" style="padding:0 24px 8px 24px;"></div>
+    <div id="modal-actions" style="display:flex;justify-content:flex-end;gap:12px;padding:0 24px 8px 24px;"></div>
+  </div>
   <script src="https://cdn.jsdelivr.net/npm/protobufjs/dist/protobuf.min.js"></script>
   <script src="main.js"></script>
+  <script>
+// 按钮悬停高亮
+const addFriendBtn = document.getElementById('add-friend-btn');
+if (addFriendBtn) {
+  addFriendBtn.onmouseenter = function() { this.style.background = '#1976d2'; };
+  addFriendBtn.onmouseleave = function() { this.style.background = '#409eff'; };
+}
+const addGroupBtn = document.getElementById('add-group-btn');
+if (addGroupBtn) {
+  addGroupBtn.onmouseenter = function() { this.style.background = '#1976d2'; };
+  addGroupBtn.onmouseleave = function() { this.style.background = '#409eff'; };
+}
+</script>
 </body>
 </html>
  
