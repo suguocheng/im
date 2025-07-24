@@ -1,3 +1,7 @@
+// ======= 统一API/WS地址配置 =======
+const API_BASE = 'http://113.219.237.106:62596';
+const WS_BASE = 'ws://60.215.128.50:38438/ws';
+
 // ========== 通用居中弹窗 ==========
 function showModal({ title = '', content = '', inputs = [], okText = '确定', cancelText = '取消', onOk }) {
   const mask = document.getElementById('modal-mask');
