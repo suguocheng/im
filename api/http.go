@@ -42,9 +42,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		writeResp(w, 1002, "密码或邮箱长度不合法", nil)
 		return
 	}
-	uid := fmt.Sprintf("%d", nextUID)
-	nextUID++
-	err = storageManager.CreateUser(uid, req.Username, req.Password, req.Email)
+	uid, err := storageManager.CreateUser(req.Username, req.Password, req.Email)
 	if err != nil {
 		writeResp(w, 1004, err.Error(), nil)
 		return

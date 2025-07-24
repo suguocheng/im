@@ -47,14 +47,34 @@ func (m *MySQLUserStorage) InitTables() error {
 		return fmt.Errorf("创建用户表失败: %v", err)
 	}
 
+	// 新增：自动修正uid字段为NULL，避免注册时插入报错
+	_, err = m.db.Exec("ALTER TABLE users MODIFY COLUMN uid VARCHAR(64) NULL;")
+	if err != nil {
+		fmt.Println("尝试修正users.uid为NULL失败：", err)
+	}
+
 	return nil
 }
 
 // 创建用户
-func (m *MySQLUserStorage) CreateUser(uid, username, password, email string) error {
-	query := `INSERT INTO users (uid, username, password, email) VALUES (?, ?, ?, ?)`
-	_, err := m.db.Exec(query, uid, username, password, email)
-	return err
+func (m *MySQLUserStorage) CreateUser(username, password, email string) (string, error) {
+	// 先插入一条记录，让id自增
+	query := `INSERT INTO users (username, password, email) VALUES (?, ?, ?)`
+	res, err := m.db.Exec(query, username, password, email)
+	if err != nil {
+		return "", err
+	}
+	id, err := res.LastInsertId()
+	if err != nil {
+		return "", err
+	}
+	uid := fmt.Sprintf("%d", id)
+	// 更新uid字段
+	_, err = m.db.Exec(`UPDATE users SET uid = ? WHERE id = ?`, uid, id)
+	if err != nil {
+		return "", err
+	}
+	return uid, nil
 }
 
 // 根据UID获取用户

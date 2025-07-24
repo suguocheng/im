@@ -35,6 +35,12 @@ func (m *MySQLGroupStorage) InitTables() error {
 		return fmt.Errorf("创建群组表失败: %v", err)
 	}
 
+	// 新增：自动修正group_id字段为NULL，避免建群时插入报错
+	_, err = m.db.Exec("ALTER TABLE `groups` MODIFY COLUMN group_id VARCHAR(50) NULL;")
+	if err != nil {
+		fmt.Println("尝试修正groups.group_id为NULL失败：", err)
+	}
+
 	// 群组成员表
 	_, err = m.db.Exec("CREATE TABLE IF NOT EXISTS group_members (" +
 		"group_id VARCHAR(50) NOT NULL," +
@@ -102,15 +108,22 @@ func (m *MySQLGroupStorage) CreateGroup(name, ownerUID string) (string, error) {
 	defer tx.Rollback()
 
 	now := time.Now().Unix()
-	groupID := m.GenerateGroupID()
-
-	// 插入群组信息（描述字段置空）
-	_, err = tx.Exec("INSERT INTO `groups` (group_id, name, description, owner_uid, created_at, updated_at) VALUES (?, ?, '', ?, ?, ?)",
-		groupID, name, ownerUID, now, now)
+	// 先插入一条记录，让id自增
+	res, err := tx.Exec("INSERT INTO `groups` (name, description, owner_uid, created_at, updated_at) VALUES (?, '', ?, ?, ?)",
+		name, ownerUID, now, now)
 	if err != nil {
 		return "", fmt.Errorf("创建群组失败: %v", err)
 	}
-
+	id, err := res.LastInsertId()
+	if err != nil {
+		return "", fmt.Errorf("获取群组ID失败: %v", err)
+	}
+	groupID := fmt.Sprintf("%d", id)
+	// 更新group_id字段
+	_, err = tx.Exec("UPDATE `groups` SET group_id = ? WHERE id = ?", groupID, id)
+	if err != nil {
+		return "", fmt.Errorf("更新group_id失败: %v", err)
+	}
 	// 添加群主为成员
 	_, err = tx.Exec(`
 		INSERT INTO group_members (group_id, uid, nickname, role, join_time)

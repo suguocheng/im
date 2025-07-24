@@ -87,14 +87,14 @@ func (sm *StorageManager) Close() error {
 // ==================== 用户相关操作 ====================
 
 // 创建用户
-func (sm *StorageManager) CreateUser(uid, username, password, email string) error {
+func (sm *StorageManager) CreateUser(username, password, email string) (string, error) {
 	sm.mu.RLock()
 	defer sm.mu.RUnlock()
 
 	if !sm.useMySQL || sm.userStorage == nil {
-		return fmt.Errorf("MySQL存储未初始化")
+		return "", fmt.Errorf("MySQL存储未初始化")
 	}
-	return sm.userStorage.CreateUser(uid, username, password, email)
+	return sm.userStorage.CreateUser(username, password, email)
 }
 
 // 根据UID获取用户

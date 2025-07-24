@@ -54,6 +54,7 @@ func main() {
 
 			// --- 处理私聊消息 ---
 			if isChatMessage && msg.To != "" {
+				msg.FromUsername = senderUsername(storageManager, msg.From)
 				b, _ := proto.Marshal(&msg)
 				err := protocol.SendToUser(msg.To, b) // 始终推送消息
 				if err != nil {
@@ -77,6 +78,7 @@ func main() {
 
 			// --- 新增：处理群聊消息 ---
 			if isChatMessage && msg.GroupId != "" {
+				msg.FromUsername = senderUsername(storageManager, msg.From)
 				// 新增禁言校验
 				storageManager := storage.GetStorageManager()
 				isMuted := false

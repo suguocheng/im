@@ -237,6 +237,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const buf = await resp.arrayBuffer();
         const msg = APIResp.decode(new Uint8Array(buf));
         if (msg.code !== 0) throw new Error(msg.msg);
+        // 新增：注册成功后弹窗提示UID
+        const newUid = new TextDecoder().decode(msg.data);
+        showModal({
+          title: '注册成功',
+          content: `<div style='font-size:1.1em;'>您的账号UID为 <b>${newUid}</b><br>请妥善保存，用于登录</div>`,
+          okText: '去登录'
+        });
         showLoginPanel();
       } catch (e) {
         registerError.textContent = e.message || '注册失败';
@@ -257,7 +264,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const apiMsg = APIResp.decode(new Uint8Array(buf));
         if (apiMsg.code !== 0) throw new Error(apiMsg.msg);
         const userInfo = UserInfoResp.decode(apiMsg.data);
-        userInfoSpan.textContent = `${userInfo.username} (${userInfo.email})`;
+        userInfoSpan.textContent = `${userInfo.username} (UID: ${userInfo.uid})`;
         myUid = userInfo.uid;
         myUsername = userInfo.username;
         // 获取好友列表
@@ -1078,7 +1085,7 @@ document.addEventListener('DOMContentLoaded', function() {
       chatInput.value = '';
     }
 
-    function appendMessage({ from, content, self, timestamp, type, extra }) {
+    function appendMessage({ from, content, self, timestamp, type, extra, username }) {
       // 移除暂无消息提示
       const emptyTip = chatHistoryDiv.querySelector('.empty-tip');
       if (emptyTip) emptyTip.remove();
@@ -1086,15 +1093,29 @@ document.addEventListener('DOMContentLoaded', function() {
       div.style.margin = '8px 0';
       div.style.textAlign = self ? 'right' : 'left';
       let html = '';
+      // 群聊消息显示昵称
+      let nickname = '';
+      if (currentGroup && !self) {
+        // extra格式: nickname:xxx, 可扩展
+        if (extra && typeof extra === 'string') {
+          const match = extra.match(/nickname:([^,]+)/);
+          if (match) nickname = match[1];
+        }
+        if (!nickname && username) nickname = username;
+        if (!nickname) nickname = from; // 兜底显示UID
+        if (nickname) {
+          html += `<div style='font-size:0.98em;color:#409eff;margin-bottom:2px;'>${nickname}</div>`;
+        }
+      }
       if (type === 'image') {
         const imgUrl = (content && content.startsWith('http')) ? content : (content ? 'http://localhost:8081' + content : '');
-        html = imgUrl ? `<img src="${imgUrl}" alt="图片" style="max-width:180px;max-height:120px;border-radius:8px;vertical-align:middle;">` : '';
+        html += imgUrl ? `<img src="${imgUrl}" alt="图片" style="max-width:180px;max-height:120px;border-radius:8px;vertical-align:middle;">` : '';
         if (extra) html += `<div style="font-size:0.9em;color:#888;">${extra}</div>`;
       } else if (type === 'file') {
         const fileUrl = (content && content.startsWith('http')) ? content : (content ? 'http://localhost:8081' + content : '');
-        html = fileUrl ? `<a href="${fileUrl}" target="_blank" style="color:#409eff;text-decoration:underline;">${extra || '文件'}</a>` : '';
+        html += fileUrl ? `<a href="${fileUrl}" target="_blank" style="color:#409eff;text-decoration:underline;">${extra || '文件'}</a>` : '';
       } else {
-        html = `<span style="display:inline-block;padding:6px 14px;border-radius:16px;background:${self ? '#409eff' : '#eee'};color:${self ? '#fff' : '#222'};max-width:60%;word-break:break-all;">${content}</span>`;
+        html += `<span style="display:inline-block;padding:6px 14px;border-radius:16px;background:${self ? '#409eff' : '#eee'};color:${self ? '#fff' : '#222'};max-width:60%;word-break:break-all;">${content}</span>`;
       }
       // 格式化时间
       const timeStr = timestamp ? formatTime(timestamp) : '';
@@ -1142,6 +1163,14 @@ document.addEventListener('DOMContentLoaded', function() {
             notif = Notification.decode(buf);
           } catch {}
           if (notif && notif.type) {
+            // 判断是否为当前聊天对象的消息，若是则不弹窗
+            if (
+              (notif.type === 'private_chat_message' && currentFriend && notif.from === currentFriend.uid) ||
+              (notif.type === 'group_chat_message' && currentGroup && notif.groupId === currentGroup.groupId)
+            ) {
+              // 不弹窗
+              return;
+            }
             console.log('notif分支');
             console.log('notif对象:', notif);
             console.log('notif.type:', notif.type, typeof notif.type);
@@ -1217,7 +1246,7 @@ document.addEventListener('DOMContentLoaded', function() {
           }
           // 群聊消息
           else if (msg.type === 'chat' && currentGroup && msg.groupId === currentGroup.groupId) {
-            appendMessage({ from: msg.from, content: replaceEmojis(msg.content), self: msg.from === myUid, timestamp: msg.timestamp, type: 'chat' });
+            appendMessage({ from: msg.from, content: replaceEmojis(msg.content), self: msg.from === myUid, timestamp: msg.timestamp, type: 'chat', extra: msg.extra, username: msg.fromUsername });
           } else if (msg.type === 'image' && currentGroup && msg.groupId === currentGroup.groupId) {
             appendMessage({ from: msg.from, content: msg.content, self: msg.from === myUid, timestamp: msg.timestamp, type: 'image', extra: msg.extra });
           } else if (msg.type === 'file' && currentGroup && msg.groupId === currentGroup.groupId) {
@@ -1422,81 +1451,277 @@ document.addEventListener('DOMContentLoaded', function() {
     if (addFriendBtn) {
       addFriendBtn.onclick = async function() {
         showModal({
-          title: '添加好友',
-          inputs: [
-            { label: '对方UID', placeholder: '请输入对方UID' },
-            { label: '验证消息', placeholder: '验证消息(可选)' }
-          ],
-          okText: '发送请求',
-          onOk: async ([toUid, verifyMsg]) => {
-            if (!toUid) return;
-            if (toUid && token) {
-              const AddFriendReq = root.lookupType('protocol.AddFriendReq');
-              const APIResp = root.lookupType('protocol.APIResp');
-              const reqBuf = AddFriendReq.encode(AddFriendReq.create({ fromUid: myUid, toUid, verifyMsg, token })).finish();
-              try {
-                const resp = await fetch('http://localhost:8081/add_friend', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/x-protobuf' },
-                  body: reqBuf
-                });
-                const buf = await resp.arrayBuffer();
-                const msg = APIResp.decode(new Uint8Array(buf));
-                alert(msg.msg || (msg.code === 0 ? '好友请求已发送' : '添加失败'));
-              } catch (e) {
-                alert('添加失败: ' + (e.message || e));
-              }
-            }
-          }
+          title: '好友操作',
+          content: `<div style='display:flex;flex-direction:column;gap:12px;padding:8px 0;'>
+            <button id='btn-add-friend' style='padding:10px 0;font-size:1em;border-radius:4px;border:none;background:#409eff;color:#fff;cursor:pointer;'>添加好友</button>
+            <button id='btn-handle-friend-req' style='padding:10px 0;font-size:1em;border-radius:4px;border:none;background:#eee;color:#222;cursor:pointer;'>处理好友请求</button>
+          </div>`,
+          okText: '关闭',
+          cancelText: '',
+          onOk: null
         });
+        setTimeout(() => {
+          const btnAdd = document.getElementById('btn-add-friend');
+          if (btnAdd) btnAdd.onclick = function() {
+            showModal({
+              title: '添加好友',
+              inputs: [
+                { label: '对方UID', placeholder: '请输入对方UID' },
+                { label: '验证消息', placeholder: '验证消息(可选)' }
+              ],
+              okText: '发送请求',
+              onOk: async ([toUid, verifyMsg]) => {
+                if (!toUid) return;
+                if (toUid && token) {
+                  const AddFriendReq = root.lookupType('protocol.AddFriendReq');
+                  const APIResp = root.lookupType('protocol.APIResp');
+                  const reqBuf = AddFriendReq.encode(AddFriendReq.create({ fromUid: myUid, toUid, verifyMsg, token })).finish();
+                  try {
+                    const resp = await fetch('http://localhost:8081/add_friend', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/x-protobuf' },
+                      body: reqBuf
+                    });
+                    const buf = await resp.arrayBuffer();
+                    const msg = APIResp.decode(new Uint8Array(buf));
+                    alert(msg.msg || (msg.code === 0 ? '好友请求已发送' : '添加失败'));
+                  } catch (e) {
+                    alert('添加失败: ' + (e.message || e));
+                  }
+                }
+              }
+            });
+          };
+          const btnHandle = document.getElementById('btn-handle-friend-req');
+          if (btnHandle) btnHandle.onclick = async function() {
+            // 拉取好友请求列表
+            const FriendListReq = root.lookupType('protocol.FriendListReq');
+            const APIResp = root.lookupType('protocol.APIResp');
+            const FriendRequestListResp = root.lookupType('protocol.FriendRequestListResp');
+            const reqBuf = FriendListReq.encode(FriendListReq.create({ uid: myUid, token })).finish();
+            try {
+              const resp = await fetch('http://localhost:8081/friend_request_list', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-protobuf' },
+                body: reqBuf
+              });
+              const buf = await resp.arrayBuffer();
+              const msg = APIResp.decode(new Uint8Array(buf));
+              if (msg.code !== 0) throw new Error(msg.msg);
+              const reqList = FriendRequestListResp.decode(msg.data);
+              let html = '';
+              if (!reqList.fromUids || reqList.fromUids.length === 0) {
+                html = `<div style='color:#888;padding:12px;'>暂无好友请求</div>`;
+              } else {
+                html = reqList.fromUids.map((uid, i) => {
+                  const uname = reqList.fromUsernames[i] || uid;
+                  const vmsg = reqList.verifyMsgs[i] || '';
+                  return `<div style='margin-bottom:10px;padding:8px 0;border-bottom:1px solid #eee;'>
+                    <b>${uname}</b> (UID: ${uid})<br>
+                    <span style='color:#888;'>验证消息: ${vmsg}</span><br>
+                    <button class='btn-accept-friend' data-uid='${uid}' style='margin:6px 8px 0 0;padding:4px 14px;background:#409eff;color:#fff;border:none;border-radius:4px;cursor:pointer;'>同意</button>
+                    <button class='btn-reject-friend' data-uid='${uid}' style='margin:6px 0 0 0;padding:4px 14px;background:#eee;color:#222;border:none;border-radius:4px;cursor:pointer;'>拒绝</button>
+                  </div>`;
+                }).join('');
+              }
+              showModal({
+                title: '处理好友请求',
+                content: html,
+                okText: '关闭',
+                cancelText: '',
+                onOk: null
+              });
+              setTimeout(() => {
+                document.querySelectorAll('.btn-accept-friend').forEach(btn => {
+                  btn.onclick = async function() {
+                    const fromUid = btn.getAttribute('data-uid');
+                    const HandleFriendReq = root.lookupType('protocol.HandleFriendReq');
+                    const reqBuf = HandleFriendReq.encode(HandleFriendReq.create({ fromUid, toUid: myUid, accept: true, token })).finish();
+                    const resp = await fetch('http://localhost:8081/handle_friend', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/x-protobuf' },
+                      body: reqBuf
+                    });
+                    const buf = await resp.arrayBuffer();
+                    const msg = APIResp.decode(new Uint8Array(buf));
+                    alert(msg.msg || (msg.code === 0 ? '已同意' : '操作失败'));
+                  };
+                });
+                document.querySelectorAll('.btn-reject-friend').forEach(btn => {
+                  btn.onclick = async function() {
+                    const fromUid = btn.getAttribute('data-uid');
+                    const HandleFriendReq = root.lookupType('protocol.HandleFriendReq');
+                    const reqBuf = HandleFriendReq.encode(HandleFriendReq.create({ fromUid, toUid: myUid, accept: false, token })).finish();
+                    const resp = await fetch('http://localhost:8081/handle_friend', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/x-protobuf' },
+                      body: reqBuf
+                    });
+                    const buf = await resp.arrayBuffer();
+                    const msg = APIResp.decode(new Uint8Array(buf));
+                    alert(msg.msg || (msg.code === 0 ? '已拒绝' : '操作失败'));
+                  };
+                });
+              }, 50);
+            } catch (e) {
+              showModal({ title: '处理好友请求', content: `<div style='color:#e74c3c;padding:12px;'>加载失败: ${e.message || e}</div>`, okText: '关闭' });
+            }
+          };
+        }, 50);
       };
     }
     const addGroupBtn = document.getElementById('add-group-btn');
     if (addGroupBtn) {
       addGroupBtn.onclick = async function() {
         showModal({
-          title: '创建/加入群组',
-          inputs: [
-            { label: '创建群组（填写群名）', placeholder: '群组名称' },
-            { label: '加入群组（填写群ID）', placeholder: '群组ID' }
-          ],
-          okText: '确定',
-          onOk: async ([groupName, groupId]) => {
-            if (groupName) {
-              const CreateGroupReq = root.lookupType('protocol.CreateGroupReq');
-              const APIResp = root.lookupType('protocol.APIResp');
-              const reqBuf = CreateGroupReq.encode(CreateGroupReq.create({ name: groupName, ownerUid: myUid, token })).finish();
-              try {
-                const resp = await fetch('http://localhost:8081/create_group', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/x-protobuf' },
-                  body: reqBuf
-                });
-                const buf = await resp.arrayBuffer();
-                const msg = APIResp.decode(new Uint8Array(buf));
-                alert(msg.msg || (msg.code === 0 ? '群组创建成功' : '创建失败'));
-              } catch (e) {
-                alert('创建失败: ' + (e.message || e));
-              }
-            } else if (groupId) {
-              const JoinGroupReq = root.lookupType('protocol.JoinGroupReq');
-              const APIResp = root.lookupType('protocol.APIResp');
-              const reqBuf = JoinGroupReq.encode(JoinGroupReq.create({ groupId, uid: myUid, token })).finish();
-              try {
-                const resp = await fetch('http://localhost:8081/join_group', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/x-protobuf' },
-                  body: reqBuf
-                });
-                const buf = await resp.arrayBuffer();
-                const msg = APIResp.decode(new Uint8Array(buf));
-                alert(msg.msg || (msg.code === 0 ? '入群申请已发送' : '加入失败'));
-              } catch (e) {
-                alert('加入失败: ' + (e.message || e));
-              }
-            }
-          }
+          title: '群组操作',
+          content: `<div style='display:flex;flex-direction:column;gap:12px;padding:8px 0;'>
+            <button id='btn-create-group' style='padding:10px 0;font-size:1em;border-radius:4px;border:none;background:#409eff;color:#fff;cursor:pointer;'>创建群组</button>
+            <button id='btn-join-group' style='padding:10px 0;font-size:1em;border-radius:4px;border:none;background:#eee;color:#222;cursor:pointer;'>加入群组</button>
+            <button id='btn-handle-group-req' style='padding:10px 0;font-size:1em;border-radius:4px;border:none;background:#eee;color:#222;cursor:pointer;'>处理群组请求</button>
+          </div>`,
+          okText: '关闭',
+          cancelText: '',
+          onOk: null
         });
+        setTimeout(() => {
+          const btnCreate = document.getElementById('btn-create-group');
+          if (btnCreate) btnCreate.onclick = function() {
+            showModal({
+              title: '创建群组',
+              inputs: [
+                { label: '群组名称', placeholder: '输入群组名称' }
+              ],
+              okText: '创建',
+              onOk: async ([groupName]) => {
+                if (!groupName) return;
+                const CreateGroupReq = root.lookupType('protocol.CreateGroupReq');
+                const APIResp = root.lookupType('protocol.APIResp');
+                const reqBuf = CreateGroupReq.encode(CreateGroupReq.create({ name: groupName, ownerUid: myUid, token })).finish();
+                try {
+                  const resp = await fetch('http://localhost:8081/create_group', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-protobuf' },
+                    body: reqBuf
+                  });
+                  const buf = await resp.arrayBuffer();
+                  const msg = APIResp.decode(new Uint8Array(buf));
+                  alert(msg.msg || (msg.code === 0 ? '群组创建成功' : '创建失败'));
+                  fetchGroupList(token);
+                } catch (e) {
+                  alert('创建失败: ' + (e.message || e));
+                }
+              }
+            });
+          };
+          const btnJoin = document.getElementById('btn-join-group');
+          if (btnJoin) btnJoin.onclick = function() {
+            showModal({
+              title: '加入群组',
+              inputs: [
+                { label: '群组ID', placeholder: '输入群组ID' }
+              ],
+              okText: '申请加入',
+              onOk: async ([groupId]) => {
+                if (!groupId) return;
+                const JoinGroupReq = root.lookupType('protocol.JoinGroupReq');
+                const APIResp = root.lookupType('protocol.APIResp');
+                const reqBuf = JoinGroupReq.encode(JoinGroupReq.create({ groupId, uid: myUid, token })).finish();
+                try {
+                  const resp = await fetch('http://localhost:8081/join_group', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-protobuf' },
+                    body: reqBuf
+                  });
+                  const buf = await resp.arrayBuffer();
+                  const msg = APIResp.decode(new Uint8Array(buf));
+                  alert(msg.msg || (msg.code === 0 ? '入群申请已发送' : '加入失败'));
+                } catch (e) {
+                  alert('加入失败: ' + (e.message || e));
+                }
+              }
+            });
+          };
+          const btnHandle = document.getElementById('btn-handle-group-req');
+          if (btnHandle) btnHandle.onclick = async function() {
+            // 拉取待审批群组邀请请求
+            const GroupInviteListReq = root.lookupType('protocol.GroupInviteListReq');
+            const APIResp = root.lookupType('protocol.APIResp');
+            const GroupInviteListResp = root.lookupType('protocol.GroupInviteListResp');
+            const reqBuf = GroupInviteListReq.encode(GroupInviteListReq.create({ uid: myUid, token })).finish();
+            try {
+              const resp = await fetch('http://localhost:8081/group_invite_requests', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-protobuf' },
+                body: reqBuf
+              });
+              const buf = await resp.arrayBuffer();
+              const msg = APIResp.decode(new Uint8Array(buf));
+              if (msg.code !== 0) throw new Error(msg.msg);
+              const reqList = GroupInviteListResp.decode(msg.data);
+              let html = '';
+              if (!reqList.items || reqList.items.length === 0) {
+                html = `<div style='color:#888;padding:12px;'>暂无待审批的群组请求</div>`;
+              } else {
+                html = reqList.items.map(item => {
+                  return `<div style='margin-bottom:10px;padding:8px 0;border-bottom:1px solid #eee;'>
+                    <b>群名:</b> ${item.groupName} (ID: ${item.groupId})<br>
+                    <b>邀请人:</b> ${item.inviterUsername} (UID: ${item.inviterUid})<br>
+                    <b>被邀请:</b> ${item.inviteeUsername} (UID: ${item.inviteeUid})<br>
+                    <b>状态:</b> ${item.status}<br>
+                    <button class='btn-approve-group' data-id='${item.id}' data-group='${item.groupId}' data-invitee='${item.inviteeUid}' style='margin:6px 8px 0 0;padding:4px 14px;background:#409eff;color:#fff;border:none;border-radius:4px;cursor:pointer;'>同意</button>
+                    <button class='btn-reject-group' data-id='${item.id}' data-group='${item.groupId}' data-invitee='${item.inviteeUid}' style='margin:6px 0 0 0;padding:4px 14px;background:#eee;color:#222;border:none;border-radius:4px;cursor:pointer;'>拒绝</button>
+                  </div>`;
+                }).join('');
+              }
+              showModal({
+                title: '处理群组请求',
+                content: html,
+                okText: '关闭',
+                cancelText: '',
+                onOk: null
+              });
+              setTimeout(() => {
+                document.querySelectorAll('.btn-approve-group').forEach(btn => {
+                  btn.onclick = async function() {
+                    const id = btn.getAttribute('data-id');
+                    const groupId = btn.getAttribute('data-group');
+                    const inviteeUid = btn.getAttribute('data-invitee');
+                    const HandleGroupInviteReq = root.lookupType('protocol.HandleGroupInviteReq');
+                    const reqBuf = HandleGroupInviteReq.encode(HandleGroupInviteReq.create({ id, groupId, inviteeUid, approve: true, token })).finish();
+                    const resp = await fetch('http://localhost:8081/handle_group_invite', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/x-protobuf' },
+                      body: reqBuf
+                    });
+                    const buf = await resp.arrayBuffer();
+                    const msg = APIResp.decode(new Uint8Array(buf));
+                    alert(msg.msg || (msg.code === 0 ? '已同意' : '操作失败'));
+                  };
+                });
+                document.querySelectorAll('.btn-reject-group').forEach(btn => {
+                  btn.onclick = async function() {
+                    const id = btn.getAttribute('data-id');
+                    const groupId = btn.getAttribute('data-group');
+                    const inviteeUid = btn.getAttribute('data-invitee');
+                    const HandleGroupInviteReq = root.lookupType('protocol.HandleGroupInviteReq');
+                    const reqBuf = HandleGroupInviteReq.encode(HandleGroupInviteReq.create({ id, groupId, inviteeUid, approve: false, token })).finish();
+                    const resp = await fetch('http://localhost:8081/handle_group_invite', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/x-protobuf' },
+                      body: reqBuf
+                    });
+                    const buf = await resp.arrayBuffer();
+                    const msg = APIResp.decode(new Uint8Array(buf));
+                    alert(msg.msg || (msg.code === 0 ? '已拒绝' : '操作失败'));
+                  };
+                });
+              }, 50);
+            } catch (e) {
+              showModal({ title: '处理群组请求', content: `<div style='color:#e74c3c;padding:12px;'>加载失败: ${e.message || e}</div>`, okText: '关闭' });
+            }
+          };
+        }, 50);
       };
     }
 
@@ -1527,7 +1752,5 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
 
-    // ========== 退出按钮 ==========
-    // ...（彻底删除与logoutBtn相关的所有代码，无需保留任何内容）
   });
 }); 

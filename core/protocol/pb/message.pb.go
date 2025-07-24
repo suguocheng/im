@@ -23,18 +23,19 @@ const (
 
 type IMMessage struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Type          string                 `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`                          // 消息类型: text, emoji, image, file, etc.
-	From          string                 `protobuf:"bytes,2,opt,name=from,proto3" json:"from,omitempty"`                          // 发送方UID
-	To            string                 `protobuf:"bytes,3,opt,name=to,proto3" json:"to,omitempty"`                              // 接收方UID
-	Content       string                 `protobuf:"bytes,4,opt,name=content,proto3" json:"content,omitempty"`                    // 文本内容、表情代码、图片URL、文件URL等
-	Timestamp     int64                  `protobuf:"varint,5,opt,name=timestamp,proto3" json:"timestamp,omitempty"`               // 消息时间戳
-	Extra         string                 `protobuf:"bytes,6,opt,name=extra,proto3" json:"extra,omitempty"`                        // 扩展字段（如图片缩略图、文件名、文件大小等）
-	Token         string                 `protobuf:"bytes,7,opt,name=token,proto3" json:"token,omitempty"`                        // 登录鉴权token
-	Data          []byte                 `protobuf:"bytes,8,opt,name=data,proto3" json:"data,omitempty"`                          // 二进制数据（图片、文件等）
-	Filename      string                 `protobuf:"bytes,9,opt,name=filename,proto3" json:"filename,omitempty"`                  // 文件名
-	Filesize      int64                  `protobuf:"varint,10,opt,name=filesize,proto3" json:"filesize,omitempty"`                // 文件大小（字节）
-	MimeType      string                 `protobuf:"bytes,11,opt,name=mime_type,json=mimeType,proto3" json:"mime_type,omitempty"` // MIME类型
-	GroupId       string                 `protobuf:"bytes,12,opt,name=group_id,json=groupId,proto3" json:"group_id,omitempty"`    // 新增：群组ID
+	Type          string                 `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"` // 消息类型: text, emoji, image, file, etc.
+	From          string                 `protobuf:"bytes,2,opt,name=from,proto3" json:"from,omitempty"` // 发送方UID
+	FromUsername  string                 `protobuf:"bytes,3,opt,name=from_username,json=fromUsername,proto3" json:"from_username,omitempty"`
+	To            string                 `protobuf:"bytes,4,opt,name=to,proto3" json:"to,omitempty"`                              // 接收方UID
+	Content       string                 `protobuf:"bytes,5,opt,name=content,proto3" json:"content,omitempty"`                    // 文本内容、表情代码、图片URL、文件URL等
+	Timestamp     int64                  `protobuf:"varint,6,opt,name=timestamp,proto3" json:"timestamp,omitempty"`               // 消息时间戳
+	Extra         string                 `protobuf:"bytes,7,opt,name=extra,proto3" json:"extra,omitempty"`                        // 扩展字段（如图片缩略图、文件名、文件大小等）
+	Token         string                 `protobuf:"bytes,8,opt,name=token,proto3" json:"token,omitempty"`                        // 登录鉴权token
+	Data          []byte                 `protobuf:"bytes,9,opt,name=data,proto3" json:"data,omitempty"`                          // 二进制数据（图片、文件等）
+	Filename      string                 `protobuf:"bytes,10,opt,name=filename,proto3" json:"filename,omitempty"`                 // 文件名
+	Filesize      int64                  `protobuf:"varint,11,opt,name=filesize,proto3" json:"filesize,omitempty"`                // 文件大小（字节）
+	MimeType      string                 `protobuf:"bytes,12,opt,name=mime_type,json=mimeType,proto3" json:"mime_type,omitempty"` // MIME类型
+	GroupId       string                 `protobuf:"bytes,13,opt,name=group_id,json=groupId,proto3" json:"group_id,omitempty"`    // 新增：群组ID
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -79,6 +80,13 @@ func (x *IMMessage) GetType() string {
 func (x *IMMessage) GetFrom() string {
 	if x != nil {
 		return x.From
+	}
+	return ""
+}
+
+func (x *IMMessage) GetFromUsername() string {
+	if x != nil {
+		return x.FromUsername
 	}
 	return ""
 }
@@ -403,21 +411,22 @@ var File_core_protocol_proto_message_proto protoreflect.FileDescriptor
 
 const file_core_protocol_proto_message_proto_rawDesc = "" +
 	"\n" +
-	"!core/protocol/proto/message.proto\x12\bprotocol\"\xab\x02\n" +
+	"!core/protocol/proto/message.proto\x12\bprotocol\"\xd0\x02\n" +
 	"\tIMMessage\x12\x12\n" +
 	"\x04type\x18\x01 \x01(\tR\x04type\x12\x12\n" +
-	"\x04from\x18\x02 \x01(\tR\x04from\x12\x0e\n" +
-	"\x02to\x18\x03 \x01(\tR\x02to\x12\x18\n" +
-	"\acontent\x18\x04 \x01(\tR\acontent\x12\x1c\n" +
-	"\ttimestamp\x18\x05 \x01(\x03R\ttimestamp\x12\x14\n" +
-	"\x05extra\x18\x06 \x01(\tR\x05extra\x12\x14\n" +
-	"\x05token\x18\a \x01(\tR\x05token\x12\x12\n" +
-	"\x04data\x18\b \x01(\fR\x04data\x12\x1a\n" +
-	"\bfilename\x18\t \x01(\tR\bfilename\x12\x1a\n" +
-	"\bfilesize\x18\n" +
-	" \x01(\x03R\bfilesize\x12\x1b\n" +
-	"\tmime_type\x18\v \x01(\tR\bmimeType\x12\x19\n" +
-	"\bgroup_id\x18\f \x01(\tR\agroupId\"C\n" +
+	"\x04from\x18\x02 \x01(\tR\x04from\x12#\n" +
+	"\rfrom_username\x18\x03 \x01(\tR\ffromUsername\x12\x0e\n" +
+	"\x02to\x18\x04 \x01(\tR\x02to\x12\x18\n" +
+	"\acontent\x18\x05 \x01(\tR\acontent\x12\x1c\n" +
+	"\ttimestamp\x18\x06 \x01(\x03R\ttimestamp\x12\x14\n" +
+	"\x05extra\x18\a \x01(\tR\x05extra\x12\x14\n" +
+	"\x05token\x18\b \x01(\tR\x05token\x12\x12\n" +
+	"\x04data\x18\t \x01(\fR\x04data\x12\x1a\n" +
+	"\bfilename\x18\n" +
+	" \x01(\tR\bfilename\x12\x1a\n" +
+	"\bfilesize\x18\v \x01(\x03R\bfilesize\x12\x1b\n" +
+	"\tmime_type\x18\f \x01(\tR\bmimeType\x12\x19\n" +
+	"\bgroup_id\x18\r \x01(\tR\agroupId\"C\n" +
 	"\aAPIResp\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x10\n" +
 	"\x03msg\x18\x02 \x01(\tR\x03msg\x12\x12\n" +

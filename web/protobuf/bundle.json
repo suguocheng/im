@@ -5,17 +5,151 @@
         "go_package": "im/core/protocol/pb;pb"
       },
       "nested": {
-        "UserInfoResp": {
+        "AddFriendReq": {
+          "fields": {
+            "fromUid": {
+              "type": "string",
+              "id": 1
+            },
+            "toUid": {
+              "type": "string",
+              "id": 2
+            },
+            "verifyMsg": {
+              "type": "string",
+              "id": 3
+            },
+            "token": {
+              "type": "string",
+              "id": 4
+            }
+          }
+        },
+        "AddFriendResp": {
+          "fields": {
+            "code": {
+              "type": "int32",
+              "id": 1
+            },
+            "msg": {
+              "type": "string",
+              "id": 2
+            }
+          }
+        },
+        "HandleFriendReq": {
+          "fields": {
+            "fromUid": {
+              "type": "string",
+              "id": 1
+            },
+            "toUid": {
+              "type": "string",
+              "id": 2
+            },
+            "accept": {
+              "type": "bool",
+              "id": 3
+            },
+            "token": {
+              "type": "string",
+              "id": 4
+            }
+          }
+        },
+        "HandleFriendResp": {
+          "fields": {
+            "code": {
+              "type": "int32",
+              "id": 1
+            },
+            "msg": {
+              "type": "string",
+              "id": 2
+            }
+          }
+        },
+        "FriendListReq": {
           "fields": {
             "uid": {
               "type": "string",
               "id": 1
             },
-            "username": {
+            "token": {
+              "type": "string",
+              "id": 2
+            }
+          }
+        },
+        "FriendListResp": {
+          "fields": {
+            "friendUids": {
+              "rule": "repeated",
+              "type": "string",
+              "id": 1
+            },
+            "friendUsernames": {
+              "rule": "repeated",
               "type": "string",
               "id": 2
             },
-            "email": {
+            "code": {
+              "type": "int32",
+              "id": 3
+            },
+            "msg": {
+              "type": "string",
+              "id": 4
+            },
+            "remarks": {
+              "rule": "repeated",
+              "type": "string",
+              "id": 5
+            }
+          }
+        },
+        "DeleteFriendReq": {
+          "fields": {
+            "uid": {
+              "type": "string",
+              "id": 1
+            },
+            "friendUid": {
+              "type": "string",
+              "id": 2
+            },
+            "token": {
+              "type": "string",
+              "id": 3
+            }
+          }
+        },
+        "DeleteFriendResp": {
+          "fields": {
+            "code": {
+              "type": "int32",
+              "id": 1
+            },
+            "msg": {
+              "type": "string",
+              "id": 2
+            }
+          }
+        },
+        "FriendRequestListResp": {
+          "fields": {
+            "fromUids": {
+              "rule": "repeated",
+              "type": "string",
+              "id": 1
+            },
+            "fromUsernames": {
+              "rule": "repeated",
+              "type": "string",
+              "id": 2
+            },
+            "verifyMsgs": {
+              "rule": "repeated",
               "type": "string",
               "id": 3
             },
@@ -29,171 +163,27 @@
             }
           }
         },
-        "RegisterReq": {
-          "fields": {
-            "username": {
-              "type": "string",
-              "id": 1
-            },
-            "password": {
-              "type": "string",
-              "id": 2
-            },
-            "email": {
-              "type": "string",
-              "id": 3
-            }
-          }
-        },
-        "LoginReq": {
+        "UpdateRemarkReq": {
           "fields": {
             "uid": {
               "type": "string",
               "id": 1
             },
-            "password": {
-              "type": "string",
-              "id": 2
-            }
-          }
-        },
-        "ResetPwdReq": {
-          "fields": {
-            "email": {
-              "type": "string",
-              "id": 1
-            },
-            "newPwd": {
+            "friendUid": {
               "type": "string",
               "id": 2
             },
-            "code": {
+            "remark": {
               "type": "string",
               "id": 3
-            }
-          }
-        },
-        "UpdateUsernameReq": {
-          "fields": {
-            "uid": {
-              "type": "string",
-              "id": 1
             },
-            "newUsername": {
-              "type": "string",
-              "id": 2
-            }
-          }
-        },
-        "UpdatePwdReq": {
-          "fields": {
-            "uid": {
-              "type": "string",
-              "id": 1
-            },
-            "oldPwd": {
-              "type": "string",
-              "id": 2
-            },
-            "newPwd": {
-              "type": "string",
-              "id": 3
-            }
-          }
-        },
-        "TokenCheckReq": {
-          "fields": {
             "token": {
-              "type": "string",
-              "id": 1
-            }
-          }
-        },
-        "DeleteAccountReq": {
-          "fields": {
-            "uid": {
-              "type": "string",
-              "id": 1
-            }
-          }
-        },
-        "UserInfoReq": {
-          "fields": {
-            "token": {
-              "type": "string",
-              "id": 1
-            }
-          }
-        },
-        "LogoutReq": {
-          "fields": {
-            "token": {
-              "type": "string",
-              "id": 1
-            }
-          }
-        },
-        "SendEmailCodeReq": {
-          "fields": {
-            "email": {
-              "type": "string",
-              "id": 1
-            }
-          }
-        },
-        "IMMessage": {
-          "fields": {
-            "type": {
-              "type": "string",
-              "id": 1
-            },
-            "from": {
-              "type": "string",
-              "id": 2
-            },
-            "to": {
-              "type": "string",
-              "id": 3
-            },
-            "content": {
               "type": "string",
               "id": 4
-            },
-            "timestamp": {
-              "type": "int64",
-              "id": 5
-            },
-            "extra": {
-              "type": "string",
-              "id": 6
-            },
-            "token": {
-              "type": "string",
-              "id": 7
-            },
-            "data": {
-              "type": "bytes",
-              "id": 8
-            },
-            "filename": {
-              "type": "string",
-              "id": 9
-            },
-            "filesize": {
-              "type": "int64",
-              "id": 10
-            },
-            "mimeType": {
-              "type": "string",
-              "id": 11
-            },
-            "groupId": {
-              "type": "string",
-              "id": 12
             }
           }
         },
-        "APIResp": {
+        "UpdateRemarkResp": {
           "fields": {
             "code": {
               "type": "int32",
@@ -202,74 +192,86 @@
             "msg": {
               "type": "string",
               "id": 2
+            }
+          }
+        },
+        "FriendInfoReq": {
+          "fields": {
+            "uid": {
+              "type": "string",
+              "id": 1
             },
-            "data": {
-              "type": "bytes",
+            "friendUid": {
+              "type": "string",
+              "id": 2
+            },
+            "token": {
+              "type": "string",
               "id": 3
             }
           }
         },
-        "Notification": {
+        "FriendInfoResp": {
           "fields": {
-            "type": {
+            "uid": {
               "type": "string",
               "id": 1
             },
-            "from": {
+            "username": {
               "type": "string",
               "id": 2
             },
-            "fromUsername": {
+            "email": {
               "type": "string",
               "id": 3
             },
-            "to": {
+            "remark": {
               "type": "string",
               "id": 4
             },
-            "groupId": {
-              "type": "string",
+            "dnd": {
+              "type": "bool",
               "id": 5
             },
-            "groupName": {
-              "type": "string",
+            "code": {
+              "type": "int32",
               "id": 6
             },
-            "content": {
+            "msg": {
               "type": "string",
               "id": 7
-            },
-            "timestamp": {
-              "type": "int64",
-              "id": 8
-            },
-            "extra": {
-              "type": "string",
-              "id": 9
             }
           }
         },
-        "FileInfo": {
+        "SetDNDReq": {
           "fields": {
-            "filename": {
+            "uid": {
               "type": "string",
               "id": 1
             },
-            "originalName": {
+            "friendUid": {
               "type": "string",
               "id": 2
             },
-            "size": {
-              "type": "int64",
+            "dnd": {
+              "type": "bool",
               "id": 3
             },
-            "type": {
+            "token": {
               "type": "string",
               "id": 4
+            }
+          }
+        },
+        "SetDNDResp": {
+          "fields": {
+            "code": {
+              "type": "int32",
+              "id": 1
             },
-            "url": {
+            "msg": {
               "type": "string",
-              "id": 5
+              "id": 2
             }
           }
         },
@@ -331,38 +333,6 @@
             "joinTime": {
               "type": "int64",
               "id": 5
-            }
-          }
-        },
-        "GroupMessage": {
-          "fields": {
-            "messageId": {
-              "type": "string",
-              "id": 1
-            },
-            "groupId": {
-              "type": "string",
-              "id": 2
-            },
-            "fromUid": {
-              "type": "string",
-              "id": 3
-            },
-            "fromUsername": {
-              "type": "string",
-              "id": 4
-            },
-            "content": {
-              "type": "string",
-              "id": 5
-            },
-            "messageType": {
-              "type": "string",
-              "id": 6
-            },
-            "timestamp": {
-              "type": "int64",
-              "id": 7
             }
           }
         },
@@ -521,75 +491,6 @@
             },
             "group": {
               "type": "Group",
-              "id": 3
-            }
-          }
-        },
-        "SendGroupMessageReq": {
-          "fields": {
-            "groupId": {
-              "type": "string",
-              "id": 1
-            },
-            "fromUid": {
-              "type": "string",
-              "id": 2
-            },
-            "content": {
-              "type": "string",
-              "id": 3
-            },
-            "messageType": {
-              "type": "string",
-              "id": 4
-            }
-          }
-        },
-        "SendGroupMessageResp": {
-          "fields": {
-            "code": {
-              "type": "int32",
-              "id": 1
-            },
-            "msg": {
-              "type": "string",
-              "id": 2
-            },
-            "messageId": {
-              "type": "string",
-              "id": 3
-            }
-          }
-        },
-        "GroupMessageHistoryReq": {
-          "fields": {
-            "groupId": {
-              "type": "string",
-              "id": 1
-            },
-            "limit": {
-              "type": "int32",
-              "id": 2
-            },
-            "beforeTimestamp": {
-              "type": "int64",
-              "id": 3
-            }
-          }
-        },
-        "GroupMessageHistoryResp": {
-          "fields": {
-            "code": {
-              "type": "int32",
-              "id": 1
-            },
-            "msg": {
-              "type": "string",
-              "id": 2
-            },
-            "messages": {
-              "rule": "repeated",
-              "type": "GroupMessage",
               "id": 3
             }
           }
@@ -1016,27 +917,63 @@
             }
           }
         },
-        "AddFriendReq": {
+        "IMMessage": {
           "fields": {
-            "fromUid": {
+            "type": {
               "type": "string",
               "id": 1
             },
-            "toUid": {
+            "from": {
               "type": "string",
               "id": 2
             },
-            "verifyMsg": {
+            "fromUsername": {
               "type": "string",
               "id": 3
             },
-            "token": {
+            "to": {
               "type": "string",
               "id": 4
+            },
+            "content": {
+              "type": "string",
+              "id": 5
+            },
+            "timestamp": {
+              "type": "int64",
+              "id": 6
+            },
+            "extra": {
+              "type": "string",
+              "id": 7
+            },
+            "token": {
+              "type": "string",
+              "id": 8
+            },
+            "data": {
+              "type": "bytes",
+              "id": 9
+            },
+            "filename": {
+              "type": "string",
+              "id": 10
+            },
+            "filesize": {
+              "type": "int64",
+              "id": 11
+            },
+            "mimeType": {
+              "type": "string",
+              "id": 12
+            },
+            "groupId": {
+              "type": "string",
+              "id": 13
             }
           }
         },
-        "AddFriendResp": {
+        "APIResp": {
           "fields": {
             "code": {
               "type": "int32",
@@ -1045,184 +982,78 @@
             "msg": {
               "type": "string",
               "id": 2
+            },
+            "data": {
+              "type": "bytes",
+              "id": 3
             }
           }
         },
-        "HandleFriendReq": {
+        "Notification": {
           "fields": {
-            "fromUid": {
+            "type": {
               "type": "string",
               "id": 1
             },
-            "toUid": {
+            "from": {
               "type": "string",
               "id": 2
             },
-            "accept": {
-              "type": "bool",
+            "fromUsername": {
+              "type": "string",
               "id": 3
             },
-            "token": {
-              "type": "string",
-              "id": 4
-            }
-          }
-        },
-        "HandleFriendResp": {
-          "fields": {
-            "code": {
-              "type": "int32",
-              "id": 1
-            },
-            "msg": {
-              "type": "string",
-              "id": 2
-            }
-          }
-        },
-        "FriendListReq": {
-          "fields": {
-            "uid": {
-              "type": "string",
-              "id": 1
-            },
-            "token": {
-              "type": "string",
-              "id": 2
-            }
-          }
-        },
-        "FriendListResp": {
-          "fields": {
-            "friendUids": {
-              "rule": "repeated",
-              "type": "string",
-              "id": 1
-            },
-            "friendUsernames": {
-              "rule": "repeated",
-              "type": "string",
-              "id": 2
-            },
-            "code": {
-              "type": "int32",
-              "id": 3
-            },
-            "msg": {
+            "to": {
               "type": "string",
               "id": 4
             },
-            "remarks": {
-              "rule": "repeated",
+            "groupId": {
+              "type": "string",
+              "id": 5
+            },
+            "groupName": {
+              "type": "string",
+              "id": 6
+            },
+            "content": {
+              "type": "string",
+              "id": 7
+            },
+            "timestamp": {
+              "type": "int64",
+              "id": 8
+            },
+            "extra": {
+              "type": "string",
+              "id": 9
+            }
+          }
+        },
+        "FileInfo": {
+          "fields": {
+            "filename": {
+              "type": "string",
+              "id": 1
+            },
+            "originalName": {
+              "type": "string",
+              "id": 2
+            },
+            "size": {
+              "type": "int64",
+              "id": 3
+            },
+            "type": {
+              "type": "string",
+              "id": 4
+            },
+            "url": {
               "type": "string",
               "id": 5
             }
           }
         },
-        "DeleteFriendReq": {
-          "fields": {
-            "uid": {
-              "type": "string",
-              "id": 1
-            },
-            "friendUid": {
-              "type": "string",
-              "id": 2
-            },
-            "token": {
-              "type": "string",
-              "id": 3
-            }
-          }
-        },
-        "DeleteFriendResp": {
-          "fields": {
-            "code": {
-              "type": "int32",
-              "id": 1
-            },
-            "msg": {
-              "type": "string",
-              "id": 2
-            }
-          }
-        },
-        "FriendRequestListResp": {
-          "fields": {
-            "fromUids": {
-              "rule": "repeated",
-              "type": "string",
-              "id": 1
-            },
-            "fromUsernames": {
-              "rule": "repeated",
-              "type": "string",
-              "id": 2
-            },
-            "verifyMsgs": {
-              "rule": "repeated",
-              "type": "string",
-              "id": 3
-            },
-            "code": {
-              "type": "int32",
-              "id": 4
-            },
-            "msg": {
-              "type": "string",
-              "id": 5
-            }
-          }
-        },
-        "UpdateRemarkReq": {
-          "fields": {
-            "uid": {
-              "type": "string",
-              "id": 1
-            },
-            "friendUid": {
-              "type": "string",
-              "id": 2
-            },
-            "remark": {
-              "type": "string",
-              "id": 3
-            },
-            "token": {
-              "type": "string",
-              "id": 4
-            }
-          }
-        },
-        "UpdateRemarkResp": {
-          "fields": {
-            "code": {
-              "type": "int32",
-              "id": 1
-            },
-            "msg": {
-              "type": "string",
-              "id": 2
-            }
-          }
-        },
-        "FriendInfoReq": {
-          "fields": {
-            "uid": {
-              "type": "string",
-              "id": 1
-            },
-            "friendUid": {
-              "type": "string",
-              "id": 2
-            },
-            "token": {
-              "type": "string",
-              "id": 3
-            }
-          }
-        },
-        "FriendInfoResp": {
+        "UserInfoResp": {
           "fields": {
             "uid": {
               "type": "string",
@@ -1236,53 +1067,125 @@
               "type": "string",
               "id": 3
             },
-            "remark": {
-              "type": "string",
-              "id": 4
-            },
-            "dnd": {
-              "type": "bool",
-              "id": 5
-            },
             "code": {
               "type": "int32",
-              "id": 6
+              "id": 4
             },
             "msg": {
               "type": "string",
-              "id": 7
+              "id": 5
             }
           }
         },
-        "SetDNDReq": {
+        "RegisterReq": {
+          "fields": {
+            "username": {
+              "type": "string",
+              "id": 1
+            },
+            "password": {
+              "type": "string",
+              "id": 2
+            },
+            "email": {
+              "type": "string",
+              "id": 3
+            }
+          }
+        },
+        "LoginReq": {
           "fields": {
             "uid": {
               "type": "string",
               "id": 1
             },
-            "friendUid": {
+            "password": {
               "type": "string",
               "id": 2
-            },
-            "dnd": {
-              "type": "bool",
-              "id": 3
-            },
-            "token": {
-              "type": "string",
-              "id": 4
             }
           }
         },
-        "SetDNDResp": {
+        "ResetPwdReq": {
           "fields": {
-            "code": {
-              "type": "int32",
+            "email": {
+              "type": "string",
               "id": 1
             },
-            "msg": {
+            "newPwd": {
               "type": "string",
               "id": 2
+            },
+            "code": {
+              "type": "string",
+              "id": 3
+            }
+          }
+        },
+        "UpdateUsernameReq": {
+          "fields": {
+            "uid": {
+              "type": "string",
+              "id": 1
+            },
+            "newUsername": {
+              "type": "string",
+              "id": 2
+            }
+          }
+        },
+        "UpdatePwdReq": {
+          "fields": {
+            "uid": {
+              "type": "string",
+              "id": 1
+            },
+            "oldPwd": {
+              "type": "string",
+              "id": 2
+            },
+            "newPwd": {
+              "type": "string",
+              "id": 3
+            }
+          }
+        },
+        "TokenCheckReq": {
+          "fields": {
+            "token": {
+              "type": "string",
+              "id": 1
+            }
+          }
+        },
+        "DeleteAccountReq": {
+          "fields": {
+            "uid": {
+              "type": "string",
+              "id": 1
+            }
+          }
+        },
+        "UserInfoReq": {
+          "fields": {
+            "token": {
+              "type": "string",
+              "id": 1
+            }
+          }
+        },
+        "LogoutReq": {
+          "fields": {
+            "token": {
+              "type": "string",
+              "id": 1
+            }
+          }
+        },
+        "SendEmailCodeReq": {
+          "fields": {
+            "email": {
+              "type": "string",
+              "id": 1
             }
           }
         }
