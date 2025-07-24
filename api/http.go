@@ -18,7 +18,6 @@ import (
 
 var storageManager = storage.GetStorageManager()
 var fileService = service.NewFileService()
-var nextUID = 1
 
 func writeResp(w http.ResponseWriter, code int, msg string, data []byte) {
 	w.Header().Set("Content-Type", "application/x-protobuf")
