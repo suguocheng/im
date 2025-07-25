@@ -15764,6 +15764,741 @@ $root.protocol = (function() {
         return FileInfo;
     })();
 
+    protocol.IMMessageList = (function() {
+
+        /**
+         * Properties of a IMMessageList.
+         * @memberof protocol
+         * @interface IIMMessageList
+         * @property {Array.<protocol.IIMMessage>|null} [messages] IMMessageList messages
+         */
+
+        /**
+         * Constructs a new IMMessageList.
+         * @memberof protocol
+         * @classdesc Represents a IMMessageList.
+         * @implements IIMMessageList
+         * @constructor
+         * @param {protocol.IIMMessageList=} [properties] Properties to set
+         */
+        function IMMessageList(properties) {
+            this.messages = [];
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * IMMessageList messages.
+         * @member {Array.<protocol.IIMMessage>} messages
+         * @memberof protocol.IMMessageList
+         * @instance
+         */
+        IMMessageList.prototype.messages = $util.emptyArray;
+
+        /**
+         * Creates a new IMMessageList instance using the specified properties.
+         * @function create
+         * @memberof protocol.IMMessageList
+         * @static
+         * @param {protocol.IIMMessageList=} [properties] Properties to set
+         * @returns {protocol.IMMessageList} IMMessageList instance
+         */
+        IMMessageList.create = function create(properties) {
+            return new IMMessageList(properties);
+        };
+
+        /**
+         * Encodes the specified IMMessageList message. Does not implicitly {@link protocol.IMMessageList.verify|verify} messages.
+         * @function encode
+         * @memberof protocol.IMMessageList
+         * @static
+         * @param {protocol.IIMMessageList} message IMMessageList message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        IMMessageList.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.messages != null && message.messages.length)
+                for (var i = 0; i < message.messages.length; ++i)
+                    $root.protocol.IMMessage.encode(message.messages[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified IMMessageList message, length delimited. Does not implicitly {@link protocol.IMMessageList.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof protocol.IMMessageList
+         * @static
+         * @param {protocol.IIMMessageList} message IMMessageList message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        IMMessageList.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a IMMessageList message from the specified reader or buffer.
+         * @function decode
+         * @memberof protocol.IMMessageList
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {protocol.IMMessageList} IMMessageList
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        IMMessageList.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.IMMessageList();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        if (!(message.messages && message.messages.length))
+                            message.messages = [];
+                        message.messages.push($root.protocol.IMMessage.decode(reader, reader.uint32()));
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a IMMessageList message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof protocol.IMMessageList
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {protocol.IMMessageList} IMMessageList
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        IMMessageList.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a IMMessageList message.
+         * @function verify
+         * @memberof protocol.IMMessageList
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        IMMessageList.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.messages != null && message.hasOwnProperty("messages")) {
+                if (!Array.isArray(message.messages))
+                    return "messages: array expected";
+                for (var i = 0; i < message.messages.length; ++i) {
+                    var error = $root.protocol.IMMessage.verify(message.messages[i]);
+                    if (error)
+                        return "messages." + error;
+                }
+            }
+            return null;
+        };
+
+        /**
+         * Creates a IMMessageList message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof protocol.IMMessageList
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {protocol.IMMessageList} IMMessageList
+         */
+        IMMessageList.fromObject = function fromObject(object) {
+            if (object instanceof $root.protocol.IMMessageList)
+                return object;
+            var message = new $root.protocol.IMMessageList();
+            if (object.messages) {
+                if (!Array.isArray(object.messages))
+                    throw TypeError(".protocol.IMMessageList.messages: array expected");
+                message.messages = [];
+                for (var i = 0; i < object.messages.length; ++i) {
+                    if (typeof object.messages[i] !== "object")
+                        throw TypeError(".protocol.IMMessageList.messages: object expected");
+                    message.messages[i] = $root.protocol.IMMessage.fromObject(object.messages[i]);
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a IMMessageList message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof protocol.IMMessageList
+         * @static
+         * @param {protocol.IMMessageList} message IMMessageList
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        IMMessageList.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.arrays || options.defaults)
+                object.messages = [];
+            if (message.messages && message.messages.length) {
+                object.messages = [];
+                for (var j = 0; j < message.messages.length; ++j)
+                    object.messages[j] = $root.protocol.IMMessage.toObject(message.messages[j], options);
+            }
+            return object;
+        };
+
+        /**
+         * Converts this IMMessageList to JSON.
+         * @function toJSON
+         * @memberof protocol.IMMessageList
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        IMMessageList.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for IMMessageList
+         * @function getTypeUrl
+         * @memberof protocol.IMMessageList
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        IMMessageList.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/protocol.IMMessageList";
+        };
+
+        return IMMessageList;
+    })();
+
+    protocol.GetRecentPrivateMessagesReq = (function() {
+
+        /**
+         * Properties of a GetRecentPrivateMessagesReq.
+         * @memberof protocol
+         * @interface IGetRecentPrivateMessagesReq
+         * @property {string|null} [from] GetRecentPrivateMessagesReq from
+         * @property {string|null} [to] GetRecentPrivateMessagesReq to
+         * @property {number|Long|null} [count] GetRecentPrivateMessagesReq count
+         */
+
+        /**
+         * Constructs a new GetRecentPrivateMessagesReq.
+         * @memberof protocol
+         * @classdesc Represents a GetRecentPrivateMessagesReq.
+         * @implements IGetRecentPrivateMessagesReq
+         * @constructor
+         * @param {protocol.IGetRecentPrivateMessagesReq=} [properties] Properties to set
+         */
+        function GetRecentPrivateMessagesReq(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * GetRecentPrivateMessagesReq from.
+         * @member {string} from
+         * @memberof protocol.GetRecentPrivateMessagesReq
+         * @instance
+         */
+        GetRecentPrivateMessagesReq.prototype.from = "";
+
+        /**
+         * GetRecentPrivateMessagesReq to.
+         * @member {string} to
+         * @memberof protocol.GetRecentPrivateMessagesReq
+         * @instance
+         */
+        GetRecentPrivateMessagesReq.prototype.to = "";
+
+        /**
+         * GetRecentPrivateMessagesReq count.
+         * @member {number|Long} count
+         * @memberof protocol.GetRecentPrivateMessagesReq
+         * @instance
+         */
+        GetRecentPrivateMessagesReq.prototype.count = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
+
+        /**
+         * Creates a new GetRecentPrivateMessagesReq instance using the specified properties.
+         * @function create
+         * @memberof protocol.GetRecentPrivateMessagesReq
+         * @static
+         * @param {protocol.IGetRecentPrivateMessagesReq=} [properties] Properties to set
+         * @returns {protocol.GetRecentPrivateMessagesReq} GetRecentPrivateMessagesReq instance
+         */
+        GetRecentPrivateMessagesReq.create = function create(properties) {
+            return new GetRecentPrivateMessagesReq(properties);
+        };
+
+        /**
+         * Encodes the specified GetRecentPrivateMessagesReq message. Does not implicitly {@link protocol.GetRecentPrivateMessagesReq.verify|verify} messages.
+         * @function encode
+         * @memberof protocol.GetRecentPrivateMessagesReq
+         * @static
+         * @param {protocol.IGetRecentPrivateMessagesReq} message GetRecentPrivateMessagesReq message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GetRecentPrivateMessagesReq.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.from != null && Object.hasOwnProperty.call(message, "from"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.from);
+            if (message.to != null && Object.hasOwnProperty.call(message, "to"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.to);
+            if (message.count != null && Object.hasOwnProperty.call(message, "count"))
+                writer.uint32(/* id 3, wireType 0 =*/24).int64(message.count);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified GetRecentPrivateMessagesReq message, length delimited. Does not implicitly {@link protocol.GetRecentPrivateMessagesReq.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof protocol.GetRecentPrivateMessagesReq
+         * @static
+         * @param {protocol.IGetRecentPrivateMessagesReq} message GetRecentPrivateMessagesReq message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GetRecentPrivateMessagesReq.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a GetRecentPrivateMessagesReq message from the specified reader or buffer.
+         * @function decode
+         * @memberof protocol.GetRecentPrivateMessagesReq
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {protocol.GetRecentPrivateMessagesReq} GetRecentPrivateMessagesReq
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GetRecentPrivateMessagesReq.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.GetRecentPrivateMessagesReq();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.from = reader.string();
+                        break;
+                    }
+                case 2: {
+                        message.to = reader.string();
+                        break;
+                    }
+                case 3: {
+                        message.count = reader.int64();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a GetRecentPrivateMessagesReq message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof protocol.GetRecentPrivateMessagesReq
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {protocol.GetRecentPrivateMessagesReq} GetRecentPrivateMessagesReq
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GetRecentPrivateMessagesReq.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a GetRecentPrivateMessagesReq message.
+         * @function verify
+         * @memberof protocol.GetRecentPrivateMessagesReq
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        GetRecentPrivateMessagesReq.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.from != null && message.hasOwnProperty("from"))
+                if (!$util.isString(message.from))
+                    return "from: string expected";
+            if (message.to != null && message.hasOwnProperty("to"))
+                if (!$util.isString(message.to))
+                    return "to: string expected";
+            if (message.count != null && message.hasOwnProperty("count"))
+                if (!$util.isInteger(message.count) && !(message.count && $util.isInteger(message.count.low) && $util.isInteger(message.count.high)))
+                    return "count: integer|Long expected";
+            return null;
+        };
+
+        /**
+         * Creates a GetRecentPrivateMessagesReq message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof protocol.GetRecentPrivateMessagesReq
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {protocol.GetRecentPrivateMessagesReq} GetRecentPrivateMessagesReq
+         */
+        GetRecentPrivateMessagesReq.fromObject = function fromObject(object) {
+            if (object instanceof $root.protocol.GetRecentPrivateMessagesReq)
+                return object;
+            var message = new $root.protocol.GetRecentPrivateMessagesReq();
+            if (object.from != null)
+                message.from = String(object.from);
+            if (object.to != null)
+                message.to = String(object.to);
+            if (object.count != null)
+                if ($util.Long)
+                    (message.count = $util.Long.fromValue(object.count)).unsigned = false;
+                else if (typeof object.count === "string")
+                    message.count = parseInt(object.count, 10);
+                else if (typeof object.count === "number")
+                    message.count = object.count;
+                else if (typeof object.count === "object")
+                    message.count = new $util.LongBits(object.count.low >>> 0, object.count.high >>> 0).toNumber();
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a GetRecentPrivateMessagesReq message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof protocol.GetRecentPrivateMessagesReq
+         * @static
+         * @param {protocol.GetRecentPrivateMessagesReq} message GetRecentPrivateMessagesReq
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        GetRecentPrivateMessagesReq.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                object.from = "";
+                object.to = "";
+                if ($util.Long) {
+                    var long = new $util.Long(0, 0, false);
+                    object.count = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                } else
+                    object.count = options.longs === String ? "0" : 0;
+            }
+            if (message.from != null && message.hasOwnProperty("from"))
+                object.from = message.from;
+            if (message.to != null && message.hasOwnProperty("to"))
+                object.to = message.to;
+            if (message.count != null && message.hasOwnProperty("count"))
+                if (typeof message.count === "number")
+                    object.count = options.longs === String ? String(message.count) : message.count;
+                else
+                    object.count = options.longs === String ? $util.Long.prototype.toString.call(message.count) : options.longs === Number ? new $util.LongBits(message.count.low >>> 0, message.count.high >>> 0).toNumber() : message.count;
+            return object;
+        };
+
+        /**
+         * Converts this GetRecentPrivateMessagesReq to JSON.
+         * @function toJSON
+         * @memberof protocol.GetRecentPrivateMessagesReq
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        GetRecentPrivateMessagesReq.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for GetRecentPrivateMessagesReq
+         * @function getTypeUrl
+         * @memberof protocol.GetRecentPrivateMessagesReq
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        GetRecentPrivateMessagesReq.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/protocol.GetRecentPrivateMessagesReq";
+        };
+
+        return GetRecentPrivateMessagesReq;
+    })();
+
+    protocol.GetRecentGroupMessagesReq = (function() {
+
+        /**
+         * Properties of a GetRecentGroupMessagesReq.
+         * @memberof protocol
+         * @interface IGetRecentGroupMessagesReq
+         * @property {string|null} [groupId] GetRecentGroupMessagesReq groupId
+         * @property {number|Long|null} [count] GetRecentGroupMessagesReq count
+         */
+
+        /**
+         * Constructs a new GetRecentGroupMessagesReq.
+         * @memberof protocol
+         * @classdesc Represents a GetRecentGroupMessagesReq.
+         * @implements IGetRecentGroupMessagesReq
+         * @constructor
+         * @param {protocol.IGetRecentGroupMessagesReq=} [properties] Properties to set
+         */
+        function GetRecentGroupMessagesReq(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * GetRecentGroupMessagesReq groupId.
+         * @member {string} groupId
+         * @memberof protocol.GetRecentGroupMessagesReq
+         * @instance
+         */
+        GetRecentGroupMessagesReq.prototype.groupId = "";
+
+        /**
+         * GetRecentGroupMessagesReq count.
+         * @member {number|Long} count
+         * @memberof protocol.GetRecentGroupMessagesReq
+         * @instance
+         */
+        GetRecentGroupMessagesReq.prototype.count = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
+
+        /**
+         * Creates a new GetRecentGroupMessagesReq instance using the specified properties.
+         * @function create
+         * @memberof protocol.GetRecentGroupMessagesReq
+         * @static
+         * @param {protocol.IGetRecentGroupMessagesReq=} [properties] Properties to set
+         * @returns {protocol.GetRecentGroupMessagesReq} GetRecentGroupMessagesReq instance
+         */
+        GetRecentGroupMessagesReq.create = function create(properties) {
+            return new GetRecentGroupMessagesReq(properties);
+        };
+
+        /**
+         * Encodes the specified GetRecentGroupMessagesReq message. Does not implicitly {@link protocol.GetRecentGroupMessagesReq.verify|verify} messages.
+         * @function encode
+         * @memberof protocol.GetRecentGroupMessagesReq
+         * @static
+         * @param {protocol.IGetRecentGroupMessagesReq} message GetRecentGroupMessagesReq message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GetRecentGroupMessagesReq.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.groupId != null && Object.hasOwnProperty.call(message, "groupId"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.groupId);
+            if (message.count != null && Object.hasOwnProperty.call(message, "count"))
+                writer.uint32(/* id 2, wireType 0 =*/16).int64(message.count);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified GetRecentGroupMessagesReq message, length delimited. Does not implicitly {@link protocol.GetRecentGroupMessagesReq.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof protocol.GetRecentGroupMessagesReq
+         * @static
+         * @param {protocol.IGetRecentGroupMessagesReq} message GetRecentGroupMessagesReq message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GetRecentGroupMessagesReq.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a GetRecentGroupMessagesReq message from the specified reader or buffer.
+         * @function decode
+         * @memberof protocol.GetRecentGroupMessagesReq
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {protocol.GetRecentGroupMessagesReq} GetRecentGroupMessagesReq
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GetRecentGroupMessagesReq.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.GetRecentGroupMessagesReq();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.groupId = reader.string();
+                        break;
+                    }
+                case 2: {
+                        message.count = reader.int64();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a GetRecentGroupMessagesReq message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof protocol.GetRecentGroupMessagesReq
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {protocol.GetRecentGroupMessagesReq} GetRecentGroupMessagesReq
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GetRecentGroupMessagesReq.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a GetRecentGroupMessagesReq message.
+         * @function verify
+         * @memberof protocol.GetRecentGroupMessagesReq
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        GetRecentGroupMessagesReq.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.groupId != null && message.hasOwnProperty("groupId"))
+                if (!$util.isString(message.groupId))
+                    return "groupId: string expected";
+            if (message.count != null && message.hasOwnProperty("count"))
+                if (!$util.isInteger(message.count) && !(message.count && $util.isInteger(message.count.low) && $util.isInteger(message.count.high)))
+                    return "count: integer|Long expected";
+            return null;
+        };
+
+        /**
+         * Creates a GetRecentGroupMessagesReq message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof protocol.GetRecentGroupMessagesReq
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {protocol.GetRecentGroupMessagesReq} GetRecentGroupMessagesReq
+         */
+        GetRecentGroupMessagesReq.fromObject = function fromObject(object) {
+            if (object instanceof $root.protocol.GetRecentGroupMessagesReq)
+                return object;
+            var message = new $root.protocol.GetRecentGroupMessagesReq();
+            if (object.groupId != null)
+                message.groupId = String(object.groupId);
+            if (object.count != null)
+                if ($util.Long)
+                    (message.count = $util.Long.fromValue(object.count)).unsigned = false;
+                else if (typeof object.count === "string")
+                    message.count = parseInt(object.count, 10);
+                else if (typeof object.count === "number")
+                    message.count = object.count;
+                else if (typeof object.count === "object")
+                    message.count = new $util.LongBits(object.count.low >>> 0, object.count.high >>> 0).toNumber();
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a GetRecentGroupMessagesReq message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof protocol.GetRecentGroupMessagesReq
+         * @static
+         * @param {protocol.GetRecentGroupMessagesReq} message GetRecentGroupMessagesReq
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        GetRecentGroupMessagesReq.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                object.groupId = "";
+                if ($util.Long) {
+                    var long = new $util.Long(0, 0, false);
+                    object.count = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                } else
+                    object.count = options.longs === String ? "0" : 0;
+            }
+            if (message.groupId != null && message.hasOwnProperty("groupId"))
+                object.groupId = message.groupId;
+            if (message.count != null && message.hasOwnProperty("count"))
+                if (typeof message.count === "number")
+                    object.count = options.longs === String ? String(message.count) : message.count;
+                else
+                    object.count = options.longs === String ? $util.Long.prototype.toString.call(message.count) : options.longs === Number ? new $util.LongBits(message.count.low >>> 0, message.count.high >>> 0).toNumber() : message.count;
+            return object;
+        };
+
+        /**
+         * Converts this GetRecentGroupMessagesReq to JSON.
+         * @function toJSON
+         * @memberof protocol.GetRecentGroupMessagesReq
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        GetRecentGroupMessagesReq.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for GetRecentGroupMessagesReq
+         * @function getTypeUrl
+         * @memberof protocol.GetRecentGroupMessagesReq
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        GetRecentGroupMessagesReq.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/protocol.GetRecentGroupMessagesReq";
+        };
+
+        return GetRecentGroupMessagesReq;
+    })();
+
     protocol.UserInfoResp = (function() {
 
         /**

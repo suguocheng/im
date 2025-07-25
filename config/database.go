@@ -9,13 +9,22 @@ import (
 )
 
 // 数据库配置
-type DatabaseConfig struct {
+type MysqlConfig struct {
 	Host     string
 	Port     int
 	Username string
 	Password string
 	Database string
 	Charset  string
+}
+
+// Redis配置
+// RedisConfig 结构体
+type RedisConfig struct {
+	Host     string
+	Port     int
+	Password string
+	DB       int
 }
 
 // 初始化配置
@@ -34,19 +43,29 @@ func init() {
 }
 
 // 获取数据库配置
-func GetDatabaseConfig() *DatabaseConfig {
-	return &DatabaseConfig{
-		Host:     getEnv("DB_HOST", "localhost"),
-		Port:     getEnvAsInt("DB_PORT", 3306),
-		Username: getEnv("DB_USERNAME", "root"),
-		Password: getEnv("DB_PASSWORD", ""),
-		Database: getEnv("DB_DATABASE", "im_system"),
-		Charset:  getEnv("DB_CHARSET", "utf8mb4"),
+func GetMysqlConfig() *MysqlConfig {
+	return &MysqlConfig{
+		Host:     getEnv("MYSQL_HOST", "localhost"),
+		Port:     getEnvAsInt("MYSQL_PORT", 3306),
+		Username: getEnv("MYSQL_USERNAME", "root"),
+		Password: getEnv("MYSQL_PASSWORD", ""),
+		Database: getEnv("MYSQL_DATABASE", "im_system"),
+		Charset:  getEnv("MYSQL_CHARSET", "utf8mb4"),
+	}
+}
+
+// 获取Redis配置
+func GetRedisConfig() *RedisConfig {
+	return &RedisConfig{
+		Host:     getEnv("REDIS_HOST", "localhost"),
+		Port:     getEnvAsInt("REDIS_PORT", 6379),
+		Password: getEnv("REDIS_PASSWORD", ""),
+		DB:       getEnvAsInt("REDIS_DB", 0),
 	}
 }
 
 // 获取DSN连接字符串
-func (c *DatabaseConfig) GetDSN() string {
+func (c *MysqlConfig) GetDSN() string {
 	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=true&loc=Local",
 		c.Username, c.Password, c.Host, c.Port, c.Database, c.Charset)
 }

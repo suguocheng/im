@@ -529,3 +529,26 @@ func (m *MySQLGroupStorage) HasPendingInvite(groupID, inviteeUID string) (bool, 
 	}
 	return count > 0, nil
 }
+
+// 获取单个群成员详细信息
+func (m *MySQLGroupStorage) GetGroupMemberInfo(groupID, uid string) (*pb.GroupMember, error) {
+	row := m.db.QueryRow(`SELECT gm.uid, u.username, gm.nickname, gm.role, gm.join_time FROM group_members gm LEFT JOIN users u ON gm.uid = u.uid WHERE gm.group_id = ? AND gm.uid = ?`, groupID, uid)
+	var member pb.GroupMember
+	var username sql.NullString
+	err := row.Scan(&member.Uid, &username, &member.Nickname, &member.Role, &member.JoinTime)
+	if err != nil {
+		return nil, err
+	}
+	if username.Valid {
+		member.Username = username.String
+	} else {
+		member.Username = "未知用户"
+	}
+	return &member, nil
+}
+
+// 设置群成员角色（如设置/取消管理员）
+func (m *MySQLGroupStorage) SetGroupMemberRole(groupID, uid, role string) error {
+	_, err := m.db.Exec("UPDATE group_members SET role = ? WHERE group_id = ? AND uid = ?", role, groupID, uid)
+	return err
+}

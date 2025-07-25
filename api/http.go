@@ -73,8 +73,13 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		writeResp(w, 2004, "用户不存在", nil)
 		return
 	}
-	// 验证密码（这里需要实现密码验证逻辑）
-	if user.Password != req.Password {
+	// 用 bcrypt 校验密码
+	ok, err := storageManager.CheckPassword(req.Uid, req.Password)
+	if err != nil {
+		writeResp(w, 2004, "密码校验失败", nil)
+		return
+	}
+	if !ok {
 		writeResp(w, 2004, "密码错误", nil)
 		return
 	}
@@ -834,16 +839,8 @@ func GroupMemberInfoHandler(w http.ResponseWriter, r *http.Request) {
 		writeResp(w, 1, "缺少参数", nil)
 		return
 	}
-	// 查询成员信息
-	db := storageManager.GetDB()
-	if db == nil {
-		writeResp(w, 1, "数据库未初始化", nil)
-		return
-	}
-	row := db.QueryRow(`SELECT gm.uid, u.username, gm.nickname, gm.role, gm.join_time FROM group_members gm LEFT JOIN users u ON gm.uid = u.uid WHERE gm.group_id = ? AND gm.uid = ?`, req.GroupId, req.Uid)
-	var uid, username, nickname, role string
-	var joinTime int64
-	err = row.Scan(&uid, &username, &nickname, &role, &joinTime)
+	// 使用 manager 层方法获取成员信息
+	member, err := storageManager.GetGroupMemberInfo(req.GroupId, req.Uid)
 	if err != nil {
 		writeResp(w, 1, "成员不存在", nil)
 		return
@@ -851,11 +848,11 @@ func GroupMemberInfoHandler(w http.ResponseWriter, r *http.Request) {
 	resp := &pb.GroupMemberInfoResp{
 		Code:     0,
 		Msg:      "ok",
-		Uid:      uid,
-		Username: username,
-		Nickname: nickname,
-		Role:     role,
-		JoinTime: joinTime,
+		Uid:      member.Uid,
+		Username: member.Username,
+		Nickname: member.Nickname,
+		Role:     member.Role,
+		JoinTime: member.JoinTime,
 	}
 	data, _ := proto.Marshal(resp)
 	writeResp(w, 0, "ok", data)
@@ -1138,13 +1135,12 @@ func SetGroupAdminHandler(w http.ResponseWriter, r *http.Request) {
 		writeResp(w, 1, "只有群主可以设置管理员", nil)
 		return
 	}
-	// 更新角色
+	// 使用 manager 层方法设置角色
 	newRole := "member"
 	if req.SetAdmin {
 		newRole = "admin"
 	}
-	db := storageManager.GetDB()
-	_, err = db.Exec("UPDATE group_members SET role = ? WHERE group_id = ? AND uid = ?", newRole, req.GroupId, req.TargetUid)
+	err = storageManager.SetGroupMemberRole(req.GroupId, req.TargetUid, newRole)
 	if err != nil {
 		writeResp(w, 1, "设置失败: "+err.Error(), nil)
 		return
@@ -1412,6 +1408,72 @@ func SetGroupMuteHandler(w http.ResponseWriter, r *http.Request) {
 	writeResp(w, 0, "ok", data)
 }
 
+// 获取最近N条私聊消息
+func GetRecentPrivateMessagesHandler(w http.ResponseWriter, r *http.Request) {
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		writeResp(w, 1, "请求体读取失败", nil)
+		return
+	}
+	var req pb.GetRecentPrivateMessagesReq
+	if err := proto.Unmarshal(body, &req); err != nil {
+		writeResp(w, 1, "请求格式错误", nil)
+		return
+	}
+	if req.From == "" || req.To == "" || req.Count <= 0 {
+		writeResp(w, 1, "缺少参数", nil)
+		return
+	}
+	sessionKey := "chat:" + req.From + ":" + req.To
+	msgs, err := storageManager.GetRecentMessages(sessionKey, req.Count)
+	if err != nil {
+		writeResp(w, 1, "获取消息失败: "+err.Error(), nil)
+		return
+	}
+	var pbMsgs []*pb.IMMessage
+	for _, m := range msgs {
+		var msg pb.IMMessage
+		if err := proto.Unmarshal([]byte(m), &msg); err == nil {
+			pbMsgs = append(pbMsgs, &msg)
+		}
+	}
+	data, _ := proto.Marshal(&pb.IMMessageList{Messages: pbMsgs})
+	writeResp(w, 0, "ok", data)
+}
+
+// 获取最近N条群聊消息
+func GetRecentGroupMessagesHandler(w http.ResponseWriter, r *http.Request) {
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		writeResp(w, 1, "请求体读取失败", nil)
+		return
+	}
+	var req pb.GetRecentGroupMessagesReq
+	if err := proto.Unmarshal(body, &req); err != nil {
+		writeResp(w, 1, "请求格式错误", nil)
+		return
+	}
+	if req.GroupId == "" || req.Count <= 0 {
+		writeResp(w, 1, "缺少参数", nil)
+		return
+	}
+	sessionKey := "group:" + req.GroupId
+	msgs, err := storageManager.GetRecentMessages(sessionKey, req.Count)
+	if err != nil {
+		writeResp(w, 1, "获取消息失败: "+err.Error(), nil)
+		return
+	}
+	var pbMsgs []*pb.IMMessage
+	for _, m := range msgs {
+		var msg pb.IMMessage
+		if err := proto.Unmarshal([]byte(m), &msg); err == nil {
+			pbMsgs = append(pbMsgs, &msg)
+		}
+	}
+	data, _ := proto.Marshal(&pb.IMMessageList{Messages: pbMsgs})
+	writeResp(w, 0, "ok", data)
+}
+
 // CORS中间件
 func wrapCORS(handler http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -1462,6 +1524,8 @@ func StartHTTPServer(addr string) {
 	http.HandleFunc("/set_group_remark", wrapCORS(SetGroupRemarkHandler))
 	http.HandleFunc("/set_group_dnd", wrapCORS(SetGroupDNDHandler))
 	http.HandleFunc("/set_group_mute", wrapCORS(SetGroupMuteHandler))
+	http.HandleFunc("/get_recent_private_messages", wrapCORS(GetRecentPrivateMessagesHandler))
+	http.HandleFunc("/get_recent_group_messages", wrapCORS(GetRecentGroupMessagesHandler))
 
 	// 文件上传和下载路由
 	http.HandleFunc("/upload", wrapCORS(UploadFileHandler))

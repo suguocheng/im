@@ -46,4 +46,19 @@ message FileInfo {
   int64  size = 3;          // 文件大小
   string type = 4;          // 文件类型
   string url = 5;           // 文件URL
+}
+
+message IMMessageList {
+  repeated IMMessage messages = 1;
+}
+
+message GetRecentPrivateMessagesReq {
+  string from = 1;
+  string to = 2;
+  int64 count = 3;
+}
+
+message GetRecentGroupMessagesReq {
+  string group_id = 1;
+  int64 count = 2;
 } 

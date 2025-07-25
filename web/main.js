@@ -1,6 +1,8 @@
 // ======= 统一API/WS地址配置 =======
-const API_BASE = 'https://legislation-nickel-virtue-myself.trycloudflare.com';
-const WS_BASE = 'wss://conversation-council-pig-gasoline.trycloudflare.com/ws';
+// const API_BASE = 'https://legislation-nickel-virtue-myself.trycloudflare.com';
+// const WS_BASE = 'wss://conversation-council-pig-gasoline.trycloudflare.com/ws';
+const API_BASE = 'http://127.0.0.1:8081';
+const WS_BASE = 'ws://127.0.0.1:8081/ws';
 
 // ========== 通用居中弹窗 ==========
 function showModal({ title = '', content = '', inputs = [], okText = '确定', cancelText = '取消', onOk }) {
@@ -144,6 +146,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const FriendListReq = root.lookupType('protocol.FriendListReq');
     const FriendListResp = root.lookupType('protocol.FriendListResp');
     const IMMessage = root.lookupType('protocol.IMMessage');
+    const IMMessageList = root.lookupType('protocol.IMMessageList');
+    const GetRecentPrivateMessagesReq = root.lookupType('protocol.GetRecentPrivateMessagesReq');
+    const GetRecentGroupMessagesReq = root.lookupType('protocol.GetRecentGroupMessagesReq');
     const GroupListReq = root.lookupType('protocol.GroupListReq');
     const GroupListResp = root.lookupType('protocol.GroupListResp');
     const Notification = root.lookupType('protocol.Notification');
@@ -468,8 +473,28 @@ document.addEventListener('DOMContentLoaded', function() {
       });
       // 聊天区标题
       chatTitleDiv.textContent = `与 ${remark ? `${name}（${remark}）` : name} 聊天`;
-      // 清空历史（后续可加载消息）
-      chatHistoryDiv.innerHTML = '<div class="empty-tip" style="color:#888;padding:16px;">暂无消息</div>';
+      // 拉取并展示历史消息
+      chatHistoryDiv.innerHTML = '<div class="empty-tip" style="color:#888;padding:16px;">加载中...</div>';
+      fetchRecentPrivateMessages(myUid, uid, 50).then(msgs => {
+        chatHistoryDiv.innerHTML = '';
+        if (!msgs.length) {
+          chatHistoryDiv.innerHTML = '<div class="empty-tip" style="color:#888;padding:16px;">暂无消息</div>';
+        } else {
+          msgs.reverse().forEach(msg => {
+            appendMessage({
+              from: msg.from,
+              content: msg.type === 'chat' ? replaceEmojis(msg.content) : msg.content,
+              self: msg.from === myUid,
+              timestamp: msg.timestamp,
+              type: msg.type,
+              extra: msg.extra,
+              username: msg.fromUsername
+            });
+          });
+        }
+      }).catch(e => {
+        chatHistoryDiv.innerHTML = '<div class="empty-tip" style="color:#e74c3c;padding:16px;">消息加载失败: '+(e.message||e)+'</div>';
+      });
     }
 
     // 拉取群组列表
@@ -947,7 +972,28 @@ document.addEventListener('DOMContentLoaded', function() {
       });
       // 聊天区标题
       chatTitleDiv.textContent = `群聊：${name || groupId || '未知群组'}`;
-      chatHistoryDiv.innerHTML = '<div class="empty-tip" style="color:#888;padding:16px;">暂无消息</div>';
+      // 拉取并展示历史消息
+      chatHistoryDiv.innerHTML = '<div class="empty-tip" style="color:#888;padding:16px;">加载中...</div>';
+      fetchRecentGroupMessages(groupId, 50).then(msgs => {
+        chatHistoryDiv.innerHTML = '';
+        if (!msgs.length) {
+          chatHistoryDiv.innerHTML = '<div class="empty-tip" style="color:#888;padding:16px;">暂无消息</div>';
+        } else {
+          msgs.reverse().forEach(msg => {
+            appendMessage({
+              from: msg.from,
+              content: msg.type === 'chat' ? replaceEmojis(msg.content) : msg.content,
+              self: msg.from === myUid,
+              timestamp: msg.timestamp,
+              type: msg.type,
+              extra: msg.extra,
+              username: msg.fromUsername
+            });
+          });
+        }
+      }).catch(e => {
+        chatHistoryDiv.innerHTML = '<div class="empty-tip" style="color:#e74c3c;padding:16px;">消息加载失败: '+(e.message||e)+'</div>';
+      });
     }
 
     // ========== 表情映射 ==========
@@ -1033,11 +1079,11 @@ document.addEventListener('DOMContentLoaded', function() {
       const msgObj = {
         from: myUid,
         type: type,
-        content: fileInfo.url || fileInfo.Url || '',
-        extra: fileInfo.originalName || fileInfo.OriginalName || '',
-        filename: fileInfo.filename || fileInfo.Filename || '',
-        filesize: fileInfo.size || fileInfo.Size || file.size,
-        mimeType: fileInfo.mimeType || fileInfo.MimeType || file.type,
+        content: fileInfo.url || '', // 只用url字段
+        extra: fileInfo.original_name || '', // 用original_name字段
+        filename: fileInfo.filename || '',
+        filesize: fileInfo.size || file.size,
+        mimeType: fileInfo.type || file.type,
         timestamp: Date.now(),
       };
       if (currentFriend) {
@@ -1112,11 +1158,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       }
       if (type === 'image') {
-        const imgUrl = (content && content.startsWith('http')) ? content : (content ? 'http://localhost:8081' + content : '');
-        html += imgUrl ? `<img src="${imgUrl}" alt="图片" style="max-width:180px;max-height:120px;border-radius:8px;vertical-align:middle;">` : '';
+        // 用API_BASE拼接图片URL
+        const imgUrl = (content && content.startsWith('http')) ? content : (content ? API_BASE + content : '');
+        // 用 <a href="图片URL" download> 包裹图片，实现点击下载
+        html += imgUrl ? `<a href="${imgUrl}" download><img src="${imgUrl}" alt="图片" style="max-width:180px;max-height:120px;border-radius:8px;vertical-align:middle;cursor:pointer;"></a>` : '';
         if (extra) html += `<div style="font-size:0.9em;color:#888;">${extra}</div>`;
       } else if (type === 'file') {
-        const fileUrl = (content && content.startsWith('http')) ? content : (content ? 'http://localhost:8081' + content : '');
+        // 用API_BASE拼接文件URL
+        const fileUrl = (content && content.startsWith('http')) ? content : (content ? API_BASE + content : '');
         html += fileUrl ? `<a href="${fileUrl}" target="_blank" style="color:#409eff;text-decoration:underline;">${extra || '文件'}</a>` : '';
       } else {
         html += `<span style="display:inline-block;padding:6px 14px;border-radius:16px;background:${self ? '#409eff' : '#eee'};color:${self ? '#fff' : '#222'};max-width:60%;word-break:break-all;">${content}</span>`;
@@ -1756,5 +1805,38 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
 
+    // 拉取最近N条私聊消息
+    async function fetchRecentPrivateMessages(from, to, count) {
+      // 保证key顺序和后端一致
+      let uid1 = from, uid2 = to;
+      if (uid1 > uid2) { const tmp = uid1; uid1 = uid2; uid2 = tmp; }
+      const reqBuf = GetRecentPrivateMessagesReq.encode(GetRecentPrivateMessagesReq.create({ from: uid1, to: uid2, count })).finish();
+      const resp = await fetch(`${API_BASE}/get_recent_private_messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-protobuf' },
+        body: reqBuf
+      });
+      if (!resp.ok) throw new Error('消息获取失败');
+      const buf = await resp.arrayBuffer();
+      const apiMsg = APIResp.decode(new Uint8Array(buf));
+      if (apiMsg.code !== 0) throw new Error(apiMsg.msg);
+      const msgList = IMMessageList.decode(apiMsg.data);
+      return msgList.messages || [];
+    }
+    // 拉取最近N条群聊消息
+    async function fetchRecentGroupMessages(groupId, count) {
+      const reqBuf = GetRecentGroupMessagesReq.encode(GetRecentGroupMessagesReq.create({ groupId: groupId, count })).finish();
+      const resp = await fetch(`${API_BASE}/get_recent_group_messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-protobuf' },
+        body: reqBuf
+      });
+      if (!resp.ok) throw new Error('消息获取失败');
+      const buf = await resp.arrayBuffer();
+      const apiMsg = APIResp.decode(new Uint8Array(buf));
+      if (apiMsg.code !== 0) throw new Error(apiMsg.msg);
+      const msgList = IMMessageList.decode(apiMsg.data);
+      return msgList.messages || [];
+    }
   });
 }); 

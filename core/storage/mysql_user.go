@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	"time"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 // 用户信息表结构
@@ -58,9 +60,14 @@ func (m *MySQLUserStorage) InitTables() error {
 
 // 创建用户
 func (m *MySQLUserStorage) CreateUser(username, password, email string) (string, error) {
+	// 先加密密码
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", fmt.Errorf("密码加密失败: %v", err)
+	}
 	// 先插入一条记录，让id自增
 	query := `INSERT INTO users (username, password, email) VALUES (?, ?, ?)`
-	res, err := m.db.Exec(query, username, password, email)
+	res, err := m.db.Exec(query, username, string(hash), email)
 	if err != nil {
 		return "", err
 	}
@@ -108,8 +115,13 @@ func (m *MySQLUserStorage) UpdateUsername(uid, newUsername string) error {
 
 // 更新用户密码
 func (m *MySQLUserStorage) UpdatePassword(uid, newPassword string) error {
+	// 先加密密码
+	hash, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return fmt.Errorf("新密码加密失败: %v", err)
+	}
 	query := `UPDATE users SET password = ? WHERE uid = ?`
-	_, err := m.db.Exec(query, newPassword, uid)
+	_, err = m.db.Exec(query, string(hash), uid)
 	return err
 }
 
@@ -118,4 +130,16 @@ func (m *MySQLUserStorage) DeleteUser(uid string) error {
 	query := `DELETE FROM users WHERE uid = ?`
 	_, err := m.db.Exec(query, uid)
 	return err
+}
+
+// 校验密码（可选）
+func (m *MySQLUserStorage) CheckPassword(uid, password string) (bool, error) {
+	user, err := m.GetUserByUID(uid)
+	if err != nil {
+		return false, err
+	}
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
+		return false, nil
+	}
+	return true, nil
 }

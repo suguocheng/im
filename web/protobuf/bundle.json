@@ -1053,6 +1053,43 @@
             }
           }
         },
+        "IMMessageList": {
+          "fields": {
+            "messages": {
+              "rule": "repeated",
+              "type": "IMMessage",
+              "id": 1
+            }
+          }
+        },
+        "GetRecentPrivateMessagesReq": {
+          "fields": {
+            "from": {
+              "type": "string",
+              "id": 1
+            },
+            "to": {
+              "type": "string",
+              "id": 2
+            },
+            "count": {
+              "type": "int64",
+              "id": 3
+            }
+          }
+        },
+        "GetRecentGroupMessagesReq": {
+          "fields": {
+            "groupId": {
+              "type": "string",
+              "id": 1
+            },
+            "count": {
+              "type": "int64",
+              "id": 2
+            }
+          }
+        },
         "UserInfoResp": {
           "fields": {
             "uid": {

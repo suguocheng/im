@@ -8,6 +8,9 @@ import (
 	pb "im/core/protocol/pb"
 	"im/core/storage"
 	"log"
+	"time"
+
+	"im/config"
 
 	"github.com/gorilla/websocket"
 	"google.golang.org/protobuf/proto"
@@ -24,21 +27,31 @@ func main() {
 	}
 	log.Println("MySQL存储初始化成功")
 
+	// 初始化Redis存储
+	redisConfig := config.GetRedisConfig()
+	redisAddr := fmt.Sprintf("%s:%d", redisConfig.Host, redisConfig.Port)
+	storageManager.InitRedis(redisAddr, redisConfig.Password, redisConfig.DB)
+	log.Println("Redis存储初始化成功")
+
 	// 程序结束时关闭存储
 	defer func() {
 		if err := storageManager.Close(); err != nil {
 			log.Printf("关闭存储时出错: %v", err)
 		}
 	}()
+
+	// 初始化插件
 	for _, p := range plugin.All() {
 		p.Init()
 	}
 
+	// 启动HTTP服务
 	go func() {
 		fmt.Println("HTTP 用户服务监听于 :8081")
 		api.StartHTTPServer(":8081")
 	}()
 
+	// 启动WebSocket服务
 	go func() {
 		wsProto := protocol.NewWSProtocol()
 		wsProto.OnMessage(func(conn *websocket.Conn, data []byte) {
@@ -74,6 +87,11 @@ func main() {
 					}
 					_ = protocol.SendNotificationToUser(msg.To, notif)
 				}
+				// --- Redis缓存与推送 ---
+				msgBytes, _ := proto.Marshal(&msg)
+				sessionKey := getSessionKey(msg.From, msg.To)
+				_ = storageManager.CacheMessage(sessionKey, string(msgBytes), 24*time.Hour)
+				_ = storageManager.Publish("channel:"+msg.To, string(msgBytes))
 			}
 
 			// --- 新增：处理群聊消息 ---
@@ -126,11 +144,15 @@ func main() {
 						continue // 跳过免打扰成员
 					}
 					_ = protocol.SendNotificationToUser(memberUID, notif)
+					// --- Redis缓存与推送 ---
+					msgBytes, _ := proto.Marshal(&msg)
+					groupSessionKey := "group:" + group.GroupId
+					_ = storageManager.CacheMessage(groupSessionKey, string(msgBytes), 24*time.Hour)
+					_ = storageManager.Publish("group_channel:"+group.GroupId, string(msgBytes))
 				}
 			}
 		})
-		fmt.Println("WebSocket 服务监听于 :8090/ws")
-		wsProto.Start(":8090")
+		wsProto.Start(":8081")
 	}()
 
 	select {} // 阻塞主进程，防止退出
@@ -143,4 +165,12 @@ func senderUsername(storageManager *storage.StorageManager, uid string) string {
 		return uid
 	}
 	return user.Username
+}
+
+// 获取私聊会话唯一key（双方顺序无关）
+func getSessionKey(uid1, uid2 string) string {
+	if uid1 < uid2 {
+		return "chat:" + uid1 + ":" + uid2
+	}
+	return "chat:" + uid2 + ":" + uid1
 }

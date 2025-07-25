@@ -1,0 +1,3 @@
+# 忽略本地环境配置
+.env
+config.env

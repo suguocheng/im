@@ -3,8 +3,8 @@ package storage
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"sync"
+	"time"
 
 	"im/config"
 	pb "im/core/protocol/pb"
@@ -40,7 +40,7 @@ func (sm *StorageManager) InitMySQL() error {
 	sm.mu.Lock()
 	defer sm.mu.Unlock()
 
-	dbConfig := config.GetDatabaseConfig()
+	dbConfig := config.GetMysqlConfig()
 	mysqlStorage, err := NewMySQLStorage(dbConfig.GetDSN())
 	if err != nil {
 		return err
@@ -69,7 +69,7 @@ func (sm *StorageManager) InitMySQL() error {
 	sm.friendStorage = friendStorage
 	sm.groupStorage = groupStorage
 	sm.useMySQL = true
-	log.Println("MySQL存储初始化成功")
+
 	return nil
 }
 
@@ -150,6 +150,16 @@ func (sm *StorageManager) DeleteUser(uid string) error {
 		return fmt.Errorf("MySQL存储未初始化")
 	}
 	return sm.userStorage.DeleteUser(uid)
+}
+
+// 校验用户密码
+func (sm *StorageManager) CheckPassword(uid, password string) (bool, error) {
+	sm.mu.RLock()
+	defer sm.mu.RUnlock()
+	if !sm.useMySQL || sm.userStorage == nil {
+		return false, fmt.Errorf("MySQL存储未初始化")
+	}
+	return sm.userStorage.CheckPassword(uid, password)
 }
 
 // ==================== 好友关系相关操作 ====================
@@ -552,4 +562,61 @@ func (sm *StorageManager) GetGroupMuteStatus(groupID, userID string) (bool, erro
 		return false, fmt.Errorf("MySQL存储未初始化")
 	}
 	return sm.groupStorage.GetGroupMuteStatus(groupID, userID)
+}
+
+// 获取单个群成员详细信息
+func (sm *StorageManager) GetGroupMemberInfo(groupID, uid string) (*pb.GroupMember, error) {
+	sm.mu.RLock()
+	defer sm.mu.RUnlock()
+	if !sm.useMySQL || sm.groupStorage == nil {
+		return nil, fmt.Errorf("MySQL存储未初始化")
+	}
+	return sm.groupStorage.GetGroupMemberInfo(groupID, uid)
+}
+
+// 设置群成员角色（如设置/取消管理员）
+func (sm *StorageManager) SetGroupMemberRole(groupID, uid, role string) error {
+	sm.mu.RLock()
+	defer sm.mu.RUnlock()
+	if !sm.useMySQL || sm.groupStorage == nil {
+		return fmt.Errorf("MySQL存储未初始化")
+	}
+	return sm.groupStorage.SetGroupMemberRole(groupID, uid, role)
+}
+
+// Redis消息存储
+var redisMsgStore *RedisMessageStorage
+
+// 初始化Redis（可在InitMySQL后调用）
+func (sm *StorageManager) InitRedis(addr, password string, db int) {
+	redisMsgStore = NewRedisMessageStorage(addr, password, db)
+}
+
+// 缓存消息
+func (sm *StorageManager) CacheMessage(sessionKey, msg string, expire time.Duration) error {
+	if redisMsgStore == nil {
+		return fmt.Errorf("Redis未初始化")
+	}
+	return redisMsgStore.CacheMessage(sessionKey, msg, expire)
+}
+
+// 获取最近N条消息
+func (sm *StorageManager) GetRecentMessages(sessionKey string, count int64) ([]string, error) {
+	if redisMsgStore == nil {
+		return nil, fmt.Errorf("Redis未初始化")
+	}
+	return redisMsgStore.GetRecentMessages(sessionKey, count)
+}
+
+// 发布实时消息
+func (sm *StorageManager) Publish(channel, msg string) error {
+	if redisMsgStore == nil {
+		return fmt.Errorf("Redis未初始化")
+	}
+	return redisMsgStore.Publish(channel, msg)
+}
+
+// 订阅实时消息
+func (sm *StorageManager) Subscribe(channel string) *RedisMessageStorage {
+	return redisMsgStore
 }
