@@ -1,8 +1,8 @@
 // ======= 统一API/WS地址配置 =======
-// const API_BASE = 'https://legislation-nickel-virtue-myself.trycloudflare.com';
-// const WS_BASE = 'wss://conversation-council-pig-gasoline.trycloudflare.com/ws';
-const API_BASE = 'http://127.0.0.1:8081';
-const WS_BASE = 'ws://127.0.0.1:8081/ws';
+const API_BASE = 'https://salmon-languages-ecology-wrong.trycloudflare.com';
+const WS_BASE = 'wss://salmon-languages-ecology-wrong.trycloudflare.com/ws';
+// const API_BASE = 'http://127.0.0.1:8081';
+// const WS_BASE = 'ws://127.0.0.1:8081/ws';
 
 // ========== 通用居中弹窗 ==========
 function showModal({ title = '', content = '', inputs = [], okText = '确定', cancelText = '取消', onOk }) {
@@ -125,6 +125,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let unreadMap = {};
     let friendListCache = null;
     let groupListCache = null;
+    let secretMode = false;
+    let secretBtn = null;
 
     document.getElementById('to-register').onclick = e => {
       e.preventDefault();
@@ -473,6 +475,7 @@ document.addEventListener('DOMContentLoaded', function() {
       });
       // 聊天区标题
       chatTitleDiv.textContent = `与 ${remark ? `${name}（${remark}）` : name} 聊天`;
+      renderSecretModeBtn();
       // 拉取并展示历史消息
       chatHistoryDiv.innerHTML = '<div class="empty-tip" style="color:#888;padding:16px;">加载中...</div>';
       fetchRecentPrivateMessages(myUid, uid, 50).then(msgs => {
@@ -972,6 +975,7 @@ document.addEventListener('DOMContentLoaded', function() {
       });
       // 聊天区标题
       chatTitleDiv.textContent = `群聊：${name || groupId || '未知群组'}`;
+      renderSecretModeBtn();
       // 拉取并展示历史消息
       chatHistoryDiv.innerHTML = '<div class="empty-tip" style="color:#888;padding:16px;">加载中...</div>';
       fetchRecentGroupMessages(groupId, 50).then(msgs => {
@@ -1119,7 +1123,7 @@ document.addEventListener('DOMContentLoaded', function() {
       // 构造IMMessage
       const msgObj = {
         from: myUid,
-        type: 'chat',
+        type: secretMode ? 'secret_chat' : 'chat',
         content: content,
         timestamp: Date.now(),
       };
@@ -1131,7 +1135,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const msgBuf = IMMessage.encode(IMMessage.create(msgObj)).finish();
       ws.send(msgBuf);
       // 本地回显
-      appendMessage({ from: myUid, content: displayContent, self: true, timestamp: Date.now(), type: 'chat' });
+      appendMessage({ from: myUid, content: displayContent, self: true, timestamp: Date.now(), type: msgObj.type });
       chatInput.value = '';
     }
 
@@ -1283,8 +1287,8 @@ document.addEventListener('DOMContentLoaded', function() {
           } catch {}
           if (!msg) return;
           // 私聊消息
-          if (msg.type === 'chat' && currentFriend && msg.from === currentFriend.uid && msg.to === myUid) {
-            appendMessage({ from: msg.from, content: replaceEmojis(msg.content), self: false, timestamp: msg.timestamp, type: 'chat' });
+          if ((msg.type === 'chat' || msg.type === 'secret_chat') && currentFriend && msg.from === currentFriend.uid && msg.to === myUid) {
+            appendMessage({ from: msg.from, content: replaceEmojis(msg.content), self: false, timestamp: msg.timestamp, type: msg.type });
           } else if (msg.type === 'image' && currentFriend && msg.from === currentFriend.uid && msg.to === myUid) {
             appendMessage({ from: msg.from, content: msg.content, self: false, timestamp: msg.timestamp, type: 'image', extra: msg.extra });
           } else if (msg.type === 'file' && currentFriend && msg.from === currentFriend.uid && msg.to === myUid) {
@@ -1837,6 +1841,37 @@ document.addEventListener('DOMContentLoaded', function() {
       if (apiMsg.code !== 0) throw new Error(apiMsg.msg);
       const msgList = IMMessageList.decode(apiMsg.data);
       return msgList.messages || [];
+    }
+
+    // 在selectFriend和selectGroup时插入秘密模式按钮
+    function renderSecretModeBtn() {
+      if (!chatTitleDiv) return;
+      if (secretBtn) secretBtn.remove();
+      secretBtn = document.createElement('button');
+      secretBtn.textContent = secretMode ? '🔓退出秘密' : '🔒秘密模式';
+      secretBtn.id = 'secret-mode-btn';
+      secretBtn.style.marginLeft = '12px';
+      secretBtn.style.background = secretMode ? '#409eff' : '';
+      secretBtn.style.color = secretMode ? '#fff' : '';
+      secretBtn.style.border = 'none';
+      secretBtn.style.borderRadius = '4px';
+      secretBtn.style.padding = '4px 12px';
+      secretBtn.style.cursor = 'pointer';
+      secretBtn.onclick = toggleSecretMode;
+      chatTitleDiv.appendChild(secretBtn);
+    }
+    function toggleSecretMode() {
+      secretMode = !secretMode;
+      renderSecretModeBtn();
+      if (secretMode) {
+        document.body.classList.add('dark-mode');
+        chatHistoryDiv.innerHTML = '<div style="color:#409eff;padding:12px;">已进入秘密聊天，消息仅本地可见，且端到端加密</div>';
+      } else {
+        document.body.classList.remove('dark-mode');
+        // 可选：退出秘密模式时刷新历史消息
+        if (currentFriend) selectFriend(currentFriend.uid, currentFriend.name, currentFriend.remark);
+        if (currentGroup) selectGroup(currentGroup.groupId, currentGroup.name);
+      }
     }
   });
 }); 

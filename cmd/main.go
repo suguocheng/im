@@ -63,12 +63,21 @@ func main() {
 				return
 			}
 
-			isChatMessage := msg.Type == "chat" || msg.Type == "emoji" || msg.Type == "image" || msg.Type == "file"
-
+			isChatMessage := msg.Type == "chat" || msg.Type == "secret_chat" || msg.Type == "emoji" || msg.Type == "image" || msg.Type == "file"
 			// --- 处理私聊消息 ---
 			if isChatMessage && msg.To != "" {
 				msg.FromUsername = senderUsername(storageManager, msg.From)
 				b, _ := proto.Marshal(&msg)
+				if msg.Type == "secret_chat" {
+					// 秘密聊天：只转发，不存储
+					err := protocol.SendToUser(msg.To, b)
+					if err != nil {
+						errMsg := &pb.IMMessage{Type: "error", Content: "对方不在线"}
+						b, _ := proto.Marshal(errMsg)
+						conn.WriteMessage(websocket.BinaryMessage, b)
+					}
+					return
+				}
 				err := protocol.SendToUser(msg.To, b) // 始终推送消息
 				if err != nil {
 					errMsg := &pb.IMMessage{Type: "error", Content: "对方不在线"}

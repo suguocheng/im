@@ -127,7 +127,6 @@ func SendGroupMessageToMembers(msg *pb.IMMessage) error {
 			}
 		}
 	}
-	fmt.Printf("群聊消息发送给 %d 个在线成员\n", sentCount)
 	return nil
 }
 

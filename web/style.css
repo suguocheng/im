@@ -59,7 +59,7 @@ body {
   padding: 0;
   display: flex;
   flex-direction: column;
-  min-height: 70vh;
+  height: 80vh; 
 }
 header {
   display: flex;
@@ -80,6 +80,7 @@ aside {
   background: #fafbfc;
   display: flex;
   flex-direction: column;
+  min-height: 0;
 }
 .tab-bar {
   display: flex;
@@ -124,7 +125,7 @@ aside {
 #friend-list, #group-list {
   margin-top: 0;
   padding-top: 0;
-  max-height: 310px;
+  flex: 1;
   overflow-y: auto;
 }
 #chat-section {
@@ -234,4 +235,55 @@ aside {
 }
 .circle-user-btn:hover, .circle-user-btn:focus {
   background: #1976d2;
+}
+body.dark-mode {
+  background: #181c20;
+  color: #eee;
+}
+body.dark-mode #main-panel {
+  background: #23272b;
+  color: #eee;
+}
+body.dark-mode #chat-history {
+  background: #23272b;
+  color: #eee;
+}
+body.dark-mode #chat-title {
+  background: #23272b;
+  color: #eee;
+}
+body.dark-mode #chat-input-bar {
+  background: #23272b;
+  border-top: 1px solid #333;
+}
+body.dark-mode #chat-input {
+  background: #181c20;
+  color: #eee;
+  border: 1px solid #444;
+}
+body.dark-mode #send-btn {
+  background: #409eff;
+  color: #fff;
+}
+body.dark-mode #send-btn:hover {
+  background: #1976d2;
+}
+body.dark-mode .list-item.selected, body.dark-mode .list-item:hover {
+  background: #222b36;
+}
+body.dark-mode .list-item {
+  color: #eee;
+}
+body.dark-mode .circle-more-btn, body.dark-mode .circle-add-btn, body.dark-mode .circle-user-btn {
+  background: #333;
+  color: #eee;
+}
+body.dark-mode .circle-more-btn:hover, body.dark-mode .circle-add-btn:hover, body.dark-mode .circle-user-btn:hover {
+  background: #409eff;
+  color: #fff;
+}
+body.dark-mode aside {
+  background: #181c20;
+  color: #eee;
+  border-right: 1px solid #222;
 }
