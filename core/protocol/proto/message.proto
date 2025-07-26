@@ -20,12 +20,6 @@ message IMMessage {
   string group_id = 13; // 新增：群组ID
 }
 
-message APIResp {
-  int32 code = 1;
-  string msg = 2;
-  bytes data = 3;
-}
-
 // 通用通知消息（兼容好友、群组、系统等所有场景）
 message Notification {
   string type = 1;      // 通知类型，如 friend_request, group_kicked, group_dismissed, group_message
@@ -52,12 +46,20 @@ message IMMessageList {
   repeated IMMessage messages = 1;
 }
 
+message APIResp {
+  int32 code = 1;
+  string msg = 2;
+  bytes data = 3;
+}
+
+// 获取最近私聊消息
 message GetRecentPrivateMessagesReq {
   string from = 1;
   string to = 2;
   int64 count = 3;
 }
 
+// 获取最近群聊消息
 message GetRecentGroupMessagesReq {
   string group_id = 1;
   int64 count = 2;

@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.6
 // 	protoc        v3.21.12
-// source: core/protocol/friend.proto
+// source: friend.proto
 
 package pb
 
@@ -34,7 +34,7 @@ type AddFriendReq struct {
 
 func (x *AddFriendReq) Reset() {
 	*x = AddFriendReq{}
-	mi := &file_core_protocol_friend_proto_msgTypes[0]
+	mi := &file_friend_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -46,7 +46,7 @@ func (x *AddFriendReq) String() string {
 func (*AddFriendReq) ProtoMessage() {}
 
 func (x *AddFriendReq) ProtoReflect() protoreflect.Message {
-	mi := &file_core_protocol_friend_proto_msgTypes[0]
+	mi := &file_friend_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -59,7 +59,7 @@ func (x *AddFriendReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AddFriendReq.ProtoReflect.Descriptor instead.
 func (*AddFriendReq) Descriptor() ([]byte, []int) {
-	return file_core_protocol_friend_proto_rawDescGZIP(), []int{0}
+	return file_friend_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *AddFriendReq) GetFromUid() string {
@@ -100,7 +100,7 @@ type AddFriendResp struct {
 
 func (x *AddFriendResp) Reset() {
 	*x = AddFriendResp{}
-	mi := &file_core_protocol_friend_proto_msgTypes[1]
+	mi := &file_friend_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -112,7 +112,7 @@ func (x *AddFriendResp) String() string {
 func (*AddFriendResp) ProtoMessage() {}
 
 func (x *AddFriendResp) ProtoReflect() protoreflect.Message {
-	mi := &file_core_protocol_friend_proto_msgTypes[1]
+	mi := &file_friend_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -125,7 +125,7 @@ func (x *AddFriendResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AddFriendResp.ProtoReflect.Descriptor instead.
 func (*AddFriendResp) Descriptor() ([]byte, []int) {
-	return file_core_protocol_friend_proto_rawDescGZIP(), []int{1}
+	return file_friend_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *AddFriendResp) GetCode() int32 {
@@ -136,127 +136,6 @@ func (x *AddFriendResp) GetCode() int32 {
 }
 
 func (x *AddFriendResp) GetMsg() string {
-	if x != nil {
-		return x.Msg
-	}
-	return ""
-}
-
-// 处理好友请求
-type HandleFriendReq struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	FromUid       string                 `protobuf:"bytes,1,opt,name=from_uid,json=fromUid,proto3" json:"from_uid,omitempty"`
-	ToUid         string                 `protobuf:"bytes,2,opt,name=to_uid,json=toUid,proto3" json:"to_uid,omitempty"`
-	Accept        bool                   `protobuf:"varint,3,opt,name=accept,proto3" json:"accept,omitempty"`
-	Token         string                 `protobuf:"bytes,4,opt,name=token,proto3" json:"token,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *HandleFriendReq) Reset() {
-	*x = HandleFriendReq{}
-	mi := &file_core_protocol_friend_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *HandleFriendReq) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*HandleFriendReq) ProtoMessage() {}
-
-func (x *HandleFriendReq) ProtoReflect() protoreflect.Message {
-	mi := &file_core_protocol_friend_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use HandleFriendReq.ProtoReflect.Descriptor instead.
-func (*HandleFriendReq) Descriptor() ([]byte, []int) {
-	return file_core_protocol_friend_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *HandleFriendReq) GetFromUid() string {
-	if x != nil {
-		return x.FromUid
-	}
-	return ""
-}
-
-func (x *HandleFriendReq) GetToUid() string {
-	if x != nil {
-		return x.ToUid
-	}
-	return ""
-}
-
-func (x *HandleFriendReq) GetAccept() bool {
-	if x != nil {
-		return x.Accept
-	}
-	return false
-}
-
-func (x *HandleFriendReq) GetToken() string {
-	if x != nil {
-		return x.Token
-	}
-	return ""
-}
-
-type HandleFriendResp struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
-	Msg           string                 `protobuf:"bytes,2,opt,name=msg,proto3" json:"msg,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *HandleFriendResp) Reset() {
-	*x = HandleFriendResp{}
-	mi := &file_core_protocol_friend_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *HandleFriendResp) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*HandleFriendResp) ProtoMessage() {}
-
-func (x *HandleFriendResp) ProtoReflect() protoreflect.Message {
-	mi := &file_core_protocol_friend_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use HandleFriendResp.ProtoReflect.Descriptor instead.
-func (*HandleFriendResp) Descriptor() ([]byte, []int) {
-	return file_core_protocol_friend_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *HandleFriendResp) GetCode() int32 {
-	if x != nil {
-		return x.Code
-	}
-	return 0
-}
-
-func (x *HandleFriendResp) GetMsg() string {
 	if x != nil {
 		return x.Msg
 	}
@@ -274,7 +153,7 @@ type FriendListReq struct {
 
 func (x *FriendListReq) Reset() {
 	*x = FriendListReq{}
-	mi := &file_core_protocol_friend_proto_msgTypes[4]
+	mi := &file_friend_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -286,7 +165,7 @@ func (x *FriendListReq) String() string {
 func (*FriendListReq) ProtoMessage() {}
 
 func (x *FriendListReq) ProtoReflect() protoreflect.Message {
-	mi := &file_core_protocol_friend_proto_msgTypes[4]
+	mi := &file_friend_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -299,7 +178,7 @@ func (x *FriendListReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FriendListReq.ProtoReflect.Descriptor instead.
 func (*FriendListReq) Descriptor() ([]byte, []int) {
-	return file_core_protocol_friend_proto_rawDescGZIP(), []int{4}
+	return file_friend_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *FriendListReq) GetUid() string {
@@ -329,7 +208,7 @@ type FriendListResp struct {
 
 func (x *FriendListResp) Reset() {
 	*x = FriendListResp{}
-	mi := &file_core_protocol_friend_proto_msgTypes[5]
+	mi := &file_friend_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -341,7 +220,7 @@ func (x *FriendListResp) String() string {
 func (*FriendListResp) ProtoMessage() {}
 
 func (x *FriendListResp) ProtoReflect() protoreflect.Message {
-	mi := &file_core_protocol_friend_proto_msgTypes[5]
+	mi := &file_friend_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -354,7 +233,7 @@ func (x *FriendListResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FriendListResp.ProtoReflect.Descriptor instead.
 func (*FriendListResp) Descriptor() ([]byte, []int) {
-	return file_core_protocol_friend_proto_rawDescGZIP(), []int{5}
+	return file_friend_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *FriendListResp) GetFriendUids() []string {
@@ -392,317 +271,6 @@ func (x *FriendListResp) GetRemarks() []string {
 	return nil
 }
 
-// 删除好友
-type DeleteFriendReq struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Uid           string                 `protobuf:"bytes,1,opt,name=uid,proto3" json:"uid,omitempty"`
-	FriendUid     string                 `protobuf:"bytes,2,opt,name=friend_uid,json=friendUid,proto3" json:"friend_uid,omitempty"`
-	Token         string                 `protobuf:"bytes,3,opt,name=token,proto3" json:"token,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *DeleteFriendReq) Reset() {
-	*x = DeleteFriendReq{}
-	mi := &file_core_protocol_friend_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *DeleteFriendReq) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DeleteFriendReq) ProtoMessage() {}
-
-func (x *DeleteFriendReq) ProtoReflect() protoreflect.Message {
-	mi := &file_core_protocol_friend_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DeleteFriendReq.ProtoReflect.Descriptor instead.
-func (*DeleteFriendReq) Descriptor() ([]byte, []int) {
-	return file_core_protocol_friend_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *DeleteFriendReq) GetUid() string {
-	if x != nil {
-		return x.Uid
-	}
-	return ""
-}
-
-func (x *DeleteFriendReq) GetFriendUid() string {
-	if x != nil {
-		return x.FriendUid
-	}
-	return ""
-}
-
-func (x *DeleteFriendReq) GetToken() string {
-	if x != nil {
-		return x.Token
-	}
-	return ""
-}
-
-type DeleteFriendResp struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
-	Msg           string                 `protobuf:"bytes,2,opt,name=msg,proto3" json:"msg,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *DeleteFriendResp) Reset() {
-	*x = DeleteFriendResp{}
-	mi := &file_core_protocol_friend_proto_msgTypes[7]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *DeleteFriendResp) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DeleteFriendResp) ProtoMessage() {}
-
-func (x *DeleteFriendResp) ProtoReflect() protoreflect.Message {
-	mi := &file_core_protocol_friend_proto_msgTypes[7]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DeleteFriendResp.ProtoReflect.Descriptor instead.
-func (*DeleteFriendResp) Descriptor() ([]byte, []int) {
-	return file_core_protocol_friend_proto_rawDescGZIP(), []int{7}
-}
-
-func (x *DeleteFriendResp) GetCode() int32 {
-	if x != nil {
-		return x.Code
-	}
-	return 0
-}
-
-func (x *DeleteFriendResp) GetMsg() string {
-	if x != nil {
-		return x.Msg
-	}
-	return ""
-}
-
-// 获取收到的好友请求列表响应
-type FriendRequestListResp struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	FromUids      []string               `protobuf:"bytes,1,rep,name=from_uids,json=fromUids,proto3" json:"from_uids,omitempty"`
-	FromUsernames []string               `protobuf:"bytes,2,rep,name=from_usernames,json=fromUsernames,proto3" json:"from_usernames,omitempty"`
-	VerifyMsgs    []string               `protobuf:"bytes,3,rep,name=verify_msgs,json=verifyMsgs,proto3" json:"verify_msgs,omitempty"`
-	Code          int32                  `protobuf:"varint,4,opt,name=code,proto3" json:"code,omitempty"`
-	Msg           string                 `protobuf:"bytes,5,opt,name=msg,proto3" json:"msg,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *FriendRequestListResp) Reset() {
-	*x = FriendRequestListResp{}
-	mi := &file_core_protocol_friend_proto_msgTypes[8]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *FriendRequestListResp) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*FriendRequestListResp) ProtoMessage() {}
-
-func (x *FriendRequestListResp) ProtoReflect() protoreflect.Message {
-	mi := &file_core_protocol_friend_proto_msgTypes[8]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use FriendRequestListResp.ProtoReflect.Descriptor instead.
-func (*FriendRequestListResp) Descriptor() ([]byte, []int) {
-	return file_core_protocol_friend_proto_rawDescGZIP(), []int{8}
-}
-
-func (x *FriendRequestListResp) GetFromUids() []string {
-	if x != nil {
-		return x.FromUids
-	}
-	return nil
-}
-
-func (x *FriendRequestListResp) GetFromUsernames() []string {
-	if x != nil {
-		return x.FromUsernames
-	}
-	return nil
-}
-
-func (x *FriendRequestListResp) GetVerifyMsgs() []string {
-	if x != nil {
-		return x.VerifyMsgs
-	}
-	return nil
-}
-
-func (x *FriendRequestListResp) GetCode() int32 {
-	if x != nil {
-		return x.Code
-	}
-	return 0
-}
-
-func (x *FriendRequestListResp) GetMsg() string {
-	if x != nil {
-		return x.Msg
-	}
-	return ""
-}
-
-// 设置好友备注
-type UpdateRemarkReq struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Uid           string                 `protobuf:"bytes,1,opt,name=uid,proto3" json:"uid,omitempty"`
-	FriendUid     string                 `protobuf:"bytes,2,opt,name=friend_uid,json=friendUid,proto3" json:"friend_uid,omitempty"`
-	Remark        string                 `protobuf:"bytes,3,opt,name=remark,proto3" json:"remark,omitempty"`
-	Token         string                 `protobuf:"bytes,4,opt,name=token,proto3" json:"token,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UpdateRemarkReq) Reset() {
-	*x = UpdateRemarkReq{}
-	mi := &file_core_protocol_friend_proto_msgTypes[9]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UpdateRemarkReq) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UpdateRemarkReq) ProtoMessage() {}
-
-func (x *UpdateRemarkReq) ProtoReflect() protoreflect.Message {
-	mi := &file_core_protocol_friend_proto_msgTypes[9]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UpdateRemarkReq.ProtoReflect.Descriptor instead.
-func (*UpdateRemarkReq) Descriptor() ([]byte, []int) {
-	return file_core_protocol_friend_proto_rawDescGZIP(), []int{9}
-}
-
-func (x *UpdateRemarkReq) GetUid() string {
-	if x != nil {
-		return x.Uid
-	}
-	return ""
-}
-
-func (x *UpdateRemarkReq) GetFriendUid() string {
-	if x != nil {
-		return x.FriendUid
-	}
-	return ""
-}
-
-func (x *UpdateRemarkReq) GetRemark() string {
-	if x != nil {
-		return x.Remark
-	}
-	return ""
-}
-
-func (x *UpdateRemarkReq) GetToken() string {
-	if x != nil {
-		return x.Token
-	}
-	return ""
-}
-
-type UpdateRemarkResp struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
-	Msg           string                 `protobuf:"bytes,2,opt,name=msg,proto3" json:"msg,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UpdateRemarkResp) Reset() {
-	*x = UpdateRemarkResp{}
-	mi := &file_core_protocol_friend_proto_msgTypes[10]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UpdateRemarkResp) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UpdateRemarkResp) ProtoMessage() {}
-
-func (x *UpdateRemarkResp) ProtoReflect() protoreflect.Message {
-	mi := &file_core_protocol_friend_proto_msgTypes[10]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UpdateRemarkResp.ProtoReflect.Descriptor instead.
-func (*UpdateRemarkResp) Descriptor() ([]byte, []int) {
-	return file_core_protocol_friend_proto_rawDescGZIP(), []int{10}
-}
-
-func (x *UpdateRemarkResp) GetCode() int32 {
-	if x != nil {
-		return x.Code
-	}
-	return 0
-}
-
-func (x *UpdateRemarkResp) GetMsg() string {
-	if x != nil {
-		return x.Msg
-	}
-	return ""
-}
-
 // 查看好友信息
 type FriendInfoReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -715,7 +283,7 @@ type FriendInfoReq struct {
 
 func (x *FriendInfoReq) Reset() {
 	*x = FriendInfoReq{}
-	mi := &file_core_protocol_friend_proto_msgTypes[11]
+	mi := &file_friend_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -727,7 +295,7 @@ func (x *FriendInfoReq) String() string {
 func (*FriendInfoReq) ProtoMessage() {}
 
 func (x *FriendInfoReq) ProtoReflect() protoreflect.Message {
-	mi := &file_core_protocol_friend_proto_msgTypes[11]
+	mi := &file_friend_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -740,7 +308,7 @@ func (x *FriendInfoReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FriendInfoReq.ProtoReflect.Descriptor instead.
 func (*FriendInfoReq) Descriptor() ([]byte, []int) {
-	return file_core_protocol_friend_proto_rawDescGZIP(), []int{11}
+	return file_friend_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *FriendInfoReq) GetUid() string {
@@ -779,7 +347,7 @@ type FriendInfoResp struct {
 
 func (x *FriendInfoResp) Reset() {
 	*x = FriendInfoResp{}
-	mi := &file_core_protocol_friend_proto_msgTypes[12]
+	mi := &file_friend_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -791,7 +359,7 @@ func (x *FriendInfoResp) String() string {
 func (*FriendInfoResp) ProtoMessage() {}
 
 func (x *FriendInfoResp) ProtoReflect() protoreflect.Message {
-	mi := &file_core_protocol_friend_proto_msgTypes[12]
+	mi := &file_friend_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -804,7 +372,7 @@ func (x *FriendInfoResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FriendInfoResp.ProtoReflect.Descriptor instead.
 func (*FriendInfoResp) Descriptor() ([]byte, []int) {
-	return file_core_protocol_friend_proto_rawDescGZIP(), []int{12}
+	return file_friend_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *FriendInfoResp) GetUid() string {
@@ -856,8 +424,129 @@ func (x *FriendInfoResp) GetMsg() string {
 	return ""
 }
 
+// 设置好友备注
+type UpdateFriendRemarkReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Uid           string                 `protobuf:"bytes,1,opt,name=uid,proto3" json:"uid,omitempty"`
+	FriendUid     string                 `protobuf:"bytes,2,opt,name=friend_uid,json=friendUid,proto3" json:"friend_uid,omitempty"`
+	Remark        string                 `protobuf:"bytes,3,opt,name=remark,proto3" json:"remark,omitempty"`
+	Token         string                 `protobuf:"bytes,4,opt,name=token,proto3" json:"token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateFriendRemarkReq) Reset() {
+	*x = UpdateFriendRemarkReq{}
+	mi := &file_friend_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateFriendRemarkReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateFriendRemarkReq) ProtoMessage() {}
+
+func (x *UpdateFriendRemarkReq) ProtoReflect() protoreflect.Message {
+	mi := &file_friend_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateFriendRemarkReq.ProtoReflect.Descriptor instead.
+func (*UpdateFriendRemarkReq) Descriptor() ([]byte, []int) {
+	return file_friend_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *UpdateFriendRemarkReq) GetUid() string {
+	if x != nil {
+		return x.Uid
+	}
+	return ""
+}
+
+func (x *UpdateFriendRemarkReq) GetFriendUid() string {
+	if x != nil {
+		return x.FriendUid
+	}
+	return ""
+}
+
+func (x *UpdateFriendRemarkReq) GetRemark() string {
+	if x != nil {
+		return x.Remark
+	}
+	return ""
+}
+
+func (x *UpdateFriendRemarkReq) GetToken() string {
+	if x != nil {
+		return x.Token
+	}
+	return ""
+}
+
+type UpdateFriendRemarkResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Msg           string                 `protobuf:"bytes,2,opt,name=msg,proto3" json:"msg,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateFriendRemarkResp) Reset() {
+	*x = UpdateFriendRemarkResp{}
+	mi := &file_friend_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateFriendRemarkResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateFriendRemarkResp) ProtoMessage() {}
+
+func (x *UpdateFriendRemarkResp) ProtoReflect() protoreflect.Message {
+	mi := &file_friend_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateFriendRemarkResp.ProtoReflect.Descriptor instead.
+func (*UpdateFriendRemarkResp) Descriptor() ([]byte, []int) {
+	return file_friend_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *UpdateFriendRemarkResp) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *UpdateFriendRemarkResp) GetMsg() string {
+	if x != nil {
+		return x.Msg
+	}
+	return ""
+}
+
 // 设置消息免打扰
-type SetDNDReq struct {
+type SetFriendDNDReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Uid           string                 `protobuf:"bytes,1,opt,name=uid,proto3" json:"uid,omitempty"`
 	FriendUid     string                 `protobuf:"bytes,2,opt,name=friend_uid,json=friendUid,proto3" json:"friend_uid,omitempty"`
@@ -867,21 +556,21 @@ type SetDNDReq struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *SetDNDReq) Reset() {
-	*x = SetDNDReq{}
-	mi := &file_core_protocol_friend_proto_msgTypes[13]
+func (x *SetFriendDNDReq) Reset() {
+	*x = SetFriendDNDReq{}
+	mi := &file_friend_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *SetDNDReq) String() string {
+func (x *SetFriendDNDReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SetDNDReq) ProtoMessage() {}
+func (*SetFriendDNDReq) ProtoMessage() {}
 
-func (x *SetDNDReq) ProtoReflect() protoreflect.Message {
-	mi := &file_core_protocol_friend_proto_msgTypes[13]
+func (x *SetFriendDNDReq) ProtoReflect() protoreflect.Message {
+	mi := &file_friend_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -892,40 +581,40 @@ func (x *SetDNDReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SetDNDReq.ProtoReflect.Descriptor instead.
-func (*SetDNDReq) Descriptor() ([]byte, []int) {
-	return file_core_protocol_friend_proto_rawDescGZIP(), []int{13}
+// Deprecated: Use SetFriendDNDReq.ProtoReflect.Descriptor instead.
+func (*SetFriendDNDReq) Descriptor() ([]byte, []int) {
+	return file_friend_proto_rawDescGZIP(), []int{8}
 }
 
-func (x *SetDNDReq) GetUid() string {
+func (x *SetFriendDNDReq) GetUid() string {
 	if x != nil {
 		return x.Uid
 	}
 	return ""
 }
 
-func (x *SetDNDReq) GetFriendUid() string {
+func (x *SetFriendDNDReq) GetFriendUid() string {
 	if x != nil {
 		return x.FriendUid
 	}
 	return ""
 }
 
-func (x *SetDNDReq) GetDnd() bool {
+func (x *SetFriendDNDReq) GetDnd() bool {
 	if x != nil {
 		return x.Dnd
 	}
 	return false
 }
 
-func (x *SetDNDReq) GetToken() string {
+func (x *SetFriendDNDReq) GetToken() string {
 	if x != nil {
 		return x.Token
 	}
 	return ""
 }
 
-type SetDNDResp struct {
+type SetFriendDNDResp struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
 	Msg           string                 `protobuf:"bytes,2,opt,name=msg,proto3" json:"msg,omitempty"`
@@ -933,21 +622,21 @@ type SetDNDResp struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *SetDNDResp) Reset() {
-	*x = SetDNDResp{}
-	mi := &file_core_protocol_friend_proto_msgTypes[14]
+func (x *SetFriendDNDResp) Reset() {
+	*x = SetFriendDNDResp{}
+	mi := &file_friend_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *SetDNDResp) String() string {
+func (x *SetFriendDNDResp) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SetDNDResp) ProtoMessage() {}
+func (*SetFriendDNDResp) ProtoMessage() {}
 
-func (x *SetDNDResp) ProtoReflect() protoreflect.Message {
-	mi := &file_core_protocol_friend_proto_msgTypes[14]
+func (x *SetFriendDNDResp) ProtoReflect() protoreflect.Message {
+	mi := &file_friend_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -958,30 +647,341 @@ func (x *SetDNDResp) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SetDNDResp.ProtoReflect.Descriptor instead.
-func (*SetDNDResp) Descriptor() ([]byte, []int) {
-	return file_core_protocol_friend_proto_rawDescGZIP(), []int{14}
+// Deprecated: Use SetFriendDNDResp.ProtoReflect.Descriptor instead.
+func (*SetFriendDNDResp) Descriptor() ([]byte, []int) {
+	return file_friend_proto_rawDescGZIP(), []int{9}
 }
 
-func (x *SetDNDResp) GetCode() int32 {
+func (x *SetFriendDNDResp) GetCode() int32 {
 	if x != nil {
 		return x.Code
 	}
 	return 0
 }
 
-func (x *SetDNDResp) GetMsg() string {
+func (x *SetFriendDNDResp) GetMsg() string {
 	if x != nil {
 		return x.Msg
 	}
 	return ""
 }
 
-var File_core_protocol_friend_proto protoreflect.FileDescriptor
+// 删除好友
+type DeleteFriendReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Uid           string                 `protobuf:"bytes,1,opt,name=uid,proto3" json:"uid,omitempty"`
+	FriendUid     string                 `protobuf:"bytes,2,opt,name=friend_uid,json=friendUid,proto3" json:"friend_uid,omitempty"`
+	Token         string                 `protobuf:"bytes,3,opt,name=token,proto3" json:"token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
 
-const file_core_protocol_friend_proto_rawDesc = "" +
+func (x *DeleteFriendReq) Reset() {
+	*x = DeleteFriendReq{}
+	mi := &file_friend_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteFriendReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteFriendReq) ProtoMessage() {}
+
+func (x *DeleteFriendReq) ProtoReflect() protoreflect.Message {
+	mi := &file_friend_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteFriendReq.ProtoReflect.Descriptor instead.
+func (*DeleteFriendReq) Descriptor() ([]byte, []int) {
+	return file_friend_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *DeleteFriendReq) GetUid() string {
+	if x != nil {
+		return x.Uid
+	}
+	return ""
+}
+
+func (x *DeleteFriendReq) GetFriendUid() string {
+	if x != nil {
+		return x.FriendUid
+	}
+	return ""
+}
+
+func (x *DeleteFriendReq) GetToken() string {
+	if x != nil {
+		return x.Token
+	}
+	return ""
+}
+
+type DeleteFriendResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Msg           string                 `protobuf:"bytes,2,opt,name=msg,proto3" json:"msg,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteFriendResp) Reset() {
+	*x = DeleteFriendResp{}
+	mi := &file_friend_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteFriendResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteFriendResp) ProtoMessage() {}
+
+func (x *DeleteFriendResp) ProtoReflect() protoreflect.Message {
+	mi := &file_friend_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteFriendResp.ProtoReflect.Descriptor instead.
+func (*DeleteFriendResp) Descriptor() ([]byte, []int) {
+	return file_friend_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *DeleteFriendResp) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *DeleteFriendResp) GetMsg() string {
+	if x != nil {
+		return x.Msg
+	}
+	return ""
+}
+
+// 获取收到的好友请求列表响应
+type FriendRequestListResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	FromUids      []string               `protobuf:"bytes,1,rep,name=from_uids,json=fromUids,proto3" json:"from_uids,omitempty"`
+	FromUsernames []string               `protobuf:"bytes,2,rep,name=from_usernames,json=fromUsernames,proto3" json:"from_usernames,omitempty"`
+	VerifyMsgs    []string               `protobuf:"bytes,3,rep,name=verify_msgs,json=verifyMsgs,proto3" json:"verify_msgs,omitempty"`
+	Code          int32                  `protobuf:"varint,4,opt,name=code,proto3" json:"code,omitempty"`
+	Msg           string                 `protobuf:"bytes,5,opt,name=msg,proto3" json:"msg,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FriendRequestListResp) Reset() {
+	*x = FriendRequestListResp{}
+	mi := &file_friend_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FriendRequestListResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FriendRequestListResp) ProtoMessage() {}
+
+func (x *FriendRequestListResp) ProtoReflect() protoreflect.Message {
+	mi := &file_friend_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FriendRequestListResp.ProtoReflect.Descriptor instead.
+func (*FriendRequestListResp) Descriptor() ([]byte, []int) {
+	return file_friend_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *FriendRequestListResp) GetFromUids() []string {
+	if x != nil {
+		return x.FromUids
+	}
+	return nil
+}
+
+func (x *FriendRequestListResp) GetFromUsernames() []string {
+	if x != nil {
+		return x.FromUsernames
+	}
+	return nil
+}
+
+func (x *FriendRequestListResp) GetVerifyMsgs() []string {
+	if x != nil {
+		return x.VerifyMsgs
+	}
+	return nil
+}
+
+func (x *FriendRequestListResp) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *FriendRequestListResp) GetMsg() string {
+	if x != nil {
+		return x.Msg
+	}
+	return ""
+}
+
+// 处理好友请求
+type HandleFriendRequestReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	FromUid       string                 `protobuf:"bytes,1,opt,name=from_uid,json=fromUid,proto3" json:"from_uid,omitempty"`
+	ToUid         string                 `protobuf:"bytes,2,opt,name=to_uid,json=toUid,proto3" json:"to_uid,omitempty"`
+	Accept        bool                   `protobuf:"varint,3,opt,name=accept,proto3" json:"accept,omitempty"`
+	Token         string                 `protobuf:"bytes,4,opt,name=token,proto3" json:"token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *HandleFriendRequestReq) Reset() {
+	*x = HandleFriendRequestReq{}
+	mi := &file_friend_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *HandleFriendRequestReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HandleFriendRequestReq) ProtoMessage() {}
+
+func (x *HandleFriendRequestReq) ProtoReflect() protoreflect.Message {
+	mi := &file_friend_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HandleFriendRequestReq.ProtoReflect.Descriptor instead.
+func (*HandleFriendRequestReq) Descriptor() ([]byte, []int) {
+	return file_friend_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *HandleFriendRequestReq) GetFromUid() string {
+	if x != nil {
+		return x.FromUid
+	}
+	return ""
+}
+
+func (x *HandleFriendRequestReq) GetToUid() string {
+	if x != nil {
+		return x.ToUid
+	}
+	return ""
+}
+
+func (x *HandleFriendRequestReq) GetAccept() bool {
+	if x != nil {
+		return x.Accept
+	}
+	return false
+}
+
+func (x *HandleFriendRequestReq) GetToken() string {
+	if x != nil {
+		return x.Token
+	}
+	return ""
+}
+
+type HandleFriendRequestResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Msg           string                 `protobuf:"bytes,2,opt,name=msg,proto3" json:"msg,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *HandleFriendRequestResp) Reset() {
+	*x = HandleFriendRequestResp{}
+	mi := &file_friend_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *HandleFriendRequestResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HandleFriendRequestResp) ProtoMessage() {}
+
+func (x *HandleFriendRequestResp) ProtoReflect() protoreflect.Message {
+	mi := &file_friend_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HandleFriendRequestResp.ProtoReflect.Descriptor instead.
+func (*HandleFriendRequestResp) Descriptor() ([]byte, []int) {
+	return file_friend_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *HandleFriendRequestResp) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *HandleFriendRequestResp) GetMsg() string {
+	if x != nil {
+		return x.Msg
+	}
+	return ""
+}
+
+var File_friend_proto protoreflect.FileDescriptor
+
+const file_friend_proto_rawDesc = "" +
 	"\n" +
-	"\x1acore/protocol/friend.proto\x12\bprotocol\"u\n" +
+	"\ffriend.proto\x12\bprotocol\"u\n" +
 	"\fAddFriendReq\x12\x19\n" +
 	"\bfrom_uid\x18\x01 \x01(\tR\afromUid\x12\x15\n" +
 	"\x06to_uid\x18\x02 \x01(\tR\x05toUid\x12\x1d\n" +
@@ -989,14 +989,6 @@ const file_core_protocol_friend_proto_rawDesc = "" +
 	"verify_msg\x18\x03 \x01(\tR\tverifyMsg\x12\x14\n" +
 	"\x05token\x18\x04 \x01(\tR\x05token\"5\n" +
 	"\rAddFriendResp\x12\x12\n" +
-	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x10\n" +
-	"\x03msg\x18\x02 \x01(\tR\x03msg\"q\n" +
-	"\x0fHandleFriendReq\x12\x19\n" +
-	"\bfrom_uid\x18\x01 \x01(\tR\afromUid\x12\x15\n" +
-	"\x06to_uid\x18\x02 \x01(\tR\x05toUid\x12\x16\n" +
-	"\x06accept\x18\x03 \x01(\bR\x06accept\x12\x14\n" +
-	"\x05token\x18\x04 \x01(\tR\x05token\"8\n" +
-	"\x10HandleFriendResp\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x10\n" +
 	"\x03msg\x18\x02 \x01(\tR\x03msg\"7\n" +
 	"\rFriendListReq\x12\x10\n" +
@@ -1008,7 +1000,38 @@ const file_core_protocol_friend_proto_rawDesc = "" +
 	"\x10friend_usernames\x18\x02 \x03(\tR\x0ffriendUsernames\x12\x12\n" +
 	"\x04code\x18\x03 \x01(\x05R\x04code\x12\x10\n" +
 	"\x03msg\x18\x04 \x01(\tR\x03msg\x12\x18\n" +
-	"\aremarks\x18\x05 \x03(\tR\aremarks\"X\n" +
+	"\aremarks\x18\x05 \x03(\tR\aremarks\"V\n" +
+	"\rFriendInfoReq\x12\x10\n" +
+	"\x03uid\x18\x01 \x01(\tR\x03uid\x12\x1d\n" +
+	"\n" +
+	"friend_uid\x18\x02 \x01(\tR\tfriendUid\x12\x14\n" +
+	"\x05token\x18\x03 \x01(\tR\x05token\"\xa4\x01\n" +
+	"\x0eFriendInfoResp\x12\x10\n" +
+	"\x03uid\x18\x01 \x01(\tR\x03uid\x12\x1a\n" +
+	"\busername\x18\x02 \x01(\tR\busername\x12\x14\n" +
+	"\x05email\x18\x03 \x01(\tR\x05email\x12\x16\n" +
+	"\x06remark\x18\x04 \x01(\tR\x06remark\x12\x10\n" +
+	"\x03dnd\x18\x05 \x01(\bR\x03dnd\x12\x12\n" +
+	"\x04code\x18\x06 \x01(\x05R\x04code\x12\x10\n" +
+	"\x03msg\x18\a \x01(\tR\x03msg\"v\n" +
+	"\x15UpdateFriendRemarkReq\x12\x10\n" +
+	"\x03uid\x18\x01 \x01(\tR\x03uid\x12\x1d\n" +
+	"\n" +
+	"friend_uid\x18\x02 \x01(\tR\tfriendUid\x12\x16\n" +
+	"\x06remark\x18\x03 \x01(\tR\x06remark\x12\x14\n" +
+	"\x05token\x18\x04 \x01(\tR\x05token\">\n" +
+	"\x16UpdateFriendRemarkResp\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x10\n" +
+	"\x03msg\x18\x02 \x01(\tR\x03msg\"j\n" +
+	"\x0fSetFriendDNDReq\x12\x10\n" +
+	"\x03uid\x18\x01 \x01(\tR\x03uid\x12\x1d\n" +
+	"\n" +
+	"friend_uid\x18\x02 \x01(\tR\tfriendUid\x12\x10\n" +
+	"\x03dnd\x18\x03 \x01(\bR\x03dnd\x12\x14\n" +
+	"\x05token\x18\x04 \x01(\tR\x05token\"8\n" +
+	"\x10SetFriendDNDResp\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x10\n" +
+	"\x03msg\x18\x02 \x01(\tR\x03msg\"X\n" +
 	"\x0fDeleteFriendReq\x12\x10\n" +
 	"\x03uid\x18\x01 \x01(\tR\x03uid\x12\x1d\n" +
 	"\n" +
@@ -1023,71 +1046,47 @@ const file_core_protocol_friend_proto_rawDesc = "" +
 	"\vverify_msgs\x18\x03 \x03(\tR\n" +
 	"verifyMsgs\x12\x12\n" +
 	"\x04code\x18\x04 \x01(\x05R\x04code\x12\x10\n" +
-	"\x03msg\x18\x05 \x01(\tR\x03msg\"p\n" +
-	"\x0fUpdateRemarkReq\x12\x10\n" +
-	"\x03uid\x18\x01 \x01(\tR\x03uid\x12\x1d\n" +
-	"\n" +
-	"friend_uid\x18\x02 \x01(\tR\tfriendUid\x12\x16\n" +
-	"\x06remark\x18\x03 \x01(\tR\x06remark\x12\x14\n" +
-	"\x05token\x18\x04 \x01(\tR\x05token\"8\n" +
-	"\x10UpdateRemarkResp\x12\x12\n" +
-	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x10\n" +
-	"\x03msg\x18\x02 \x01(\tR\x03msg\"V\n" +
-	"\rFriendInfoReq\x12\x10\n" +
-	"\x03uid\x18\x01 \x01(\tR\x03uid\x12\x1d\n" +
-	"\n" +
-	"friend_uid\x18\x02 \x01(\tR\tfriendUid\x12\x14\n" +
-	"\x05token\x18\x03 \x01(\tR\x05token\"\xa4\x01\n" +
-	"\x0eFriendInfoResp\x12\x10\n" +
-	"\x03uid\x18\x01 \x01(\tR\x03uid\x12\x1a\n" +
-	"\busername\x18\x02 \x01(\tR\busername\x12\x14\n" +
-	"\x05email\x18\x03 \x01(\tR\x05email\x12\x16\n" +
-	"\x06remark\x18\x04 \x01(\tR\x06remark\x12\x10\n" +
-	"\x03dnd\x18\x05 \x01(\bR\x03dnd\x12\x12\n" +
-	"\x04code\x18\x06 \x01(\x05R\x04code\x12\x10\n" +
-	"\x03msg\x18\a \x01(\tR\x03msg\"d\n" +
-	"\tSetDNDReq\x12\x10\n" +
-	"\x03uid\x18\x01 \x01(\tR\x03uid\x12\x1d\n" +
-	"\n" +
-	"friend_uid\x18\x02 \x01(\tR\tfriendUid\x12\x10\n" +
-	"\x03dnd\x18\x03 \x01(\bR\x03dnd\x12\x14\n" +
-	"\x05token\x18\x04 \x01(\tR\x05token\"2\n" +
-	"\n" +
-	"SetDNDResp\x12\x12\n" +
+	"\x03msg\x18\x05 \x01(\tR\x03msg\"x\n" +
+	"\x16HandleFriendRequestReq\x12\x19\n" +
+	"\bfrom_uid\x18\x01 \x01(\tR\afromUid\x12\x15\n" +
+	"\x06to_uid\x18\x02 \x01(\tR\x05toUid\x12\x16\n" +
+	"\x06accept\x18\x03 \x01(\bR\x06accept\x12\x14\n" +
+	"\x05token\x18\x04 \x01(\tR\x05token\"?\n" +
+	"\x17HandleFriendRequestResp\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x10\n" +
 	"\x03msg\x18\x02 \x01(\tR\x03msgB\x18Z\x16im/core/protocol/pb;pbb\x06proto3"
 
 var (
-	file_core_protocol_friend_proto_rawDescOnce sync.Once
-	file_core_protocol_friend_proto_rawDescData []byte
+	file_friend_proto_rawDescOnce sync.Once
+	file_friend_proto_rawDescData []byte
 )
 
-func file_core_protocol_friend_proto_rawDescGZIP() []byte {
-	file_core_protocol_friend_proto_rawDescOnce.Do(func() {
-		file_core_protocol_friend_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_core_protocol_friend_proto_rawDesc), len(file_core_protocol_friend_proto_rawDesc)))
+func file_friend_proto_rawDescGZIP() []byte {
+	file_friend_proto_rawDescOnce.Do(func() {
+		file_friend_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_friend_proto_rawDesc), len(file_friend_proto_rawDesc)))
 	})
-	return file_core_protocol_friend_proto_rawDescData
+	return file_friend_proto_rawDescData
 }
 
-var file_core_protocol_friend_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
-var file_core_protocol_friend_proto_goTypes = []any{
-	(*AddFriendReq)(nil),          // 0: protocol.AddFriendReq
-	(*AddFriendResp)(nil),         // 1: protocol.AddFriendResp
-	(*HandleFriendReq)(nil),       // 2: protocol.HandleFriendReq
-	(*HandleFriendResp)(nil),      // 3: protocol.HandleFriendResp
-	(*FriendListReq)(nil),         // 4: protocol.FriendListReq
-	(*FriendListResp)(nil),        // 5: protocol.FriendListResp
-	(*DeleteFriendReq)(nil),       // 6: protocol.DeleteFriendReq
-	(*DeleteFriendResp)(nil),      // 7: protocol.DeleteFriendResp
-	(*FriendRequestListResp)(nil), // 8: protocol.FriendRequestListResp
-	(*UpdateRemarkReq)(nil),       // 9: protocol.UpdateRemarkReq
-	(*UpdateRemarkResp)(nil),      // 10: protocol.UpdateRemarkResp
-	(*FriendInfoReq)(nil),         // 11: protocol.FriendInfoReq
-	(*FriendInfoResp)(nil),        // 12: protocol.FriendInfoResp
-	(*SetDNDReq)(nil),             // 13: protocol.SetDNDReq
-	(*SetDNDResp)(nil),            // 14: protocol.SetDNDResp
+var file_friend_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
+var file_friend_proto_goTypes = []any{
+	(*AddFriendReq)(nil),            // 0: protocol.AddFriendReq
+	(*AddFriendResp)(nil),           // 1: protocol.AddFriendResp
+	(*FriendListReq)(nil),           // 2: protocol.FriendListReq
+	(*FriendListResp)(nil),          // 3: protocol.FriendListResp
+	(*FriendInfoReq)(nil),           // 4: protocol.FriendInfoReq
+	(*FriendInfoResp)(nil),          // 5: protocol.FriendInfoResp
+	(*UpdateFriendRemarkReq)(nil),   // 6: protocol.UpdateFriendRemarkReq
+	(*UpdateFriendRemarkResp)(nil),  // 7: protocol.UpdateFriendRemarkResp
+	(*SetFriendDNDReq)(nil),         // 8: protocol.SetFriendDNDReq
+	(*SetFriendDNDResp)(nil),        // 9: protocol.SetFriendDNDResp
+	(*DeleteFriendReq)(nil),         // 10: protocol.DeleteFriendReq
+	(*DeleteFriendResp)(nil),        // 11: protocol.DeleteFriendResp
+	(*FriendRequestListResp)(nil),   // 12: protocol.FriendRequestListResp
+	(*HandleFriendRequestReq)(nil),  // 13: protocol.HandleFriendRequestReq
+	(*HandleFriendRequestResp)(nil), // 14: protocol.HandleFriendRequestResp
 }
-var file_core_protocol_friend_proto_depIdxs = []int32{
+var file_friend_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
 	0, // [0:0] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -1095,26 +1094,26 @@ var file_core_protocol_friend_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_core_protocol_friend_proto_init() }
-func file_core_protocol_friend_proto_init() {
-	if File_core_protocol_friend_proto != nil {
+func init() { file_friend_proto_init() }
+func file_friend_proto_init() {
+	if File_friend_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_core_protocol_friend_proto_rawDesc), len(file_core_protocol_friend_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_friend_proto_rawDesc), len(file_friend_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   15,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_core_protocol_friend_proto_goTypes,
-		DependencyIndexes: file_core_protocol_friend_proto_depIdxs,
-		MessageInfos:      file_core_protocol_friend_proto_msgTypes,
+		GoTypes:           file_friend_proto_goTypes,
+		DependencyIndexes: file_friend_proto_depIdxs,
+		MessageInfos:      file_friend_proto_msgTypes,
 	}.Build()
-	File_core_protocol_friend_proto = out.File
-	file_core_protocol_friend_proto_goTypes = nil
-	file_core_protocol_friend_proto_depIdxs = nil
+	File_friend_proto = out.File
+	file_friend_proto_goTypes = nil
+	file_friend_proto_depIdxs = nil
 }

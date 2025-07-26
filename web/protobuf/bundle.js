@@ -522,510 +522,6 @@ $root.protocol = (function() {
         return AddFriendResp;
     })();
 
-    protocol.HandleFriendReq = (function() {
-
-        /**
-         * Properties of a HandleFriendReq.
-         * @memberof protocol
-         * @interface IHandleFriendReq
-         * @property {string|null} [fromUid] HandleFriendReq fromUid
-         * @property {string|null} [toUid] HandleFriendReq toUid
-         * @property {boolean|null} [accept] HandleFriendReq accept
-         * @property {string|null} [token] HandleFriendReq token
-         */
-
-        /**
-         * Constructs a new HandleFriendReq.
-         * @memberof protocol
-         * @classdesc Represents a HandleFriendReq.
-         * @implements IHandleFriendReq
-         * @constructor
-         * @param {protocol.IHandleFriendReq=} [properties] Properties to set
-         */
-        function HandleFriendReq(properties) {
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * HandleFriendReq fromUid.
-         * @member {string} fromUid
-         * @memberof protocol.HandleFriendReq
-         * @instance
-         */
-        HandleFriendReq.prototype.fromUid = "";
-
-        /**
-         * HandleFriendReq toUid.
-         * @member {string} toUid
-         * @memberof protocol.HandleFriendReq
-         * @instance
-         */
-        HandleFriendReq.prototype.toUid = "";
-
-        /**
-         * HandleFriendReq accept.
-         * @member {boolean} accept
-         * @memberof protocol.HandleFriendReq
-         * @instance
-         */
-        HandleFriendReq.prototype.accept = false;
-
-        /**
-         * HandleFriendReq token.
-         * @member {string} token
-         * @memberof protocol.HandleFriendReq
-         * @instance
-         */
-        HandleFriendReq.prototype.token = "";
-
-        /**
-         * Creates a new HandleFriendReq instance using the specified properties.
-         * @function create
-         * @memberof protocol.HandleFriendReq
-         * @static
-         * @param {protocol.IHandleFriendReq=} [properties] Properties to set
-         * @returns {protocol.HandleFriendReq} HandleFriendReq instance
-         */
-        HandleFriendReq.create = function create(properties) {
-            return new HandleFriendReq(properties);
-        };
-
-        /**
-         * Encodes the specified HandleFriendReq message. Does not implicitly {@link protocol.HandleFriendReq.verify|verify} messages.
-         * @function encode
-         * @memberof protocol.HandleFriendReq
-         * @static
-         * @param {protocol.IHandleFriendReq} message HandleFriendReq message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        HandleFriendReq.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.fromUid != null && Object.hasOwnProperty.call(message, "fromUid"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.fromUid);
-            if (message.toUid != null && Object.hasOwnProperty.call(message, "toUid"))
-                writer.uint32(/* id 2, wireType 2 =*/18).string(message.toUid);
-            if (message.accept != null && Object.hasOwnProperty.call(message, "accept"))
-                writer.uint32(/* id 3, wireType 0 =*/24).bool(message.accept);
-            if (message.token != null && Object.hasOwnProperty.call(message, "token"))
-                writer.uint32(/* id 4, wireType 2 =*/34).string(message.token);
-            return writer;
-        };
-
-        /**
-         * Encodes the specified HandleFriendReq message, length delimited. Does not implicitly {@link protocol.HandleFriendReq.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof protocol.HandleFriendReq
-         * @static
-         * @param {protocol.IHandleFriendReq} message HandleFriendReq message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        HandleFriendReq.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a HandleFriendReq message from the specified reader or buffer.
-         * @function decode
-         * @memberof protocol.HandleFriendReq
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {protocol.HandleFriendReq} HandleFriendReq
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        HandleFriendReq.decode = function decode(reader, length, error) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.HandleFriendReq();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                if (tag === error)
-                    break;
-                switch (tag >>> 3) {
-                case 1: {
-                        message.fromUid = reader.string();
-                        break;
-                    }
-                case 2: {
-                        message.toUid = reader.string();
-                        break;
-                    }
-                case 3: {
-                        message.accept = reader.bool();
-                        break;
-                    }
-                case 4: {
-                        message.token = reader.string();
-                        break;
-                    }
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a HandleFriendReq message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof protocol.HandleFriendReq
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {protocol.HandleFriendReq} HandleFriendReq
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        HandleFriendReq.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a HandleFriendReq message.
-         * @function verify
-         * @memberof protocol.HandleFriendReq
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        HandleFriendReq.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.fromUid != null && message.hasOwnProperty("fromUid"))
-                if (!$util.isString(message.fromUid))
-                    return "fromUid: string expected";
-            if (message.toUid != null && message.hasOwnProperty("toUid"))
-                if (!$util.isString(message.toUid))
-                    return "toUid: string expected";
-            if (message.accept != null && message.hasOwnProperty("accept"))
-                if (typeof message.accept !== "boolean")
-                    return "accept: boolean expected";
-            if (message.token != null && message.hasOwnProperty("token"))
-                if (!$util.isString(message.token))
-                    return "token: string expected";
-            return null;
-        };
-
-        /**
-         * Creates a HandleFriendReq message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof protocol.HandleFriendReq
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {protocol.HandleFriendReq} HandleFriendReq
-         */
-        HandleFriendReq.fromObject = function fromObject(object) {
-            if (object instanceof $root.protocol.HandleFriendReq)
-                return object;
-            var message = new $root.protocol.HandleFriendReq();
-            if (object.fromUid != null)
-                message.fromUid = String(object.fromUid);
-            if (object.toUid != null)
-                message.toUid = String(object.toUid);
-            if (object.accept != null)
-                message.accept = Boolean(object.accept);
-            if (object.token != null)
-                message.token = String(object.token);
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a HandleFriendReq message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof protocol.HandleFriendReq
-         * @static
-         * @param {protocol.HandleFriendReq} message HandleFriendReq
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        HandleFriendReq.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            var object = {};
-            if (options.defaults) {
-                object.fromUid = "";
-                object.toUid = "";
-                object.accept = false;
-                object.token = "";
-            }
-            if (message.fromUid != null && message.hasOwnProperty("fromUid"))
-                object.fromUid = message.fromUid;
-            if (message.toUid != null && message.hasOwnProperty("toUid"))
-                object.toUid = message.toUid;
-            if (message.accept != null && message.hasOwnProperty("accept"))
-                object.accept = message.accept;
-            if (message.token != null && message.hasOwnProperty("token"))
-                object.token = message.token;
-            return object;
-        };
-
-        /**
-         * Converts this HandleFriendReq to JSON.
-         * @function toJSON
-         * @memberof protocol.HandleFriendReq
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        HandleFriendReq.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        /**
-         * Gets the default type url for HandleFriendReq
-         * @function getTypeUrl
-         * @memberof protocol.HandleFriendReq
-         * @static
-         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns {string} The default type url
-         */
-        HandleFriendReq.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-            if (typeUrlPrefix === undefined) {
-                typeUrlPrefix = "type.googleapis.com";
-            }
-            return typeUrlPrefix + "/protocol.HandleFriendReq";
-        };
-
-        return HandleFriendReq;
-    })();
-
-    protocol.HandleFriendResp = (function() {
-
-        /**
-         * Properties of a HandleFriendResp.
-         * @memberof protocol
-         * @interface IHandleFriendResp
-         * @property {number|null} [code] HandleFriendResp code
-         * @property {string|null} [msg] HandleFriendResp msg
-         */
-
-        /**
-         * Constructs a new HandleFriendResp.
-         * @memberof protocol
-         * @classdesc Represents a HandleFriendResp.
-         * @implements IHandleFriendResp
-         * @constructor
-         * @param {protocol.IHandleFriendResp=} [properties] Properties to set
-         */
-        function HandleFriendResp(properties) {
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * HandleFriendResp code.
-         * @member {number} code
-         * @memberof protocol.HandleFriendResp
-         * @instance
-         */
-        HandleFriendResp.prototype.code = 0;
-
-        /**
-         * HandleFriendResp msg.
-         * @member {string} msg
-         * @memberof protocol.HandleFriendResp
-         * @instance
-         */
-        HandleFriendResp.prototype.msg = "";
-
-        /**
-         * Creates a new HandleFriendResp instance using the specified properties.
-         * @function create
-         * @memberof protocol.HandleFriendResp
-         * @static
-         * @param {protocol.IHandleFriendResp=} [properties] Properties to set
-         * @returns {protocol.HandleFriendResp} HandleFriendResp instance
-         */
-        HandleFriendResp.create = function create(properties) {
-            return new HandleFriendResp(properties);
-        };
-
-        /**
-         * Encodes the specified HandleFriendResp message. Does not implicitly {@link protocol.HandleFriendResp.verify|verify} messages.
-         * @function encode
-         * @memberof protocol.HandleFriendResp
-         * @static
-         * @param {protocol.IHandleFriendResp} message HandleFriendResp message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        HandleFriendResp.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.code != null && Object.hasOwnProperty.call(message, "code"))
-                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.code);
-            if (message.msg != null && Object.hasOwnProperty.call(message, "msg"))
-                writer.uint32(/* id 2, wireType 2 =*/18).string(message.msg);
-            return writer;
-        };
-
-        /**
-         * Encodes the specified HandleFriendResp message, length delimited. Does not implicitly {@link protocol.HandleFriendResp.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof protocol.HandleFriendResp
-         * @static
-         * @param {protocol.IHandleFriendResp} message HandleFriendResp message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        HandleFriendResp.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a HandleFriendResp message from the specified reader or buffer.
-         * @function decode
-         * @memberof protocol.HandleFriendResp
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {protocol.HandleFriendResp} HandleFriendResp
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        HandleFriendResp.decode = function decode(reader, length, error) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.HandleFriendResp();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                if (tag === error)
-                    break;
-                switch (tag >>> 3) {
-                case 1: {
-                        message.code = reader.int32();
-                        break;
-                    }
-                case 2: {
-                        message.msg = reader.string();
-                        break;
-                    }
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a HandleFriendResp message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof protocol.HandleFriendResp
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {protocol.HandleFriendResp} HandleFriendResp
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        HandleFriendResp.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a HandleFriendResp message.
-         * @function verify
-         * @memberof protocol.HandleFriendResp
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        HandleFriendResp.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.code != null && message.hasOwnProperty("code"))
-                if (!$util.isInteger(message.code))
-                    return "code: integer expected";
-            if (message.msg != null && message.hasOwnProperty("msg"))
-                if (!$util.isString(message.msg))
-                    return "msg: string expected";
-            return null;
-        };
-
-        /**
-         * Creates a HandleFriendResp message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof protocol.HandleFriendResp
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {protocol.HandleFriendResp} HandleFriendResp
-         */
-        HandleFriendResp.fromObject = function fromObject(object) {
-            if (object instanceof $root.protocol.HandleFriendResp)
-                return object;
-            var message = new $root.protocol.HandleFriendResp();
-            if (object.code != null)
-                message.code = object.code | 0;
-            if (object.msg != null)
-                message.msg = String(object.msg);
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a HandleFriendResp message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof protocol.HandleFriendResp
-         * @static
-         * @param {protocol.HandleFriendResp} message HandleFriendResp
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        HandleFriendResp.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            var object = {};
-            if (options.defaults) {
-                object.code = 0;
-                object.msg = "";
-            }
-            if (message.code != null && message.hasOwnProperty("code"))
-                object.code = message.code;
-            if (message.msg != null && message.hasOwnProperty("msg"))
-                object.msg = message.msg;
-            return object;
-        };
-
-        /**
-         * Converts this HandleFriendResp to JSON.
-         * @function toJSON
-         * @memberof protocol.HandleFriendResp
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        HandleFriendResp.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        /**
-         * Gets the default type url for HandleFriendResp
-         * @function getTypeUrl
-         * @memberof protocol.HandleFriendResp
-         * @static
-         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns {string} The default type url
-         */
-        HandleFriendResp.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-            if (typeUrlPrefix === undefined) {
-                typeUrlPrefix = "type.googleapis.com";
-            }
-            return typeUrlPrefix + "/protocol.HandleFriendResp";
-        };
-
-        return HandleFriendResp;
-    })();
-
     protocol.FriendListReq = (function() {
 
         /**
@@ -1601,6 +1097,1610 @@ $root.protocol = (function() {
         };
 
         return FriendListResp;
+    })();
+
+    protocol.FriendInfoReq = (function() {
+
+        /**
+         * Properties of a FriendInfoReq.
+         * @memberof protocol
+         * @interface IFriendInfoReq
+         * @property {string|null} [uid] FriendInfoReq uid
+         * @property {string|null} [friendUid] FriendInfoReq friendUid
+         * @property {string|null} [token] FriendInfoReq token
+         */
+
+        /**
+         * Constructs a new FriendInfoReq.
+         * @memberof protocol
+         * @classdesc Represents a FriendInfoReq.
+         * @implements IFriendInfoReq
+         * @constructor
+         * @param {protocol.IFriendInfoReq=} [properties] Properties to set
+         */
+        function FriendInfoReq(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * FriendInfoReq uid.
+         * @member {string} uid
+         * @memberof protocol.FriendInfoReq
+         * @instance
+         */
+        FriendInfoReq.prototype.uid = "";
+
+        /**
+         * FriendInfoReq friendUid.
+         * @member {string} friendUid
+         * @memberof protocol.FriendInfoReq
+         * @instance
+         */
+        FriendInfoReq.prototype.friendUid = "";
+
+        /**
+         * FriendInfoReq token.
+         * @member {string} token
+         * @memberof protocol.FriendInfoReq
+         * @instance
+         */
+        FriendInfoReq.prototype.token = "";
+
+        /**
+         * Creates a new FriendInfoReq instance using the specified properties.
+         * @function create
+         * @memberof protocol.FriendInfoReq
+         * @static
+         * @param {protocol.IFriendInfoReq=} [properties] Properties to set
+         * @returns {protocol.FriendInfoReq} FriendInfoReq instance
+         */
+        FriendInfoReq.create = function create(properties) {
+            return new FriendInfoReq(properties);
+        };
+
+        /**
+         * Encodes the specified FriendInfoReq message. Does not implicitly {@link protocol.FriendInfoReq.verify|verify} messages.
+         * @function encode
+         * @memberof protocol.FriendInfoReq
+         * @static
+         * @param {protocol.IFriendInfoReq} message FriendInfoReq message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        FriendInfoReq.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.uid != null && Object.hasOwnProperty.call(message, "uid"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.uid);
+            if (message.friendUid != null && Object.hasOwnProperty.call(message, "friendUid"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.friendUid);
+            if (message.token != null && Object.hasOwnProperty.call(message, "token"))
+                writer.uint32(/* id 3, wireType 2 =*/26).string(message.token);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified FriendInfoReq message, length delimited. Does not implicitly {@link protocol.FriendInfoReq.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof protocol.FriendInfoReq
+         * @static
+         * @param {protocol.IFriendInfoReq} message FriendInfoReq message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        FriendInfoReq.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a FriendInfoReq message from the specified reader or buffer.
+         * @function decode
+         * @memberof protocol.FriendInfoReq
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {protocol.FriendInfoReq} FriendInfoReq
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        FriendInfoReq.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.FriendInfoReq();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.uid = reader.string();
+                        break;
+                    }
+                case 2: {
+                        message.friendUid = reader.string();
+                        break;
+                    }
+                case 3: {
+                        message.token = reader.string();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a FriendInfoReq message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof protocol.FriendInfoReq
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {protocol.FriendInfoReq} FriendInfoReq
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        FriendInfoReq.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a FriendInfoReq message.
+         * @function verify
+         * @memberof protocol.FriendInfoReq
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        FriendInfoReq.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.uid != null && message.hasOwnProperty("uid"))
+                if (!$util.isString(message.uid))
+                    return "uid: string expected";
+            if (message.friendUid != null && message.hasOwnProperty("friendUid"))
+                if (!$util.isString(message.friendUid))
+                    return "friendUid: string expected";
+            if (message.token != null && message.hasOwnProperty("token"))
+                if (!$util.isString(message.token))
+                    return "token: string expected";
+            return null;
+        };
+
+        /**
+         * Creates a FriendInfoReq message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof protocol.FriendInfoReq
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {protocol.FriendInfoReq} FriendInfoReq
+         */
+        FriendInfoReq.fromObject = function fromObject(object) {
+            if (object instanceof $root.protocol.FriendInfoReq)
+                return object;
+            var message = new $root.protocol.FriendInfoReq();
+            if (object.uid != null)
+                message.uid = String(object.uid);
+            if (object.friendUid != null)
+                message.friendUid = String(object.friendUid);
+            if (object.token != null)
+                message.token = String(object.token);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a FriendInfoReq message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof protocol.FriendInfoReq
+         * @static
+         * @param {protocol.FriendInfoReq} message FriendInfoReq
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        FriendInfoReq.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                object.uid = "";
+                object.friendUid = "";
+                object.token = "";
+            }
+            if (message.uid != null && message.hasOwnProperty("uid"))
+                object.uid = message.uid;
+            if (message.friendUid != null && message.hasOwnProperty("friendUid"))
+                object.friendUid = message.friendUid;
+            if (message.token != null && message.hasOwnProperty("token"))
+                object.token = message.token;
+            return object;
+        };
+
+        /**
+         * Converts this FriendInfoReq to JSON.
+         * @function toJSON
+         * @memberof protocol.FriendInfoReq
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        FriendInfoReq.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for FriendInfoReq
+         * @function getTypeUrl
+         * @memberof protocol.FriendInfoReq
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        FriendInfoReq.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/protocol.FriendInfoReq";
+        };
+
+        return FriendInfoReq;
+    })();
+
+    protocol.FriendInfoResp = (function() {
+
+        /**
+         * Properties of a FriendInfoResp.
+         * @memberof protocol
+         * @interface IFriendInfoResp
+         * @property {string|null} [uid] FriendInfoResp uid
+         * @property {string|null} [username] FriendInfoResp username
+         * @property {string|null} [email] FriendInfoResp email
+         * @property {string|null} [remark] FriendInfoResp remark
+         * @property {boolean|null} [dnd] FriendInfoResp dnd
+         * @property {number|null} [code] FriendInfoResp code
+         * @property {string|null} [msg] FriendInfoResp msg
+         */
+
+        /**
+         * Constructs a new FriendInfoResp.
+         * @memberof protocol
+         * @classdesc Represents a FriendInfoResp.
+         * @implements IFriendInfoResp
+         * @constructor
+         * @param {protocol.IFriendInfoResp=} [properties] Properties to set
+         */
+        function FriendInfoResp(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * FriendInfoResp uid.
+         * @member {string} uid
+         * @memberof protocol.FriendInfoResp
+         * @instance
+         */
+        FriendInfoResp.prototype.uid = "";
+
+        /**
+         * FriendInfoResp username.
+         * @member {string} username
+         * @memberof protocol.FriendInfoResp
+         * @instance
+         */
+        FriendInfoResp.prototype.username = "";
+
+        /**
+         * FriendInfoResp email.
+         * @member {string} email
+         * @memberof protocol.FriendInfoResp
+         * @instance
+         */
+        FriendInfoResp.prototype.email = "";
+
+        /**
+         * FriendInfoResp remark.
+         * @member {string} remark
+         * @memberof protocol.FriendInfoResp
+         * @instance
+         */
+        FriendInfoResp.prototype.remark = "";
+
+        /**
+         * FriendInfoResp dnd.
+         * @member {boolean} dnd
+         * @memberof protocol.FriendInfoResp
+         * @instance
+         */
+        FriendInfoResp.prototype.dnd = false;
+
+        /**
+         * FriendInfoResp code.
+         * @member {number} code
+         * @memberof protocol.FriendInfoResp
+         * @instance
+         */
+        FriendInfoResp.prototype.code = 0;
+
+        /**
+         * FriendInfoResp msg.
+         * @member {string} msg
+         * @memberof protocol.FriendInfoResp
+         * @instance
+         */
+        FriendInfoResp.prototype.msg = "";
+
+        /**
+         * Creates a new FriendInfoResp instance using the specified properties.
+         * @function create
+         * @memberof protocol.FriendInfoResp
+         * @static
+         * @param {protocol.IFriendInfoResp=} [properties] Properties to set
+         * @returns {protocol.FriendInfoResp} FriendInfoResp instance
+         */
+        FriendInfoResp.create = function create(properties) {
+            return new FriendInfoResp(properties);
+        };
+
+        /**
+         * Encodes the specified FriendInfoResp message. Does not implicitly {@link protocol.FriendInfoResp.verify|verify} messages.
+         * @function encode
+         * @memberof protocol.FriendInfoResp
+         * @static
+         * @param {protocol.IFriendInfoResp} message FriendInfoResp message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        FriendInfoResp.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.uid != null && Object.hasOwnProperty.call(message, "uid"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.uid);
+            if (message.username != null && Object.hasOwnProperty.call(message, "username"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.username);
+            if (message.email != null && Object.hasOwnProperty.call(message, "email"))
+                writer.uint32(/* id 3, wireType 2 =*/26).string(message.email);
+            if (message.remark != null && Object.hasOwnProperty.call(message, "remark"))
+                writer.uint32(/* id 4, wireType 2 =*/34).string(message.remark);
+            if (message.dnd != null && Object.hasOwnProperty.call(message, "dnd"))
+                writer.uint32(/* id 5, wireType 0 =*/40).bool(message.dnd);
+            if (message.code != null && Object.hasOwnProperty.call(message, "code"))
+                writer.uint32(/* id 6, wireType 0 =*/48).int32(message.code);
+            if (message.msg != null && Object.hasOwnProperty.call(message, "msg"))
+                writer.uint32(/* id 7, wireType 2 =*/58).string(message.msg);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified FriendInfoResp message, length delimited. Does not implicitly {@link protocol.FriendInfoResp.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof protocol.FriendInfoResp
+         * @static
+         * @param {protocol.IFriendInfoResp} message FriendInfoResp message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        FriendInfoResp.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a FriendInfoResp message from the specified reader or buffer.
+         * @function decode
+         * @memberof protocol.FriendInfoResp
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {protocol.FriendInfoResp} FriendInfoResp
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        FriendInfoResp.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.FriendInfoResp();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.uid = reader.string();
+                        break;
+                    }
+                case 2: {
+                        message.username = reader.string();
+                        break;
+                    }
+                case 3: {
+                        message.email = reader.string();
+                        break;
+                    }
+                case 4: {
+                        message.remark = reader.string();
+                        break;
+                    }
+                case 5: {
+                        message.dnd = reader.bool();
+                        break;
+                    }
+                case 6: {
+                        message.code = reader.int32();
+                        break;
+                    }
+                case 7: {
+                        message.msg = reader.string();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a FriendInfoResp message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof protocol.FriendInfoResp
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {protocol.FriendInfoResp} FriendInfoResp
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        FriendInfoResp.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a FriendInfoResp message.
+         * @function verify
+         * @memberof protocol.FriendInfoResp
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        FriendInfoResp.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.uid != null && message.hasOwnProperty("uid"))
+                if (!$util.isString(message.uid))
+                    return "uid: string expected";
+            if (message.username != null && message.hasOwnProperty("username"))
+                if (!$util.isString(message.username))
+                    return "username: string expected";
+            if (message.email != null && message.hasOwnProperty("email"))
+                if (!$util.isString(message.email))
+                    return "email: string expected";
+            if (message.remark != null && message.hasOwnProperty("remark"))
+                if (!$util.isString(message.remark))
+                    return "remark: string expected";
+            if (message.dnd != null && message.hasOwnProperty("dnd"))
+                if (typeof message.dnd !== "boolean")
+                    return "dnd: boolean expected";
+            if (message.code != null && message.hasOwnProperty("code"))
+                if (!$util.isInteger(message.code))
+                    return "code: integer expected";
+            if (message.msg != null && message.hasOwnProperty("msg"))
+                if (!$util.isString(message.msg))
+                    return "msg: string expected";
+            return null;
+        };
+
+        /**
+         * Creates a FriendInfoResp message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof protocol.FriendInfoResp
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {protocol.FriendInfoResp} FriendInfoResp
+         */
+        FriendInfoResp.fromObject = function fromObject(object) {
+            if (object instanceof $root.protocol.FriendInfoResp)
+                return object;
+            var message = new $root.protocol.FriendInfoResp();
+            if (object.uid != null)
+                message.uid = String(object.uid);
+            if (object.username != null)
+                message.username = String(object.username);
+            if (object.email != null)
+                message.email = String(object.email);
+            if (object.remark != null)
+                message.remark = String(object.remark);
+            if (object.dnd != null)
+                message.dnd = Boolean(object.dnd);
+            if (object.code != null)
+                message.code = object.code | 0;
+            if (object.msg != null)
+                message.msg = String(object.msg);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a FriendInfoResp message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof protocol.FriendInfoResp
+         * @static
+         * @param {protocol.FriendInfoResp} message FriendInfoResp
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        FriendInfoResp.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                object.uid = "";
+                object.username = "";
+                object.email = "";
+                object.remark = "";
+                object.dnd = false;
+                object.code = 0;
+                object.msg = "";
+            }
+            if (message.uid != null && message.hasOwnProperty("uid"))
+                object.uid = message.uid;
+            if (message.username != null && message.hasOwnProperty("username"))
+                object.username = message.username;
+            if (message.email != null && message.hasOwnProperty("email"))
+                object.email = message.email;
+            if (message.remark != null && message.hasOwnProperty("remark"))
+                object.remark = message.remark;
+            if (message.dnd != null && message.hasOwnProperty("dnd"))
+                object.dnd = message.dnd;
+            if (message.code != null && message.hasOwnProperty("code"))
+                object.code = message.code;
+            if (message.msg != null && message.hasOwnProperty("msg"))
+                object.msg = message.msg;
+            return object;
+        };
+
+        /**
+         * Converts this FriendInfoResp to JSON.
+         * @function toJSON
+         * @memberof protocol.FriendInfoResp
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        FriendInfoResp.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for FriendInfoResp
+         * @function getTypeUrl
+         * @memberof protocol.FriendInfoResp
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        FriendInfoResp.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/protocol.FriendInfoResp";
+        };
+
+        return FriendInfoResp;
+    })();
+
+    protocol.UpdateFriendRemarkReq = (function() {
+
+        /**
+         * Properties of an UpdateFriendRemarkReq.
+         * @memberof protocol
+         * @interface IUpdateFriendRemarkReq
+         * @property {string|null} [uid] UpdateFriendRemarkReq uid
+         * @property {string|null} [friendUid] UpdateFriendRemarkReq friendUid
+         * @property {string|null} [remark] UpdateFriendRemarkReq remark
+         * @property {string|null} [token] UpdateFriendRemarkReq token
+         */
+
+        /**
+         * Constructs a new UpdateFriendRemarkReq.
+         * @memberof protocol
+         * @classdesc Represents an UpdateFriendRemarkReq.
+         * @implements IUpdateFriendRemarkReq
+         * @constructor
+         * @param {protocol.IUpdateFriendRemarkReq=} [properties] Properties to set
+         */
+        function UpdateFriendRemarkReq(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * UpdateFriendRemarkReq uid.
+         * @member {string} uid
+         * @memberof protocol.UpdateFriendRemarkReq
+         * @instance
+         */
+        UpdateFriendRemarkReq.prototype.uid = "";
+
+        /**
+         * UpdateFriendRemarkReq friendUid.
+         * @member {string} friendUid
+         * @memberof protocol.UpdateFriendRemarkReq
+         * @instance
+         */
+        UpdateFriendRemarkReq.prototype.friendUid = "";
+
+        /**
+         * UpdateFriendRemarkReq remark.
+         * @member {string} remark
+         * @memberof protocol.UpdateFriendRemarkReq
+         * @instance
+         */
+        UpdateFriendRemarkReq.prototype.remark = "";
+
+        /**
+         * UpdateFriendRemarkReq token.
+         * @member {string} token
+         * @memberof protocol.UpdateFriendRemarkReq
+         * @instance
+         */
+        UpdateFriendRemarkReq.prototype.token = "";
+
+        /**
+         * Creates a new UpdateFriendRemarkReq instance using the specified properties.
+         * @function create
+         * @memberof protocol.UpdateFriendRemarkReq
+         * @static
+         * @param {protocol.IUpdateFriendRemarkReq=} [properties] Properties to set
+         * @returns {protocol.UpdateFriendRemarkReq} UpdateFriendRemarkReq instance
+         */
+        UpdateFriendRemarkReq.create = function create(properties) {
+            return new UpdateFriendRemarkReq(properties);
+        };
+
+        /**
+         * Encodes the specified UpdateFriendRemarkReq message. Does not implicitly {@link protocol.UpdateFriendRemarkReq.verify|verify} messages.
+         * @function encode
+         * @memberof protocol.UpdateFriendRemarkReq
+         * @static
+         * @param {protocol.IUpdateFriendRemarkReq} message UpdateFriendRemarkReq message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        UpdateFriendRemarkReq.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.uid != null && Object.hasOwnProperty.call(message, "uid"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.uid);
+            if (message.friendUid != null && Object.hasOwnProperty.call(message, "friendUid"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.friendUid);
+            if (message.remark != null && Object.hasOwnProperty.call(message, "remark"))
+                writer.uint32(/* id 3, wireType 2 =*/26).string(message.remark);
+            if (message.token != null && Object.hasOwnProperty.call(message, "token"))
+                writer.uint32(/* id 4, wireType 2 =*/34).string(message.token);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified UpdateFriendRemarkReq message, length delimited. Does not implicitly {@link protocol.UpdateFriendRemarkReq.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof protocol.UpdateFriendRemarkReq
+         * @static
+         * @param {protocol.IUpdateFriendRemarkReq} message UpdateFriendRemarkReq message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        UpdateFriendRemarkReq.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes an UpdateFriendRemarkReq message from the specified reader or buffer.
+         * @function decode
+         * @memberof protocol.UpdateFriendRemarkReq
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {protocol.UpdateFriendRemarkReq} UpdateFriendRemarkReq
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        UpdateFriendRemarkReq.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.UpdateFriendRemarkReq();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.uid = reader.string();
+                        break;
+                    }
+                case 2: {
+                        message.friendUid = reader.string();
+                        break;
+                    }
+                case 3: {
+                        message.remark = reader.string();
+                        break;
+                    }
+                case 4: {
+                        message.token = reader.string();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes an UpdateFriendRemarkReq message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof protocol.UpdateFriendRemarkReq
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {protocol.UpdateFriendRemarkReq} UpdateFriendRemarkReq
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        UpdateFriendRemarkReq.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies an UpdateFriendRemarkReq message.
+         * @function verify
+         * @memberof protocol.UpdateFriendRemarkReq
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        UpdateFriendRemarkReq.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.uid != null && message.hasOwnProperty("uid"))
+                if (!$util.isString(message.uid))
+                    return "uid: string expected";
+            if (message.friendUid != null && message.hasOwnProperty("friendUid"))
+                if (!$util.isString(message.friendUid))
+                    return "friendUid: string expected";
+            if (message.remark != null && message.hasOwnProperty("remark"))
+                if (!$util.isString(message.remark))
+                    return "remark: string expected";
+            if (message.token != null && message.hasOwnProperty("token"))
+                if (!$util.isString(message.token))
+                    return "token: string expected";
+            return null;
+        };
+
+        /**
+         * Creates an UpdateFriendRemarkReq message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof protocol.UpdateFriendRemarkReq
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {protocol.UpdateFriendRemarkReq} UpdateFriendRemarkReq
+         */
+        UpdateFriendRemarkReq.fromObject = function fromObject(object) {
+            if (object instanceof $root.protocol.UpdateFriendRemarkReq)
+                return object;
+            var message = new $root.protocol.UpdateFriendRemarkReq();
+            if (object.uid != null)
+                message.uid = String(object.uid);
+            if (object.friendUid != null)
+                message.friendUid = String(object.friendUid);
+            if (object.remark != null)
+                message.remark = String(object.remark);
+            if (object.token != null)
+                message.token = String(object.token);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from an UpdateFriendRemarkReq message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof protocol.UpdateFriendRemarkReq
+         * @static
+         * @param {protocol.UpdateFriendRemarkReq} message UpdateFriendRemarkReq
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        UpdateFriendRemarkReq.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                object.uid = "";
+                object.friendUid = "";
+                object.remark = "";
+                object.token = "";
+            }
+            if (message.uid != null && message.hasOwnProperty("uid"))
+                object.uid = message.uid;
+            if (message.friendUid != null && message.hasOwnProperty("friendUid"))
+                object.friendUid = message.friendUid;
+            if (message.remark != null && message.hasOwnProperty("remark"))
+                object.remark = message.remark;
+            if (message.token != null && message.hasOwnProperty("token"))
+                object.token = message.token;
+            return object;
+        };
+
+        /**
+         * Converts this UpdateFriendRemarkReq to JSON.
+         * @function toJSON
+         * @memberof protocol.UpdateFriendRemarkReq
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        UpdateFriendRemarkReq.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for UpdateFriendRemarkReq
+         * @function getTypeUrl
+         * @memberof protocol.UpdateFriendRemarkReq
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        UpdateFriendRemarkReq.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/protocol.UpdateFriendRemarkReq";
+        };
+
+        return UpdateFriendRemarkReq;
+    })();
+
+    protocol.UpdateFriendRemarkResp = (function() {
+
+        /**
+         * Properties of an UpdateFriendRemarkResp.
+         * @memberof protocol
+         * @interface IUpdateFriendRemarkResp
+         * @property {number|null} [code] UpdateFriendRemarkResp code
+         * @property {string|null} [msg] UpdateFriendRemarkResp msg
+         */
+
+        /**
+         * Constructs a new UpdateFriendRemarkResp.
+         * @memberof protocol
+         * @classdesc Represents an UpdateFriendRemarkResp.
+         * @implements IUpdateFriendRemarkResp
+         * @constructor
+         * @param {protocol.IUpdateFriendRemarkResp=} [properties] Properties to set
+         */
+        function UpdateFriendRemarkResp(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * UpdateFriendRemarkResp code.
+         * @member {number} code
+         * @memberof protocol.UpdateFriendRemarkResp
+         * @instance
+         */
+        UpdateFriendRemarkResp.prototype.code = 0;
+
+        /**
+         * UpdateFriendRemarkResp msg.
+         * @member {string} msg
+         * @memberof protocol.UpdateFriendRemarkResp
+         * @instance
+         */
+        UpdateFriendRemarkResp.prototype.msg = "";
+
+        /**
+         * Creates a new UpdateFriendRemarkResp instance using the specified properties.
+         * @function create
+         * @memberof protocol.UpdateFriendRemarkResp
+         * @static
+         * @param {protocol.IUpdateFriendRemarkResp=} [properties] Properties to set
+         * @returns {protocol.UpdateFriendRemarkResp} UpdateFriendRemarkResp instance
+         */
+        UpdateFriendRemarkResp.create = function create(properties) {
+            return new UpdateFriendRemarkResp(properties);
+        };
+
+        /**
+         * Encodes the specified UpdateFriendRemarkResp message. Does not implicitly {@link protocol.UpdateFriendRemarkResp.verify|verify} messages.
+         * @function encode
+         * @memberof protocol.UpdateFriendRemarkResp
+         * @static
+         * @param {protocol.IUpdateFriendRemarkResp} message UpdateFriendRemarkResp message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        UpdateFriendRemarkResp.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.code != null && Object.hasOwnProperty.call(message, "code"))
+                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.code);
+            if (message.msg != null && Object.hasOwnProperty.call(message, "msg"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.msg);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified UpdateFriendRemarkResp message, length delimited. Does not implicitly {@link protocol.UpdateFriendRemarkResp.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof protocol.UpdateFriendRemarkResp
+         * @static
+         * @param {protocol.IUpdateFriendRemarkResp} message UpdateFriendRemarkResp message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        UpdateFriendRemarkResp.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes an UpdateFriendRemarkResp message from the specified reader or buffer.
+         * @function decode
+         * @memberof protocol.UpdateFriendRemarkResp
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {protocol.UpdateFriendRemarkResp} UpdateFriendRemarkResp
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        UpdateFriendRemarkResp.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.UpdateFriendRemarkResp();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.code = reader.int32();
+                        break;
+                    }
+                case 2: {
+                        message.msg = reader.string();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes an UpdateFriendRemarkResp message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof protocol.UpdateFriendRemarkResp
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {protocol.UpdateFriendRemarkResp} UpdateFriendRemarkResp
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        UpdateFriendRemarkResp.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies an UpdateFriendRemarkResp message.
+         * @function verify
+         * @memberof protocol.UpdateFriendRemarkResp
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        UpdateFriendRemarkResp.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.code != null && message.hasOwnProperty("code"))
+                if (!$util.isInteger(message.code))
+                    return "code: integer expected";
+            if (message.msg != null && message.hasOwnProperty("msg"))
+                if (!$util.isString(message.msg))
+                    return "msg: string expected";
+            return null;
+        };
+
+        /**
+         * Creates an UpdateFriendRemarkResp message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof protocol.UpdateFriendRemarkResp
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {protocol.UpdateFriendRemarkResp} UpdateFriendRemarkResp
+         */
+        UpdateFriendRemarkResp.fromObject = function fromObject(object) {
+            if (object instanceof $root.protocol.UpdateFriendRemarkResp)
+                return object;
+            var message = new $root.protocol.UpdateFriendRemarkResp();
+            if (object.code != null)
+                message.code = object.code | 0;
+            if (object.msg != null)
+                message.msg = String(object.msg);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from an UpdateFriendRemarkResp message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof protocol.UpdateFriendRemarkResp
+         * @static
+         * @param {protocol.UpdateFriendRemarkResp} message UpdateFriendRemarkResp
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        UpdateFriendRemarkResp.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                object.code = 0;
+                object.msg = "";
+            }
+            if (message.code != null && message.hasOwnProperty("code"))
+                object.code = message.code;
+            if (message.msg != null && message.hasOwnProperty("msg"))
+                object.msg = message.msg;
+            return object;
+        };
+
+        /**
+         * Converts this UpdateFriendRemarkResp to JSON.
+         * @function toJSON
+         * @memberof protocol.UpdateFriendRemarkResp
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        UpdateFriendRemarkResp.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for UpdateFriendRemarkResp
+         * @function getTypeUrl
+         * @memberof protocol.UpdateFriendRemarkResp
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        UpdateFriendRemarkResp.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/protocol.UpdateFriendRemarkResp";
+        };
+
+        return UpdateFriendRemarkResp;
+    })();
+
+    protocol.SetFriendDNDReq = (function() {
+
+        /**
+         * Properties of a SetFriendDNDReq.
+         * @memberof protocol
+         * @interface ISetFriendDNDReq
+         * @property {string|null} [uid] SetFriendDNDReq uid
+         * @property {string|null} [friendUid] SetFriendDNDReq friendUid
+         * @property {boolean|null} [dnd] SetFriendDNDReq dnd
+         * @property {string|null} [token] SetFriendDNDReq token
+         */
+
+        /**
+         * Constructs a new SetFriendDNDReq.
+         * @memberof protocol
+         * @classdesc Represents a SetFriendDNDReq.
+         * @implements ISetFriendDNDReq
+         * @constructor
+         * @param {protocol.ISetFriendDNDReq=} [properties] Properties to set
+         */
+        function SetFriendDNDReq(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * SetFriendDNDReq uid.
+         * @member {string} uid
+         * @memberof protocol.SetFriendDNDReq
+         * @instance
+         */
+        SetFriendDNDReq.prototype.uid = "";
+
+        /**
+         * SetFriendDNDReq friendUid.
+         * @member {string} friendUid
+         * @memberof protocol.SetFriendDNDReq
+         * @instance
+         */
+        SetFriendDNDReq.prototype.friendUid = "";
+
+        /**
+         * SetFriendDNDReq dnd.
+         * @member {boolean} dnd
+         * @memberof protocol.SetFriendDNDReq
+         * @instance
+         */
+        SetFriendDNDReq.prototype.dnd = false;
+
+        /**
+         * SetFriendDNDReq token.
+         * @member {string} token
+         * @memberof protocol.SetFriendDNDReq
+         * @instance
+         */
+        SetFriendDNDReq.prototype.token = "";
+
+        /**
+         * Creates a new SetFriendDNDReq instance using the specified properties.
+         * @function create
+         * @memberof protocol.SetFriendDNDReq
+         * @static
+         * @param {protocol.ISetFriendDNDReq=} [properties] Properties to set
+         * @returns {protocol.SetFriendDNDReq} SetFriendDNDReq instance
+         */
+        SetFriendDNDReq.create = function create(properties) {
+            return new SetFriendDNDReq(properties);
+        };
+
+        /**
+         * Encodes the specified SetFriendDNDReq message. Does not implicitly {@link protocol.SetFriendDNDReq.verify|verify} messages.
+         * @function encode
+         * @memberof protocol.SetFriendDNDReq
+         * @static
+         * @param {protocol.ISetFriendDNDReq} message SetFriendDNDReq message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        SetFriendDNDReq.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.uid != null && Object.hasOwnProperty.call(message, "uid"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.uid);
+            if (message.friendUid != null && Object.hasOwnProperty.call(message, "friendUid"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.friendUid);
+            if (message.dnd != null && Object.hasOwnProperty.call(message, "dnd"))
+                writer.uint32(/* id 3, wireType 0 =*/24).bool(message.dnd);
+            if (message.token != null && Object.hasOwnProperty.call(message, "token"))
+                writer.uint32(/* id 4, wireType 2 =*/34).string(message.token);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified SetFriendDNDReq message, length delimited. Does not implicitly {@link protocol.SetFriendDNDReq.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof protocol.SetFriendDNDReq
+         * @static
+         * @param {protocol.ISetFriendDNDReq} message SetFriendDNDReq message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        SetFriendDNDReq.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a SetFriendDNDReq message from the specified reader or buffer.
+         * @function decode
+         * @memberof protocol.SetFriendDNDReq
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {protocol.SetFriendDNDReq} SetFriendDNDReq
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        SetFriendDNDReq.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.SetFriendDNDReq();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.uid = reader.string();
+                        break;
+                    }
+                case 2: {
+                        message.friendUid = reader.string();
+                        break;
+                    }
+                case 3: {
+                        message.dnd = reader.bool();
+                        break;
+                    }
+                case 4: {
+                        message.token = reader.string();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a SetFriendDNDReq message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof protocol.SetFriendDNDReq
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {protocol.SetFriendDNDReq} SetFriendDNDReq
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        SetFriendDNDReq.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a SetFriendDNDReq message.
+         * @function verify
+         * @memberof protocol.SetFriendDNDReq
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        SetFriendDNDReq.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.uid != null && message.hasOwnProperty("uid"))
+                if (!$util.isString(message.uid))
+                    return "uid: string expected";
+            if (message.friendUid != null && message.hasOwnProperty("friendUid"))
+                if (!$util.isString(message.friendUid))
+                    return "friendUid: string expected";
+            if (message.dnd != null && message.hasOwnProperty("dnd"))
+                if (typeof message.dnd !== "boolean")
+                    return "dnd: boolean expected";
+            if (message.token != null && message.hasOwnProperty("token"))
+                if (!$util.isString(message.token))
+                    return "token: string expected";
+            return null;
+        };
+
+        /**
+         * Creates a SetFriendDNDReq message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof protocol.SetFriendDNDReq
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {protocol.SetFriendDNDReq} SetFriendDNDReq
+         */
+        SetFriendDNDReq.fromObject = function fromObject(object) {
+            if (object instanceof $root.protocol.SetFriendDNDReq)
+                return object;
+            var message = new $root.protocol.SetFriendDNDReq();
+            if (object.uid != null)
+                message.uid = String(object.uid);
+            if (object.friendUid != null)
+                message.friendUid = String(object.friendUid);
+            if (object.dnd != null)
+                message.dnd = Boolean(object.dnd);
+            if (object.token != null)
+                message.token = String(object.token);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a SetFriendDNDReq message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof protocol.SetFriendDNDReq
+         * @static
+         * @param {protocol.SetFriendDNDReq} message SetFriendDNDReq
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        SetFriendDNDReq.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                object.uid = "";
+                object.friendUid = "";
+                object.dnd = false;
+                object.token = "";
+            }
+            if (message.uid != null && message.hasOwnProperty("uid"))
+                object.uid = message.uid;
+            if (message.friendUid != null && message.hasOwnProperty("friendUid"))
+                object.friendUid = message.friendUid;
+            if (message.dnd != null && message.hasOwnProperty("dnd"))
+                object.dnd = message.dnd;
+            if (message.token != null && message.hasOwnProperty("token"))
+                object.token = message.token;
+            return object;
+        };
+
+        /**
+         * Converts this SetFriendDNDReq to JSON.
+         * @function toJSON
+         * @memberof protocol.SetFriendDNDReq
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        SetFriendDNDReq.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for SetFriendDNDReq
+         * @function getTypeUrl
+         * @memberof protocol.SetFriendDNDReq
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        SetFriendDNDReq.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/protocol.SetFriendDNDReq";
+        };
+
+        return SetFriendDNDReq;
+    })();
+
+    protocol.SetFriendDNDResp = (function() {
+
+        /**
+         * Properties of a SetFriendDNDResp.
+         * @memberof protocol
+         * @interface ISetFriendDNDResp
+         * @property {number|null} [code] SetFriendDNDResp code
+         * @property {string|null} [msg] SetFriendDNDResp msg
+         */
+
+        /**
+         * Constructs a new SetFriendDNDResp.
+         * @memberof protocol
+         * @classdesc Represents a SetFriendDNDResp.
+         * @implements ISetFriendDNDResp
+         * @constructor
+         * @param {protocol.ISetFriendDNDResp=} [properties] Properties to set
+         */
+        function SetFriendDNDResp(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * SetFriendDNDResp code.
+         * @member {number} code
+         * @memberof protocol.SetFriendDNDResp
+         * @instance
+         */
+        SetFriendDNDResp.prototype.code = 0;
+
+        /**
+         * SetFriendDNDResp msg.
+         * @member {string} msg
+         * @memberof protocol.SetFriendDNDResp
+         * @instance
+         */
+        SetFriendDNDResp.prototype.msg = "";
+
+        /**
+         * Creates a new SetFriendDNDResp instance using the specified properties.
+         * @function create
+         * @memberof protocol.SetFriendDNDResp
+         * @static
+         * @param {protocol.ISetFriendDNDResp=} [properties] Properties to set
+         * @returns {protocol.SetFriendDNDResp} SetFriendDNDResp instance
+         */
+        SetFriendDNDResp.create = function create(properties) {
+            return new SetFriendDNDResp(properties);
+        };
+
+        /**
+         * Encodes the specified SetFriendDNDResp message. Does not implicitly {@link protocol.SetFriendDNDResp.verify|verify} messages.
+         * @function encode
+         * @memberof protocol.SetFriendDNDResp
+         * @static
+         * @param {protocol.ISetFriendDNDResp} message SetFriendDNDResp message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        SetFriendDNDResp.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.code != null && Object.hasOwnProperty.call(message, "code"))
+                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.code);
+            if (message.msg != null && Object.hasOwnProperty.call(message, "msg"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.msg);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified SetFriendDNDResp message, length delimited. Does not implicitly {@link protocol.SetFriendDNDResp.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof protocol.SetFriendDNDResp
+         * @static
+         * @param {protocol.ISetFriendDNDResp} message SetFriendDNDResp message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        SetFriendDNDResp.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a SetFriendDNDResp message from the specified reader or buffer.
+         * @function decode
+         * @memberof protocol.SetFriendDNDResp
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {protocol.SetFriendDNDResp} SetFriendDNDResp
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        SetFriendDNDResp.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.SetFriendDNDResp();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.code = reader.int32();
+                        break;
+                    }
+                case 2: {
+                        message.msg = reader.string();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a SetFriendDNDResp message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof protocol.SetFriendDNDResp
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {protocol.SetFriendDNDResp} SetFriendDNDResp
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        SetFriendDNDResp.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a SetFriendDNDResp message.
+         * @function verify
+         * @memberof protocol.SetFriendDNDResp
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        SetFriendDNDResp.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.code != null && message.hasOwnProperty("code"))
+                if (!$util.isInteger(message.code))
+                    return "code: integer expected";
+            if (message.msg != null && message.hasOwnProperty("msg"))
+                if (!$util.isString(message.msg))
+                    return "msg: string expected";
+            return null;
+        };
+
+        /**
+         * Creates a SetFriendDNDResp message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof protocol.SetFriendDNDResp
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {protocol.SetFriendDNDResp} SetFriendDNDResp
+         */
+        SetFriendDNDResp.fromObject = function fromObject(object) {
+            if (object instanceof $root.protocol.SetFriendDNDResp)
+                return object;
+            var message = new $root.protocol.SetFriendDNDResp();
+            if (object.code != null)
+                message.code = object.code | 0;
+            if (object.msg != null)
+                message.msg = String(object.msg);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a SetFriendDNDResp message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof protocol.SetFriendDNDResp
+         * @static
+         * @param {protocol.SetFriendDNDResp} message SetFriendDNDResp
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        SetFriendDNDResp.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                object.code = 0;
+                object.msg = "";
+            }
+            if (message.code != null && message.hasOwnProperty("code"))
+                object.code = message.code;
+            if (message.msg != null && message.hasOwnProperty("msg"))
+                object.msg = message.msg;
+            return object;
+        };
+
+        /**
+         * Converts this SetFriendDNDResp to JSON.
+         * @function toJSON
+         * @memberof protocol.SetFriendDNDResp
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        SetFriendDNDResp.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for SetFriendDNDResp
+         * @function getTypeUrl
+         * @memberof protocol.SetFriendDNDResp
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        SetFriendDNDResp.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/protocol.SetFriendDNDResp";
+        };
+
+        return SetFriendDNDResp;
     })();
 
     protocol.DeleteFriendReq = (function() {
@@ -2432,27 +3532,27 @@ $root.protocol = (function() {
         return FriendRequestListResp;
     })();
 
-    protocol.UpdateRemarkReq = (function() {
+    protocol.HandleFriendRequestReq = (function() {
 
         /**
-         * Properties of an UpdateRemarkReq.
+         * Properties of a HandleFriendRequestReq.
          * @memberof protocol
-         * @interface IUpdateRemarkReq
-         * @property {string|null} [uid] UpdateRemarkReq uid
-         * @property {string|null} [friendUid] UpdateRemarkReq friendUid
-         * @property {string|null} [remark] UpdateRemarkReq remark
-         * @property {string|null} [token] UpdateRemarkReq token
+         * @interface IHandleFriendRequestReq
+         * @property {string|null} [fromUid] HandleFriendRequestReq fromUid
+         * @property {string|null} [toUid] HandleFriendRequestReq toUid
+         * @property {boolean|null} [accept] HandleFriendRequestReq accept
+         * @property {string|null} [token] HandleFriendRequestReq token
          */
 
         /**
-         * Constructs a new UpdateRemarkReq.
+         * Constructs a new HandleFriendRequestReq.
          * @memberof protocol
-         * @classdesc Represents an UpdateRemarkReq.
-         * @implements IUpdateRemarkReq
+         * @classdesc Represents a HandleFriendRequestReq.
+         * @implements IHandleFriendRequestReq
          * @constructor
-         * @param {protocol.IUpdateRemarkReq=} [properties] Properties to set
+         * @param {protocol.IHandleFriendRequestReq=} [properties] Properties to set
          */
-        function UpdateRemarkReq(properties) {
+        function HandleFriendRequestReq(properties) {
             if (properties)
                 for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -2460,115 +3560,115 @@ $root.protocol = (function() {
         }
 
         /**
-         * UpdateRemarkReq uid.
-         * @member {string} uid
-         * @memberof protocol.UpdateRemarkReq
+         * HandleFriendRequestReq fromUid.
+         * @member {string} fromUid
+         * @memberof protocol.HandleFriendRequestReq
          * @instance
          */
-        UpdateRemarkReq.prototype.uid = "";
+        HandleFriendRequestReq.prototype.fromUid = "";
 
         /**
-         * UpdateRemarkReq friendUid.
-         * @member {string} friendUid
-         * @memberof protocol.UpdateRemarkReq
+         * HandleFriendRequestReq toUid.
+         * @member {string} toUid
+         * @memberof protocol.HandleFriendRequestReq
          * @instance
          */
-        UpdateRemarkReq.prototype.friendUid = "";
+        HandleFriendRequestReq.prototype.toUid = "";
 
         /**
-         * UpdateRemarkReq remark.
-         * @member {string} remark
-         * @memberof protocol.UpdateRemarkReq
+         * HandleFriendRequestReq accept.
+         * @member {boolean} accept
+         * @memberof protocol.HandleFriendRequestReq
          * @instance
          */
-        UpdateRemarkReq.prototype.remark = "";
+        HandleFriendRequestReq.prototype.accept = false;
 
         /**
-         * UpdateRemarkReq token.
+         * HandleFriendRequestReq token.
          * @member {string} token
-         * @memberof protocol.UpdateRemarkReq
+         * @memberof protocol.HandleFriendRequestReq
          * @instance
          */
-        UpdateRemarkReq.prototype.token = "";
+        HandleFriendRequestReq.prototype.token = "";
 
         /**
-         * Creates a new UpdateRemarkReq instance using the specified properties.
+         * Creates a new HandleFriendRequestReq instance using the specified properties.
          * @function create
-         * @memberof protocol.UpdateRemarkReq
+         * @memberof protocol.HandleFriendRequestReq
          * @static
-         * @param {protocol.IUpdateRemarkReq=} [properties] Properties to set
-         * @returns {protocol.UpdateRemarkReq} UpdateRemarkReq instance
+         * @param {protocol.IHandleFriendRequestReq=} [properties] Properties to set
+         * @returns {protocol.HandleFriendRequestReq} HandleFriendRequestReq instance
          */
-        UpdateRemarkReq.create = function create(properties) {
-            return new UpdateRemarkReq(properties);
+        HandleFriendRequestReq.create = function create(properties) {
+            return new HandleFriendRequestReq(properties);
         };
 
         /**
-         * Encodes the specified UpdateRemarkReq message. Does not implicitly {@link protocol.UpdateRemarkReq.verify|verify} messages.
+         * Encodes the specified HandleFriendRequestReq message. Does not implicitly {@link protocol.HandleFriendRequestReq.verify|verify} messages.
          * @function encode
-         * @memberof protocol.UpdateRemarkReq
+         * @memberof protocol.HandleFriendRequestReq
          * @static
-         * @param {protocol.IUpdateRemarkReq} message UpdateRemarkReq message or plain object to encode
+         * @param {protocol.IHandleFriendRequestReq} message HandleFriendRequestReq message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        UpdateRemarkReq.encode = function encode(message, writer) {
+        HandleFriendRequestReq.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.uid != null && Object.hasOwnProperty.call(message, "uid"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.uid);
-            if (message.friendUid != null && Object.hasOwnProperty.call(message, "friendUid"))
-                writer.uint32(/* id 2, wireType 2 =*/18).string(message.friendUid);
-            if (message.remark != null && Object.hasOwnProperty.call(message, "remark"))
-                writer.uint32(/* id 3, wireType 2 =*/26).string(message.remark);
+            if (message.fromUid != null && Object.hasOwnProperty.call(message, "fromUid"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.fromUid);
+            if (message.toUid != null && Object.hasOwnProperty.call(message, "toUid"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.toUid);
+            if (message.accept != null && Object.hasOwnProperty.call(message, "accept"))
+                writer.uint32(/* id 3, wireType 0 =*/24).bool(message.accept);
             if (message.token != null && Object.hasOwnProperty.call(message, "token"))
                 writer.uint32(/* id 4, wireType 2 =*/34).string(message.token);
             return writer;
         };
 
         /**
-         * Encodes the specified UpdateRemarkReq message, length delimited. Does not implicitly {@link protocol.UpdateRemarkReq.verify|verify} messages.
+         * Encodes the specified HandleFriendRequestReq message, length delimited. Does not implicitly {@link protocol.HandleFriendRequestReq.verify|verify} messages.
          * @function encodeDelimited
-         * @memberof protocol.UpdateRemarkReq
+         * @memberof protocol.HandleFriendRequestReq
          * @static
-         * @param {protocol.IUpdateRemarkReq} message UpdateRemarkReq message or plain object to encode
+         * @param {protocol.IHandleFriendRequestReq} message HandleFriendRequestReq message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        UpdateRemarkReq.encodeDelimited = function encodeDelimited(message, writer) {
+        HandleFriendRequestReq.encodeDelimited = function encodeDelimited(message, writer) {
             return this.encode(message, writer).ldelim();
         };
 
         /**
-         * Decodes an UpdateRemarkReq message from the specified reader or buffer.
+         * Decodes a HandleFriendRequestReq message from the specified reader or buffer.
          * @function decode
-         * @memberof protocol.UpdateRemarkReq
+         * @memberof protocol.HandleFriendRequestReq
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
          * @param {number} [length] Message length if known beforehand
-         * @returns {protocol.UpdateRemarkReq} UpdateRemarkReq
+         * @returns {protocol.HandleFriendRequestReq} HandleFriendRequestReq
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        UpdateRemarkReq.decode = function decode(reader, length, error) {
+        HandleFriendRequestReq.decode = function decode(reader, length, error) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.UpdateRemarkReq();
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.HandleFriendRequestReq();
             while (reader.pos < end) {
                 var tag = reader.uint32();
                 if (tag === error)
                     break;
                 switch (tag >>> 3) {
                 case 1: {
-                        message.uid = reader.string();
+                        message.fromUid = reader.string();
                         break;
                     }
                 case 2: {
-                        message.friendUid = reader.string();
+                        message.toUid = reader.string();
                         break;
                     }
                 case 3: {
-                        message.remark = reader.string();
+                        message.accept = reader.bool();
                         break;
                     }
                 case 4: {
@@ -2584,41 +3684,41 @@ $root.protocol = (function() {
         };
 
         /**
-         * Decodes an UpdateRemarkReq message from the specified reader or buffer, length delimited.
+         * Decodes a HandleFriendRequestReq message from the specified reader or buffer, length delimited.
          * @function decodeDelimited
-         * @memberof protocol.UpdateRemarkReq
+         * @memberof protocol.HandleFriendRequestReq
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {protocol.UpdateRemarkReq} UpdateRemarkReq
+         * @returns {protocol.HandleFriendRequestReq} HandleFriendRequestReq
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        UpdateRemarkReq.decodeDelimited = function decodeDelimited(reader) {
+        HandleFriendRequestReq.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
         };
 
         /**
-         * Verifies an UpdateRemarkReq message.
+         * Verifies a HandleFriendRequestReq message.
          * @function verify
-         * @memberof protocol.UpdateRemarkReq
+         * @memberof protocol.HandleFriendRequestReq
          * @static
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        UpdateRemarkReq.verify = function verify(message) {
+        HandleFriendRequestReq.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (message.uid != null && message.hasOwnProperty("uid"))
-                if (!$util.isString(message.uid))
-                    return "uid: string expected";
-            if (message.friendUid != null && message.hasOwnProperty("friendUid"))
-                if (!$util.isString(message.friendUid))
-                    return "friendUid: string expected";
-            if (message.remark != null && message.hasOwnProperty("remark"))
-                if (!$util.isString(message.remark))
-                    return "remark: string expected";
+            if (message.fromUid != null && message.hasOwnProperty("fromUid"))
+                if (!$util.isString(message.fromUid))
+                    return "fromUid: string expected";
+            if (message.toUid != null && message.hasOwnProperty("toUid"))
+                if (!$util.isString(message.toUid))
+                    return "toUid: string expected";
+            if (message.accept != null && message.hasOwnProperty("accept"))
+                if (typeof message.accept !== "boolean")
+                    return "accept: boolean expected";
             if (message.token != null && message.hasOwnProperty("token"))
                 if (!$util.isString(message.token))
                     return "token: string expected";
@@ -2626,106 +3726,106 @@ $root.protocol = (function() {
         };
 
         /**
-         * Creates an UpdateRemarkReq message from a plain object. Also converts values to their respective internal types.
+         * Creates a HandleFriendRequestReq message from a plain object. Also converts values to their respective internal types.
          * @function fromObject
-         * @memberof protocol.UpdateRemarkReq
+         * @memberof protocol.HandleFriendRequestReq
          * @static
          * @param {Object.<string,*>} object Plain object
-         * @returns {protocol.UpdateRemarkReq} UpdateRemarkReq
+         * @returns {protocol.HandleFriendRequestReq} HandleFriendRequestReq
          */
-        UpdateRemarkReq.fromObject = function fromObject(object) {
-            if (object instanceof $root.protocol.UpdateRemarkReq)
+        HandleFriendRequestReq.fromObject = function fromObject(object) {
+            if (object instanceof $root.protocol.HandleFriendRequestReq)
                 return object;
-            var message = new $root.protocol.UpdateRemarkReq();
-            if (object.uid != null)
-                message.uid = String(object.uid);
-            if (object.friendUid != null)
-                message.friendUid = String(object.friendUid);
-            if (object.remark != null)
-                message.remark = String(object.remark);
+            var message = new $root.protocol.HandleFriendRequestReq();
+            if (object.fromUid != null)
+                message.fromUid = String(object.fromUid);
+            if (object.toUid != null)
+                message.toUid = String(object.toUid);
+            if (object.accept != null)
+                message.accept = Boolean(object.accept);
             if (object.token != null)
                 message.token = String(object.token);
             return message;
         };
 
         /**
-         * Creates a plain object from an UpdateRemarkReq message. Also converts values to other types if specified.
+         * Creates a plain object from a HandleFriendRequestReq message. Also converts values to other types if specified.
          * @function toObject
-         * @memberof protocol.UpdateRemarkReq
+         * @memberof protocol.HandleFriendRequestReq
          * @static
-         * @param {protocol.UpdateRemarkReq} message UpdateRemarkReq
+         * @param {protocol.HandleFriendRequestReq} message HandleFriendRequestReq
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        UpdateRemarkReq.toObject = function toObject(message, options) {
+        HandleFriendRequestReq.toObject = function toObject(message, options) {
             if (!options)
                 options = {};
             var object = {};
             if (options.defaults) {
-                object.uid = "";
-                object.friendUid = "";
-                object.remark = "";
+                object.fromUid = "";
+                object.toUid = "";
+                object.accept = false;
                 object.token = "";
             }
-            if (message.uid != null && message.hasOwnProperty("uid"))
-                object.uid = message.uid;
-            if (message.friendUid != null && message.hasOwnProperty("friendUid"))
-                object.friendUid = message.friendUid;
-            if (message.remark != null && message.hasOwnProperty("remark"))
-                object.remark = message.remark;
+            if (message.fromUid != null && message.hasOwnProperty("fromUid"))
+                object.fromUid = message.fromUid;
+            if (message.toUid != null && message.hasOwnProperty("toUid"))
+                object.toUid = message.toUid;
+            if (message.accept != null && message.hasOwnProperty("accept"))
+                object.accept = message.accept;
             if (message.token != null && message.hasOwnProperty("token"))
                 object.token = message.token;
             return object;
         };
 
         /**
-         * Converts this UpdateRemarkReq to JSON.
+         * Converts this HandleFriendRequestReq to JSON.
          * @function toJSON
-         * @memberof protocol.UpdateRemarkReq
+         * @memberof protocol.HandleFriendRequestReq
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        UpdateRemarkReq.prototype.toJSON = function toJSON() {
+        HandleFriendRequestReq.prototype.toJSON = function toJSON() {
             return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
         };
 
         /**
-         * Gets the default type url for UpdateRemarkReq
+         * Gets the default type url for HandleFriendRequestReq
          * @function getTypeUrl
-         * @memberof protocol.UpdateRemarkReq
+         * @memberof protocol.HandleFriendRequestReq
          * @static
          * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
          * @returns {string} The default type url
          */
-        UpdateRemarkReq.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+        HandleFriendRequestReq.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
             if (typeUrlPrefix === undefined) {
                 typeUrlPrefix = "type.googleapis.com";
             }
-            return typeUrlPrefix + "/protocol.UpdateRemarkReq";
+            return typeUrlPrefix + "/protocol.HandleFriendRequestReq";
         };
 
-        return UpdateRemarkReq;
+        return HandleFriendRequestReq;
     })();
 
-    protocol.UpdateRemarkResp = (function() {
+    protocol.HandleFriendRequestResp = (function() {
 
         /**
-         * Properties of an UpdateRemarkResp.
+         * Properties of a HandleFriendRequestResp.
          * @memberof protocol
-         * @interface IUpdateRemarkResp
-         * @property {number|null} [code] UpdateRemarkResp code
-         * @property {string|null} [msg] UpdateRemarkResp msg
+         * @interface IHandleFriendRequestResp
+         * @property {number|null} [code] HandleFriendRequestResp code
+         * @property {string|null} [msg] HandleFriendRequestResp msg
          */
 
         /**
-         * Constructs a new UpdateRemarkResp.
+         * Constructs a new HandleFriendRequestResp.
          * @memberof protocol
-         * @classdesc Represents an UpdateRemarkResp.
-         * @implements IUpdateRemarkResp
+         * @classdesc Represents a HandleFriendRequestResp.
+         * @implements IHandleFriendRequestResp
          * @constructor
-         * @param {protocol.IUpdateRemarkResp=} [properties] Properties to set
+         * @param {protocol.IHandleFriendRequestResp=} [properties] Properties to set
          */
-        function UpdateRemarkResp(properties) {
+        function HandleFriendRequestResp(properties) {
             if (properties)
                 for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -2733,43 +3833,43 @@ $root.protocol = (function() {
         }
 
         /**
-         * UpdateRemarkResp code.
+         * HandleFriendRequestResp code.
          * @member {number} code
-         * @memberof protocol.UpdateRemarkResp
+         * @memberof protocol.HandleFriendRequestResp
          * @instance
          */
-        UpdateRemarkResp.prototype.code = 0;
+        HandleFriendRequestResp.prototype.code = 0;
 
         /**
-         * UpdateRemarkResp msg.
+         * HandleFriendRequestResp msg.
          * @member {string} msg
-         * @memberof protocol.UpdateRemarkResp
+         * @memberof protocol.HandleFriendRequestResp
          * @instance
          */
-        UpdateRemarkResp.prototype.msg = "";
+        HandleFriendRequestResp.prototype.msg = "";
 
         /**
-         * Creates a new UpdateRemarkResp instance using the specified properties.
+         * Creates a new HandleFriendRequestResp instance using the specified properties.
          * @function create
-         * @memberof protocol.UpdateRemarkResp
+         * @memberof protocol.HandleFriendRequestResp
          * @static
-         * @param {protocol.IUpdateRemarkResp=} [properties] Properties to set
-         * @returns {protocol.UpdateRemarkResp} UpdateRemarkResp instance
+         * @param {protocol.IHandleFriendRequestResp=} [properties] Properties to set
+         * @returns {protocol.HandleFriendRequestResp} HandleFriendRequestResp instance
          */
-        UpdateRemarkResp.create = function create(properties) {
-            return new UpdateRemarkResp(properties);
+        HandleFriendRequestResp.create = function create(properties) {
+            return new HandleFriendRequestResp(properties);
         };
 
         /**
-         * Encodes the specified UpdateRemarkResp message. Does not implicitly {@link protocol.UpdateRemarkResp.verify|verify} messages.
+         * Encodes the specified HandleFriendRequestResp message. Does not implicitly {@link protocol.HandleFriendRequestResp.verify|verify} messages.
          * @function encode
-         * @memberof protocol.UpdateRemarkResp
+         * @memberof protocol.HandleFriendRequestResp
          * @static
-         * @param {protocol.IUpdateRemarkResp} message UpdateRemarkResp message or plain object to encode
+         * @param {protocol.IHandleFriendRequestResp} message HandleFriendRequestResp message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        UpdateRemarkResp.encode = function encode(message, writer) {
+        HandleFriendRequestResp.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
             if (message.code != null && Object.hasOwnProperty.call(message, "code"))
@@ -2780,33 +3880,33 @@ $root.protocol = (function() {
         };
 
         /**
-         * Encodes the specified UpdateRemarkResp message, length delimited. Does not implicitly {@link protocol.UpdateRemarkResp.verify|verify} messages.
+         * Encodes the specified HandleFriendRequestResp message, length delimited. Does not implicitly {@link protocol.HandleFriendRequestResp.verify|verify} messages.
          * @function encodeDelimited
-         * @memberof protocol.UpdateRemarkResp
+         * @memberof protocol.HandleFriendRequestResp
          * @static
-         * @param {protocol.IUpdateRemarkResp} message UpdateRemarkResp message or plain object to encode
+         * @param {protocol.IHandleFriendRequestResp} message HandleFriendRequestResp message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        UpdateRemarkResp.encodeDelimited = function encodeDelimited(message, writer) {
+        HandleFriendRequestResp.encodeDelimited = function encodeDelimited(message, writer) {
             return this.encode(message, writer).ldelim();
         };
 
         /**
-         * Decodes an UpdateRemarkResp message from the specified reader or buffer.
+         * Decodes a HandleFriendRequestResp message from the specified reader or buffer.
          * @function decode
-         * @memberof protocol.UpdateRemarkResp
+         * @memberof protocol.HandleFriendRequestResp
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
          * @param {number} [length] Message length if known beforehand
-         * @returns {protocol.UpdateRemarkResp} UpdateRemarkResp
+         * @returns {protocol.HandleFriendRequestResp} HandleFriendRequestResp
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        UpdateRemarkResp.decode = function decode(reader, length, error) {
+        HandleFriendRequestResp.decode = function decode(reader, length, error) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.UpdateRemarkResp();
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.HandleFriendRequestResp();
             while (reader.pos < end) {
                 var tag = reader.uint32();
                 if (tag === error)
@@ -2829,30 +3929,30 @@ $root.protocol = (function() {
         };
 
         /**
-         * Decodes an UpdateRemarkResp message from the specified reader or buffer, length delimited.
+         * Decodes a HandleFriendRequestResp message from the specified reader or buffer, length delimited.
          * @function decodeDelimited
-         * @memberof protocol.UpdateRemarkResp
+         * @memberof protocol.HandleFriendRequestResp
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {protocol.UpdateRemarkResp} UpdateRemarkResp
+         * @returns {protocol.HandleFriendRequestResp} HandleFriendRequestResp
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        UpdateRemarkResp.decodeDelimited = function decodeDelimited(reader) {
+        HandleFriendRequestResp.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
         };
 
         /**
-         * Verifies an UpdateRemarkResp message.
+         * Verifies a HandleFriendRequestResp message.
          * @function verify
-         * @memberof protocol.UpdateRemarkResp
+         * @memberof protocol.HandleFriendRequestResp
          * @static
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        UpdateRemarkResp.verify = function verify(message) {
+        HandleFriendRequestResp.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
             if (message.code != null && message.hasOwnProperty("code"))
@@ -2865,17 +3965,17 @@ $root.protocol = (function() {
         };
 
         /**
-         * Creates an UpdateRemarkResp message from a plain object. Also converts values to their respective internal types.
+         * Creates a HandleFriendRequestResp message from a plain object. Also converts values to their respective internal types.
          * @function fromObject
-         * @memberof protocol.UpdateRemarkResp
+         * @memberof protocol.HandleFriendRequestResp
          * @static
          * @param {Object.<string,*>} object Plain object
-         * @returns {protocol.UpdateRemarkResp} UpdateRemarkResp
+         * @returns {protocol.HandleFriendRequestResp} HandleFriendRequestResp
          */
-        UpdateRemarkResp.fromObject = function fromObject(object) {
-            if (object instanceof $root.protocol.UpdateRemarkResp)
+        HandleFriendRequestResp.fromObject = function fromObject(object) {
+            if (object instanceof $root.protocol.HandleFriendRequestResp)
                 return object;
-            var message = new $root.protocol.UpdateRemarkResp();
+            var message = new $root.protocol.HandleFriendRequestResp();
             if (object.code != null)
                 message.code = object.code | 0;
             if (object.msg != null)
@@ -2884,15 +3984,15 @@ $root.protocol = (function() {
         };
 
         /**
-         * Creates a plain object from an UpdateRemarkResp message. Also converts values to other types if specified.
+         * Creates a plain object from a HandleFriendRequestResp message. Also converts values to other types if specified.
          * @function toObject
-         * @memberof protocol.UpdateRemarkResp
+         * @memberof protocol.HandleFriendRequestResp
          * @static
-         * @param {protocol.UpdateRemarkResp} message UpdateRemarkResp
+         * @param {protocol.HandleFriendRequestResp} message HandleFriendRequestResp
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        UpdateRemarkResp.toObject = function toObject(message, options) {
+        HandleFriendRequestResp.toObject = function toObject(message, options) {
             if (!options)
                 options = {};
             var object = {};
@@ -2908,1132 +4008,32 @@ $root.protocol = (function() {
         };
 
         /**
-         * Converts this UpdateRemarkResp to JSON.
+         * Converts this HandleFriendRequestResp to JSON.
          * @function toJSON
-         * @memberof protocol.UpdateRemarkResp
+         * @memberof protocol.HandleFriendRequestResp
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        UpdateRemarkResp.prototype.toJSON = function toJSON() {
+        HandleFriendRequestResp.prototype.toJSON = function toJSON() {
             return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
         };
 
         /**
-         * Gets the default type url for UpdateRemarkResp
+         * Gets the default type url for HandleFriendRequestResp
          * @function getTypeUrl
-         * @memberof protocol.UpdateRemarkResp
+         * @memberof protocol.HandleFriendRequestResp
          * @static
          * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
          * @returns {string} The default type url
          */
-        UpdateRemarkResp.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+        HandleFriendRequestResp.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
             if (typeUrlPrefix === undefined) {
                 typeUrlPrefix = "type.googleapis.com";
             }
-            return typeUrlPrefix + "/protocol.UpdateRemarkResp";
+            return typeUrlPrefix + "/protocol.HandleFriendRequestResp";
         };
 
-        return UpdateRemarkResp;
-    })();
-
-    protocol.FriendInfoReq = (function() {
-
-        /**
-         * Properties of a FriendInfoReq.
-         * @memberof protocol
-         * @interface IFriendInfoReq
-         * @property {string|null} [uid] FriendInfoReq uid
-         * @property {string|null} [friendUid] FriendInfoReq friendUid
-         * @property {string|null} [token] FriendInfoReq token
-         */
-
-        /**
-         * Constructs a new FriendInfoReq.
-         * @memberof protocol
-         * @classdesc Represents a FriendInfoReq.
-         * @implements IFriendInfoReq
-         * @constructor
-         * @param {protocol.IFriendInfoReq=} [properties] Properties to set
-         */
-        function FriendInfoReq(properties) {
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * FriendInfoReq uid.
-         * @member {string} uid
-         * @memberof protocol.FriendInfoReq
-         * @instance
-         */
-        FriendInfoReq.prototype.uid = "";
-
-        /**
-         * FriendInfoReq friendUid.
-         * @member {string} friendUid
-         * @memberof protocol.FriendInfoReq
-         * @instance
-         */
-        FriendInfoReq.prototype.friendUid = "";
-
-        /**
-         * FriendInfoReq token.
-         * @member {string} token
-         * @memberof protocol.FriendInfoReq
-         * @instance
-         */
-        FriendInfoReq.prototype.token = "";
-
-        /**
-         * Creates a new FriendInfoReq instance using the specified properties.
-         * @function create
-         * @memberof protocol.FriendInfoReq
-         * @static
-         * @param {protocol.IFriendInfoReq=} [properties] Properties to set
-         * @returns {protocol.FriendInfoReq} FriendInfoReq instance
-         */
-        FriendInfoReq.create = function create(properties) {
-            return new FriendInfoReq(properties);
-        };
-
-        /**
-         * Encodes the specified FriendInfoReq message. Does not implicitly {@link protocol.FriendInfoReq.verify|verify} messages.
-         * @function encode
-         * @memberof protocol.FriendInfoReq
-         * @static
-         * @param {protocol.IFriendInfoReq} message FriendInfoReq message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        FriendInfoReq.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.uid != null && Object.hasOwnProperty.call(message, "uid"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.uid);
-            if (message.friendUid != null && Object.hasOwnProperty.call(message, "friendUid"))
-                writer.uint32(/* id 2, wireType 2 =*/18).string(message.friendUid);
-            if (message.token != null && Object.hasOwnProperty.call(message, "token"))
-                writer.uint32(/* id 3, wireType 2 =*/26).string(message.token);
-            return writer;
-        };
-
-        /**
-         * Encodes the specified FriendInfoReq message, length delimited. Does not implicitly {@link protocol.FriendInfoReq.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof protocol.FriendInfoReq
-         * @static
-         * @param {protocol.IFriendInfoReq} message FriendInfoReq message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        FriendInfoReq.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a FriendInfoReq message from the specified reader or buffer.
-         * @function decode
-         * @memberof protocol.FriendInfoReq
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {protocol.FriendInfoReq} FriendInfoReq
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        FriendInfoReq.decode = function decode(reader, length, error) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.FriendInfoReq();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                if (tag === error)
-                    break;
-                switch (tag >>> 3) {
-                case 1: {
-                        message.uid = reader.string();
-                        break;
-                    }
-                case 2: {
-                        message.friendUid = reader.string();
-                        break;
-                    }
-                case 3: {
-                        message.token = reader.string();
-                        break;
-                    }
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a FriendInfoReq message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof protocol.FriendInfoReq
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {protocol.FriendInfoReq} FriendInfoReq
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        FriendInfoReq.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a FriendInfoReq message.
-         * @function verify
-         * @memberof protocol.FriendInfoReq
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        FriendInfoReq.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.uid != null && message.hasOwnProperty("uid"))
-                if (!$util.isString(message.uid))
-                    return "uid: string expected";
-            if (message.friendUid != null && message.hasOwnProperty("friendUid"))
-                if (!$util.isString(message.friendUid))
-                    return "friendUid: string expected";
-            if (message.token != null && message.hasOwnProperty("token"))
-                if (!$util.isString(message.token))
-                    return "token: string expected";
-            return null;
-        };
-
-        /**
-         * Creates a FriendInfoReq message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof protocol.FriendInfoReq
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {protocol.FriendInfoReq} FriendInfoReq
-         */
-        FriendInfoReq.fromObject = function fromObject(object) {
-            if (object instanceof $root.protocol.FriendInfoReq)
-                return object;
-            var message = new $root.protocol.FriendInfoReq();
-            if (object.uid != null)
-                message.uid = String(object.uid);
-            if (object.friendUid != null)
-                message.friendUid = String(object.friendUid);
-            if (object.token != null)
-                message.token = String(object.token);
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a FriendInfoReq message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof protocol.FriendInfoReq
-         * @static
-         * @param {protocol.FriendInfoReq} message FriendInfoReq
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        FriendInfoReq.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            var object = {};
-            if (options.defaults) {
-                object.uid = "";
-                object.friendUid = "";
-                object.token = "";
-            }
-            if (message.uid != null && message.hasOwnProperty("uid"))
-                object.uid = message.uid;
-            if (message.friendUid != null && message.hasOwnProperty("friendUid"))
-                object.friendUid = message.friendUid;
-            if (message.token != null && message.hasOwnProperty("token"))
-                object.token = message.token;
-            return object;
-        };
-
-        /**
-         * Converts this FriendInfoReq to JSON.
-         * @function toJSON
-         * @memberof protocol.FriendInfoReq
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        FriendInfoReq.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        /**
-         * Gets the default type url for FriendInfoReq
-         * @function getTypeUrl
-         * @memberof protocol.FriendInfoReq
-         * @static
-         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns {string} The default type url
-         */
-        FriendInfoReq.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-            if (typeUrlPrefix === undefined) {
-                typeUrlPrefix = "type.googleapis.com";
-            }
-            return typeUrlPrefix + "/protocol.FriendInfoReq";
-        };
-
-        return FriendInfoReq;
-    })();
-
-    protocol.FriendInfoResp = (function() {
-
-        /**
-         * Properties of a FriendInfoResp.
-         * @memberof protocol
-         * @interface IFriendInfoResp
-         * @property {string|null} [uid] FriendInfoResp uid
-         * @property {string|null} [username] FriendInfoResp username
-         * @property {string|null} [email] FriendInfoResp email
-         * @property {string|null} [remark] FriendInfoResp remark
-         * @property {boolean|null} [dnd] FriendInfoResp dnd
-         * @property {number|null} [code] FriendInfoResp code
-         * @property {string|null} [msg] FriendInfoResp msg
-         */
-
-        /**
-         * Constructs a new FriendInfoResp.
-         * @memberof protocol
-         * @classdesc Represents a FriendInfoResp.
-         * @implements IFriendInfoResp
-         * @constructor
-         * @param {protocol.IFriendInfoResp=} [properties] Properties to set
-         */
-        function FriendInfoResp(properties) {
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * FriendInfoResp uid.
-         * @member {string} uid
-         * @memberof protocol.FriendInfoResp
-         * @instance
-         */
-        FriendInfoResp.prototype.uid = "";
-
-        /**
-         * FriendInfoResp username.
-         * @member {string} username
-         * @memberof protocol.FriendInfoResp
-         * @instance
-         */
-        FriendInfoResp.prototype.username = "";
-
-        /**
-         * FriendInfoResp email.
-         * @member {string} email
-         * @memberof protocol.FriendInfoResp
-         * @instance
-         */
-        FriendInfoResp.prototype.email = "";
-
-        /**
-         * FriendInfoResp remark.
-         * @member {string} remark
-         * @memberof protocol.FriendInfoResp
-         * @instance
-         */
-        FriendInfoResp.prototype.remark = "";
-
-        /**
-         * FriendInfoResp dnd.
-         * @member {boolean} dnd
-         * @memberof protocol.FriendInfoResp
-         * @instance
-         */
-        FriendInfoResp.prototype.dnd = false;
-
-        /**
-         * FriendInfoResp code.
-         * @member {number} code
-         * @memberof protocol.FriendInfoResp
-         * @instance
-         */
-        FriendInfoResp.prototype.code = 0;
-
-        /**
-         * FriendInfoResp msg.
-         * @member {string} msg
-         * @memberof protocol.FriendInfoResp
-         * @instance
-         */
-        FriendInfoResp.prototype.msg = "";
-
-        /**
-         * Creates a new FriendInfoResp instance using the specified properties.
-         * @function create
-         * @memberof protocol.FriendInfoResp
-         * @static
-         * @param {protocol.IFriendInfoResp=} [properties] Properties to set
-         * @returns {protocol.FriendInfoResp} FriendInfoResp instance
-         */
-        FriendInfoResp.create = function create(properties) {
-            return new FriendInfoResp(properties);
-        };
-
-        /**
-         * Encodes the specified FriendInfoResp message. Does not implicitly {@link protocol.FriendInfoResp.verify|verify} messages.
-         * @function encode
-         * @memberof protocol.FriendInfoResp
-         * @static
-         * @param {protocol.IFriendInfoResp} message FriendInfoResp message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        FriendInfoResp.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.uid != null && Object.hasOwnProperty.call(message, "uid"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.uid);
-            if (message.username != null && Object.hasOwnProperty.call(message, "username"))
-                writer.uint32(/* id 2, wireType 2 =*/18).string(message.username);
-            if (message.email != null && Object.hasOwnProperty.call(message, "email"))
-                writer.uint32(/* id 3, wireType 2 =*/26).string(message.email);
-            if (message.remark != null && Object.hasOwnProperty.call(message, "remark"))
-                writer.uint32(/* id 4, wireType 2 =*/34).string(message.remark);
-            if (message.dnd != null && Object.hasOwnProperty.call(message, "dnd"))
-                writer.uint32(/* id 5, wireType 0 =*/40).bool(message.dnd);
-            if (message.code != null && Object.hasOwnProperty.call(message, "code"))
-                writer.uint32(/* id 6, wireType 0 =*/48).int32(message.code);
-            if (message.msg != null && Object.hasOwnProperty.call(message, "msg"))
-                writer.uint32(/* id 7, wireType 2 =*/58).string(message.msg);
-            return writer;
-        };
-
-        /**
-         * Encodes the specified FriendInfoResp message, length delimited. Does not implicitly {@link protocol.FriendInfoResp.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof protocol.FriendInfoResp
-         * @static
-         * @param {protocol.IFriendInfoResp} message FriendInfoResp message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        FriendInfoResp.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a FriendInfoResp message from the specified reader or buffer.
-         * @function decode
-         * @memberof protocol.FriendInfoResp
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {protocol.FriendInfoResp} FriendInfoResp
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        FriendInfoResp.decode = function decode(reader, length, error) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.FriendInfoResp();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                if (tag === error)
-                    break;
-                switch (tag >>> 3) {
-                case 1: {
-                        message.uid = reader.string();
-                        break;
-                    }
-                case 2: {
-                        message.username = reader.string();
-                        break;
-                    }
-                case 3: {
-                        message.email = reader.string();
-                        break;
-                    }
-                case 4: {
-                        message.remark = reader.string();
-                        break;
-                    }
-                case 5: {
-                        message.dnd = reader.bool();
-                        break;
-                    }
-                case 6: {
-                        message.code = reader.int32();
-                        break;
-                    }
-                case 7: {
-                        message.msg = reader.string();
-                        break;
-                    }
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a FriendInfoResp message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof protocol.FriendInfoResp
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {protocol.FriendInfoResp} FriendInfoResp
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        FriendInfoResp.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a FriendInfoResp message.
-         * @function verify
-         * @memberof protocol.FriendInfoResp
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        FriendInfoResp.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.uid != null && message.hasOwnProperty("uid"))
-                if (!$util.isString(message.uid))
-                    return "uid: string expected";
-            if (message.username != null && message.hasOwnProperty("username"))
-                if (!$util.isString(message.username))
-                    return "username: string expected";
-            if (message.email != null && message.hasOwnProperty("email"))
-                if (!$util.isString(message.email))
-                    return "email: string expected";
-            if (message.remark != null && message.hasOwnProperty("remark"))
-                if (!$util.isString(message.remark))
-                    return "remark: string expected";
-            if (message.dnd != null && message.hasOwnProperty("dnd"))
-                if (typeof message.dnd !== "boolean")
-                    return "dnd: boolean expected";
-            if (message.code != null && message.hasOwnProperty("code"))
-                if (!$util.isInteger(message.code))
-                    return "code: integer expected";
-            if (message.msg != null && message.hasOwnProperty("msg"))
-                if (!$util.isString(message.msg))
-                    return "msg: string expected";
-            return null;
-        };
-
-        /**
-         * Creates a FriendInfoResp message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof protocol.FriendInfoResp
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {protocol.FriendInfoResp} FriendInfoResp
-         */
-        FriendInfoResp.fromObject = function fromObject(object) {
-            if (object instanceof $root.protocol.FriendInfoResp)
-                return object;
-            var message = new $root.protocol.FriendInfoResp();
-            if (object.uid != null)
-                message.uid = String(object.uid);
-            if (object.username != null)
-                message.username = String(object.username);
-            if (object.email != null)
-                message.email = String(object.email);
-            if (object.remark != null)
-                message.remark = String(object.remark);
-            if (object.dnd != null)
-                message.dnd = Boolean(object.dnd);
-            if (object.code != null)
-                message.code = object.code | 0;
-            if (object.msg != null)
-                message.msg = String(object.msg);
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a FriendInfoResp message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof protocol.FriendInfoResp
-         * @static
-         * @param {protocol.FriendInfoResp} message FriendInfoResp
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        FriendInfoResp.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            var object = {};
-            if (options.defaults) {
-                object.uid = "";
-                object.username = "";
-                object.email = "";
-                object.remark = "";
-                object.dnd = false;
-                object.code = 0;
-                object.msg = "";
-            }
-            if (message.uid != null && message.hasOwnProperty("uid"))
-                object.uid = message.uid;
-            if (message.username != null && message.hasOwnProperty("username"))
-                object.username = message.username;
-            if (message.email != null && message.hasOwnProperty("email"))
-                object.email = message.email;
-            if (message.remark != null && message.hasOwnProperty("remark"))
-                object.remark = message.remark;
-            if (message.dnd != null && message.hasOwnProperty("dnd"))
-                object.dnd = message.dnd;
-            if (message.code != null && message.hasOwnProperty("code"))
-                object.code = message.code;
-            if (message.msg != null && message.hasOwnProperty("msg"))
-                object.msg = message.msg;
-            return object;
-        };
-
-        /**
-         * Converts this FriendInfoResp to JSON.
-         * @function toJSON
-         * @memberof protocol.FriendInfoResp
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        FriendInfoResp.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        /**
-         * Gets the default type url for FriendInfoResp
-         * @function getTypeUrl
-         * @memberof protocol.FriendInfoResp
-         * @static
-         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns {string} The default type url
-         */
-        FriendInfoResp.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-            if (typeUrlPrefix === undefined) {
-                typeUrlPrefix = "type.googleapis.com";
-            }
-            return typeUrlPrefix + "/protocol.FriendInfoResp";
-        };
-
-        return FriendInfoResp;
-    })();
-
-    protocol.SetDNDReq = (function() {
-
-        /**
-         * Properties of a SetDNDReq.
-         * @memberof protocol
-         * @interface ISetDNDReq
-         * @property {string|null} [uid] SetDNDReq uid
-         * @property {string|null} [friendUid] SetDNDReq friendUid
-         * @property {boolean|null} [dnd] SetDNDReq dnd
-         * @property {string|null} [token] SetDNDReq token
-         */
-
-        /**
-         * Constructs a new SetDNDReq.
-         * @memberof protocol
-         * @classdesc Represents a SetDNDReq.
-         * @implements ISetDNDReq
-         * @constructor
-         * @param {protocol.ISetDNDReq=} [properties] Properties to set
-         */
-        function SetDNDReq(properties) {
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * SetDNDReq uid.
-         * @member {string} uid
-         * @memberof protocol.SetDNDReq
-         * @instance
-         */
-        SetDNDReq.prototype.uid = "";
-
-        /**
-         * SetDNDReq friendUid.
-         * @member {string} friendUid
-         * @memberof protocol.SetDNDReq
-         * @instance
-         */
-        SetDNDReq.prototype.friendUid = "";
-
-        /**
-         * SetDNDReq dnd.
-         * @member {boolean} dnd
-         * @memberof protocol.SetDNDReq
-         * @instance
-         */
-        SetDNDReq.prototype.dnd = false;
-
-        /**
-         * SetDNDReq token.
-         * @member {string} token
-         * @memberof protocol.SetDNDReq
-         * @instance
-         */
-        SetDNDReq.prototype.token = "";
-
-        /**
-         * Creates a new SetDNDReq instance using the specified properties.
-         * @function create
-         * @memberof protocol.SetDNDReq
-         * @static
-         * @param {protocol.ISetDNDReq=} [properties] Properties to set
-         * @returns {protocol.SetDNDReq} SetDNDReq instance
-         */
-        SetDNDReq.create = function create(properties) {
-            return new SetDNDReq(properties);
-        };
-
-        /**
-         * Encodes the specified SetDNDReq message. Does not implicitly {@link protocol.SetDNDReq.verify|verify} messages.
-         * @function encode
-         * @memberof protocol.SetDNDReq
-         * @static
-         * @param {protocol.ISetDNDReq} message SetDNDReq message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        SetDNDReq.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.uid != null && Object.hasOwnProperty.call(message, "uid"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.uid);
-            if (message.friendUid != null && Object.hasOwnProperty.call(message, "friendUid"))
-                writer.uint32(/* id 2, wireType 2 =*/18).string(message.friendUid);
-            if (message.dnd != null && Object.hasOwnProperty.call(message, "dnd"))
-                writer.uint32(/* id 3, wireType 0 =*/24).bool(message.dnd);
-            if (message.token != null && Object.hasOwnProperty.call(message, "token"))
-                writer.uint32(/* id 4, wireType 2 =*/34).string(message.token);
-            return writer;
-        };
-
-        /**
-         * Encodes the specified SetDNDReq message, length delimited. Does not implicitly {@link protocol.SetDNDReq.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof protocol.SetDNDReq
-         * @static
-         * @param {protocol.ISetDNDReq} message SetDNDReq message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        SetDNDReq.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a SetDNDReq message from the specified reader or buffer.
-         * @function decode
-         * @memberof protocol.SetDNDReq
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {protocol.SetDNDReq} SetDNDReq
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        SetDNDReq.decode = function decode(reader, length, error) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.SetDNDReq();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                if (tag === error)
-                    break;
-                switch (tag >>> 3) {
-                case 1: {
-                        message.uid = reader.string();
-                        break;
-                    }
-                case 2: {
-                        message.friendUid = reader.string();
-                        break;
-                    }
-                case 3: {
-                        message.dnd = reader.bool();
-                        break;
-                    }
-                case 4: {
-                        message.token = reader.string();
-                        break;
-                    }
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a SetDNDReq message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof protocol.SetDNDReq
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {protocol.SetDNDReq} SetDNDReq
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        SetDNDReq.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a SetDNDReq message.
-         * @function verify
-         * @memberof protocol.SetDNDReq
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        SetDNDReq.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.uid != null && message.hasOwnProperty("uid"))
-                if (!$util.isString(message.uid))
-                    return "uid: string expected";
-            if (message.friendUid != null && message.hasOwnProperty("friendUid"))
-                if (!$util.isString(message.friendUid))
-                    return "friendUid: string expected";
-            if (message.dnd != null && message.hasOwnProperty("dnd"))
-                if (typeof message.dnd !== "boolean")
-                    return "dnd: boolean expected";
-            if (message.token != null && message.hasOwnProperty("token"))
-                if (!$util.isString(message.token))
-                    return "token: string expected";
-            return null;
-        };
-
-        /**
-         * Creates a SetDNDReq message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof protocol.SetDNDReq
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {protocol.SetDNDReq} SetDNDReq
-         */
-        SetDNDReq.fromObject = function fromObject(object) {
-            if (object instanceof $root.protocol.SetDNDReq)
-                return object;
-            var message = new $root.protocol.SetDNDReq();
-            if (object.uid != null)
-                message.uid = String(object.uid);
-            if (object.friendUid != null)
-                message.friendUid = String(object.friendUid);
-            if (object.dnd != null)
-                message.dnd = Boolean(object.dnd);
-            if (object.token != null)
-                message.token = String(object.token);
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a SetDNDReq message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof protocol.SetDNDReq
-         * @static
-         * @param {protocol.SetDNDReq} message SetDNDReq
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        SetDNDReq.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            var object = {};
-            if (options.defaults) {
-                object.uid = "";
-                object.friendUid = "";
-                object.dnd = false;
-                object.token = "";
-            }
-            if (message.uid != null && message.hasOwnProperty("uid"))
-                object.uid = message.uid;
-            if (message.friendUid != null && message.hasOwnProperty("friendUid"))
-                object.friendUid = message.friendUid;
-            if (message.dnd != null && message.hasOwnProperty("dnd"))
-                object.dnd = message.dnd;
-            if (message.token != null && message.hasOwnProperty("token"))
-                object.token = message.token;
-            return object;
-        };
-
-        /**
-         * Converts this SetDNDReq to JSON.
-         * @function toJSON
-         * @memberof protocol.SetDNDReq
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        SetDNDReq.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        /**
-         * Gets the default type url for SetDNDReq
-         * @function getTypeUrl
-         * @memberof protocol.SetDNDReq
-         * @static
-         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns {string} The default type url
-         */
-        SetDNDReq.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-            if (typeUrlPrefix === undefined) {
-                typeUrlPrefix = "type.googleapis.com";
-            }
-            return typeUrlPrefix + "/protocol.SetDNDReq";
-        };
-
-        return SetDNDReq;
-    })();
-
-    protocol.SetDNDResp = (function() {
-
-        /**
-         * Properties of a SetDNDResp.
-         * @memberof protocol
-         * @interface ISetDNDResp
-         * @property {number|null} [code] SetDNDResp code
-         * @property {string|null} [msg] SetDNDResp msg
-         */
-
-        /**
-         * Constructs a new SetDNDResp.
-         * @memberof protocol
-         * @classdesc Represents a SetDNDResp.
-         * @implements ISetDNDResp
-         * @constructor
-         * @param {protocol.ISetDNDResp=} [properties] Properties to set
-         */
-        function SetDNDResp(properties) {
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * SetDNDResp code.
-         * @member {number} code
-         * @memberof protocol.SetDNDResp
-         * @instance
-         */
-        SetDNDResp.prototype.code = 0;
-
-        /**
-         * SetDNDResp msg.
-         * @member {string} msg
-         * @memberof protocol.SetDNDResp
-         * @instance
-         */
-        SetDNDResp.prototype.msg = "";
-
-        /**
-         * Creates a new SetDNDResp instance using the specified properties.
-         * @function create
-         * @memberof protocol.SetDNDResp
-         * @static
-         * @param {protocol.ISetDNDResp=} [properties] Properties to set
-         * @returns {protocol.SetDNDResp} SetDNDResp instance
-         */
-        SetDNDResp.create = function create(properties) {
-            return new SetDNDResp(properties);
-        };
-
-        /**
-         * Encodes the specified SetDNDResp message. Does not implicitly {@link protocol.SetDNDResp.verify|verify} messages.
-         * @function encode
-         * @memberof protocol.SetDNDResp
-         * @static
-         * @param {protocol.ISetDNDResp} message SetDNDResp message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        SetDNDResp.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.code != null && Object.hasOwnProperty.call(message, "code"))
-                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.code);
-            if (message.msg != null && Object.hasOwnProperty.call(message, "msg"))
-                writer.uint32(/* id 2, wireType 2 =*/18).string(message.msg);
-            return writer;
-        };
-
-        /**
-         * Encodes the specified SetDNDResp message, length delimited. Does not implicitly {@link protocol.SetDNDResp.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof protocol.SetDNDResp
-         * @static
-         * @param {protocol.ISetDNDResp} message SetDNDResp message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        SetDNDResp.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a SetDNDResp message from the specified reader or buffer.
-         * @function decode
-         * @memberof protocol.SetDNDResp
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {protocol.SetDNDResp} SetDNDResp
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        SetDNDResp.decode = function decode(reader, length, error) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.SetDNDResp();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                if (tag === error)
-                    break;
-                switch (tag >>> 3) {
-                case 1: {
-                        message.code = reader.int32();
-                        break;
-                    }
-                case 2: {
-                        message.msg = reader.string();
-                        break;
-                    }
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a SetDNDResp message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof protocol.SetDNDResp
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {protocol.SetDNDResp} SetDNDResp
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        SetDNDResp.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a SetDNDResp message.
-         * @function verify
-         * @memberof protocol.SetDNDResp
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        SetDNDResp.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.code != null && message.hasOwnProperty("code"))
-                if (!$util.isInteger(message.code))
-                    return "code: integer expected";
-            if (message.msg != null && message.hasOwnProperty("msg"))
-                if (!$util.isString(message.msg))
-                    return "msg: string expected";
-            return null;
-        };
-
-        /**
-         * Creates a SetDNDResp message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof protocol.SetDNDResp
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {protocol.SetDNDResp} SetDNDResp
-         */
-        SetDNDResp.fromObject = function fromObject(object) {
-            if (object instanceof $root.protocol.SetDNDResp)
-                return object;
-            var message = new $root.protocol.SetDNDResp();
-            if (object.code != null)
-                message.code = object.code | 0;
-            if (object.msg != null)
-                message.msg = String(object.msg);
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a SetDNDResp message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof protocol.SetDNDResp
-         * @static
-         * @param {protocol.SetDNDResp} message SetDNDResp
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        SetDNDResp.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            var object = {};
-            if (options.defaults) {
-                object.code = 0;
-                object.msg = "";
-            }
-            if (message.code != null && message.hasOwnProperty("code"))
-                object.code = message.code;
-            if (message.msg != null && message.hasOwnProperty("msg"))
-                object.msg = message.msg;
-            return object;
-        };
-
-        /**
-         * Converts this SetDNDResp to JSON.
-         * @function toJSON
-         * @memberof protocol.SetDNDResp
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        SetDNDResp.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        /**
-         * Gets the default type url for SetDNDResp
-         * @function getTypeUrl
-         * @memberof protocol.SetDNDResp
-         * @static
-         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns {string} The default type url
-         */
-        SetDNDResp.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-            if (typeUrlPrefix === undefined) {
-                typeUrlPrefix = "type.googleapis.com";
-            }
-            return typeUrlPrefix + "/protocol.SetDNDResp";
-        };
-
-        return SetDNDResp;
+        return HandleFriendRequestResp;
     })();
 
     protocol.Group = (function() {
@@ -4758,6 +4758,396 @@ $root.protocol = (function() {
         };
 
         return GroupMember;
+    })();
+
+    protocol.GroupRequestItem = (function() {
+
+        /**
+         * Properties of a GroupRequestItem.
+         * @memberof protocol
+         * @interface IGroupRequestItem
+         * @property {string|null} [id] GroupRequestItem id
+         * @property {string|null} [groupId] GroupRequestItem groupId
+         * @property {string|null} [groupName] GroupRequestItem groupName
+         * @property {string|null} [inviterUid] GroupRequestItem inviterUid
+         * @property {string|null} [inviteeUid] GroupRequestItem inviteeUid
+         * @property {string|null} [status] GroupRequestItem status
+         * @property {string|null} [createdAt] GroupRequestItem createdAt
+         * @property {string|null} [inviterUsername] GroupRequestItem inviterUsername
+         * @property {string|null} [inviteeUsername] GroupRequestItem inviteeUsername
+         */
+
+        /**
+         * Constructs a new GroupRequestItem.
+         * @memberof protocol
+         * @classdesc Represents a GroupRequestItem.
+         * @implements IGroupRequestItem
+         * @constructor
+         * @param {protocol.IGroupRequestItem=} [properties] Properties to set
+         */
+        function GroupRequestItem(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * GroupRequestItem id.
+         * @member {string} id
+         * @memberof protocol.GroupRequestItem
+         * @instance
+         */
+        GroupRequestItem.prototype.id = "";
+
+        /**
+         * GroupRequestItem groupId.
+         * @member {string} groupId
+         * @memberof protocol.GroupRequestItem
+         * @instance
+         */
+        GroupRequestItem.prototype.groupId = "";
+
+        /**
+         * GroupRequestItem groupName.
+         * @member {string} groupName
+         * @memberof protocol.GroupRequestItem
+         * @instance
+         */
+        GroupRequestItem.prototype.groupName = "";
+
+        /**
+         * GroupRequestItem inviterUid.
+         * @member {string} inviterUid
+         * @memberof protocol.GroupRequestItem
+         * @instance
+         */
+        GroupRequestItem.prototype.inviterUid = "";
+
+        /**
+         * GroupRequestItem inviteeUid.
+         * @member {string} inviteeUid
+         * @memberof protocol.GroupRequestItem
+         * @instance
+         */
+        GroupRequestItem.prototype.inviteeUid = "";
+
+        /**
+         * GroupRequestItem status.
+         * @member {string} status
+         * @memberof protocol.GroupRequestItem
+         * @instance
+         */
+        GroupRequestItem.prototype.status = "";
+
+        /**
+         * GroupRequestItem createdAt.
+         * @member {string} createdAt
+         * @memberof protocol.GroupRequestItem
+         * @instance
+         */
+        GroupRequestItem.prototype.createdAt = "";
+
+        /**
+         * GroupRequestItem inviterUsername.
+         * @member {string} inviterUsername
+         * @memberof protocol.GroupRequestItem
+         * @instance
+         */
+        GroupRequestItem.prototype.inviterUsername = "";
+
+        /**
+         * GroupRequestItem inviteeUsername.
+         * @member {string} inviteeUsername
+         * @memberof protocol.GroupRequestItem
+         * @instance
+         */
+        GroupRequestItem.prototype.inviteeUsername = "";
+
+        /**
+         * Creates a new GroupRequestItem instance using the specified properties.
+         * @function create
+         * @memberof protocol.GroupRequestItem
+         * @static
+         * @param {protocol.IGroupRequestItem=} [properties] Properties to set
+         * @returns {protocol.GroupRequestItem} GroupRequestItem instance
+         */
+        GroupRequestItem.create = function create(properties) {
+            return new GroupRequestItem(properties);
+        };
+
+        /**
+         * Encodes the specified GroupRequestItem message. Does not implicitly {@link protocol.GroupRequestItem.verify|verify} messages.
+         * @function encode
+         * @memberof protocol.GroupRequestItem
+         * @static
+         * @param {protocol.IGroupRequestItem} message GroupRequestItem message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GroupRequestItem.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.id != null && Object.hasOwnProperty.call(message, "id"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.id);
+            if (message.groupId != null && Object.hasOwnProperty.call(message, "groupId"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.groupId);
+            if (message.groupName != null && Object.hasOwnProperty.call(message, "groupName"))
+                writer.uint32(/* id 3, wireType 2 =*/26).string(message.groupName);
+            if (message.inviterUid != null && Object.hasOwnProperty.call(message, "inviterUid"))
+                writer.uint32(/* id 4, wireType 2 =*/34).string(message.inviterUid);
+            if (message.inviteeUid != null && Object.hasOwnProperty.call(message, "inviteeUid"))
+                writer.uint32(/* id 5, wireType 2 =*/42).string(message.inviteeUid);
+            if (message.status != null && Object.hasOwnProperty.call(message, "status"))
+                writer.uint32(/* id 6, wireType 2 =*/50).string(message.status);
+            if (message.createdAt != null && Object.hasOwnProperty.call(message, "createdAt"))
+                writer.uint32(/* id 7, wireType 2 =*/58).string(message.createdAt);
+            if (message.inviterUsername != null && Object.hasOwnProperty.call(message, "inviterUsername"))
+                writer.uint32(/* id 8, wireType 2 =*/66).string(message.inviterUsername);
+            if (message.inviteeUsername != null && Object.hasOwnProperty.call(message, "inviteeUsername"))
+                writer.uint32(/* id 9, wireType 2 =*/74).string(message.inviteeUsername);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified GroupRequestItem message, length delimited. Does not implicitly {@link protocol.GroupRequestItem.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof protocol.GroupRequestItem
+         * @static
+         * @param {protocol.IGroupRequestItem} message GroupRequestItem message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GroupRequestItem.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a GroupRequestItem message from the specified reader or buffer.
+         * @function decode
+         * @memberof protocol.GroupRequestItem
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {protocol.GroupRequestItem} GroupRequestItem
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GroupRequestItem.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.GroupRequestItem();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.id = reader.string();
+                        break;
+                    }
+                case 2: {
+                        message.groupId = reader.string();
+                        break;
+                    }
+                case 3: {
+                        message.groupName = reader.string();
+                        break;
+                    }
+                case 4: {
+                        message.inviterUid = reader.string();
+                        break;
+                    }
+                case 5: {
+                        message.inviteeUid = reader.string();
+                        break;
+                    }
+                case 6: {
+                        message.status = reader.string();
+                        break;
+                    }
+                case 7: {
+                        message.createdAt = reader.string();
+                        break;
+                    }
+                case 8: {
+                        message.inviterUsername = reader.string();
+                        break;
+                    }
+                case 9: {
+                        message.inviteeUsername = reader.string();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a GroupRequestItem message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof protocol.GroupRequestItem
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {protocol.GroupRequestItem} GroupRequestItem
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GroupRequestItem.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a GroupRequestItem message.
+         * @function verify
+         * @memberof protocol.GroupRequestItem
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        GroupRequestItem.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.id != null && message.hasOwnProperty("id"))
+                if (!$util.isString(message.id))
+                    return "id: string expected";
+            if (message.groupId != null && message.hasOwnProperty("groupId"))
+                if (!$util.isString(message.groupId))
+                    return "groupId: string expected";
+            if (message.groupName != null && message.hasOwnProperty("groupName"))
+                if (!$util.isString(message.groupName))
+                    return "groupName: string expected";
+            if (message.inviterUid != null && message.hasOwnProperty("inviterUid"))
+                if (!$util.isString(message.inviterUid))
+                    return "inviterUid: string expected";
+            if (message.inviteeUid != null && message.hasOwnProperty("inviteeUid"))
+                if (!$util.isString(message.inviteeUid))
+                    return "inviteeUid: string expected";
+            if (message.status != null && message.hasOwnProperty("status"))
+                if (!$util.isString(message.status))
+                    return "status: string expected";
+            if (message.createdAt != null && message.hasOwnProperty("createdAt"))
+                if (!$util.isString(message.createdAt))
+                    return "createdAt: string expected";
+            if (message.inviterUsername != null && message.hasOwnProperty("inviterUsername"))
+                if (!$util.isString(message.inviterUsername))
+                    return "inviterUsername: string expected";
+            if (message.inviteeUsername != null && message.hasOwnProperty("inviteeUsername"))
+                if (!$util.isString(message.inviteeUsername))
+                    return "inviteeUsername: string expected";
+            return null;
+        };
+
+        /**
+         * Creates a GroupRequestItem message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof protocol.GroupRequestItem
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {protocol.GroupRequestItem} GroupRequestItem
+         */
+        GroupRequestItem.fromObject = function fromObject(object) {
+            if (object instanceof $root.protocol.GroupRequestItem)
+                return object;
+            var message = new $root.protocol.GroupRequestItem();
+            if (object.id != null)
+                message.id = String(object.id);
+            if (object.groupId != null)
+                message.groupId = String(object.groupId);
+            if (object.groupName != null)
+                message.groupName = String(object.groupName);
+            if (object.inviterUid != null)
+                message.inviterUid = String(object.inviterUid);
+            if (object.inviteeUid != null)
+                message.inviteeUid = String(object.inviteeUid);
+            if (object.status != null)
+                message.status = String(object.status);
+            if (object.createdAt != null)
+                message.createdAt = String(object.createdAt);
+            if (object.inviterUsername != null)
+                message.inviterUsername = String(object.inviterUsername);
+            if (object.inviteeUsername != null)
+                message.inviteeUsername = String(object.inviteeUsername);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a GroupRequestItem message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof protocol.GroupRequestItem
+         * @static
+         * @param {protocol.GroupRequestItem} message GroupRequestItem
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        GroupRequestItem.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                object.id = "";
+                object.groupId = "";
+                object.groupName = "";
+                object.inviterUid = "";
+                object.inviteeUid = "";
+                object.status = "";
+                object.createdAt = "";
+                object.inviterUsername = "";
+                object.inviteeUsername = "";
+            }
+            if (message.id != null && message.hasOwnProperty("id"))
+                object.id = message.id;
+            if (message.groupId != null && message.hasOwnProperty("groupId"))
+                object.groupId = message.groupId;
+            if (message.groupName != null && message.hasOwnProperty("groupName"))
+                object.groupName = message.groupName;
+            if (message.inviterUid != null && message.hasOwnProperty("inviterUid"))
+                object.inviterUid = message.inviterUid;
+            if (message.inviteeUid != null && message.hasOwnProperty("inviteeUid"))
+                object.inviteeUid = message.inviteeUid;
+            if (message.status != null && message.hasOwnProperty("status"))
+                object.status = message.status;
+            if (message.createdAt != null && message.hasOwnProperty("createdAt"))
+                object.createdAt = message.createdAt;
+            if (message.inviterUsername != null && message.hasOwnProperty("inviterUsername"))
+                object.inviterUsername = message.inviterUsername;
+            if (message.inviteeUsername != null && message.hasOwnProperty("inviteeUsername"))
+                object.inviteeUsername = message.inviteeUsername;
+            return object;
+        };
+
+        /**
+         * Converts this GroupRequestItem to JSON.
+         * @function toJSON
+         * @memberof protocol.GroupRequestItem
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        GroupRequestItem.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for GroupRequestItem
+         * @function getTypeUrl
+         * @memberof protocol.GroupRequestItem
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        GroupRequestItem.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/protocol.GroupRequestItem";
+        };
+
+        return GroupRequestItem;
     })();
 
     protocol.CreateGroupReq = (function() {
@@ -5762,464 +6152,6 @@ $root.protocol = (function() {
         return JoinGroupResp;
     })();
 
-    protocol.LeaveGroupReq = (function() {
-
-        /**
-         * Properties of a LeaveGroupReq.
-         * @memberof protocol
-         * @interface ILeaveGroupReq
-         * @property {string|null} [groupId] LeaveGroupReq groupId
-         * @property {string|null} [uid] LeaveGroupReq uid
-         */
-
-        /**
-         * Constructs a new LeaveGroupReq.
-         * @memberof protocol
-         * @classdesc Represents a LeaveGroupReq.
-         * @implements ILeaveGroupReq
-         * @constructor
-         * @param {protocol.ILeaveGroupReq=} [properties] Properties to set
-         */
-        function LeaveGroupReq(properties) {
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * LeaveGroupReq groupId.
-         * @member {string} groupId
-         * @memberof protocol.LeaveGroupReq
-         * @instance
-         */
-        LeaveGroupReq.prototype.groupId = "";
-
-        /**
-         * LeaveGroupReq uid.
-         * @member {string} uid
-         * @memberof protocol.LeaveGroupReq
-         * @instance
-         */
-        LeaveGroupReq.prototype.uid = "";
-
-        /**
-         * Creates a new LeaveGroupReq instance using the specified properties.
-         * @function create
-         * @memberof protocol.LeaveGroupReq
-         * @static
-         * @param {protocol.ILeaveGroupReq=} [properties] Properties to set
-         * @returns {protocol.LeaveGroupReq} LeaveGroupReq instance
-         */
-        LeaveGroupReq.create = function create(properties) {
-            return new LeaveGroupReq(properties);
-        };
-
-        /**
-         * Encodes the specified LeaveGroupReq message. Does not implicitly {@link protocol.LeaveGroupReq.verify|verify} messages.
-         * @function encode
-         * @memberof protocol.LeaveGroupReq
-         * @static
-         * @param {protocol.ILeaveGroupReq} message LeaveGroupReq message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        LeaveGroupReq.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.groupId != null && Object.hasOwnProperty.call(message, "groupId"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.groupId);
-            if (message.uid != null && Object.hasOwnProperty.call(message, "uid"))
-                writer.uint32(/* id 2, wireType 2 =*/18).string(message.uid);
-            return writer;
-        };
-
-        /**
-         * Encodes the specified LeaveGroupReq message, length delimited. Does not implicitly {@link protocol.LeaveGroupReq.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof protocol.LeaveGroupReq
-         * @static
-         * @param {protocol.ILeaveGroupReq} message LeaveGroupReq message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        LeaveGroupReq.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a LeaveGroupReq message from the specified reader or buffer.
-         * @function decode
-         * @memberof protocol.LeaveGroupReq
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {protocol.LeaveGroupReq} LeaveGroupReq
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        LeaveGroupReq.decode = function decode(reader, length, error) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.LeaveGroupReq();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                if (tag === error)
-                    break;
-                switch (tag >>> 3) {
-                case 1: {
-                        message.groupId = reader.string();
-                        break;
-                    }
-                case 2: {
-                        message.uid = reader.string();
-                        break;
-                    }
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a LeaveGroupReq message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof protocol.LeaveGroupReq
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {protocol.LeaveGroupReq} LeaveGroupReq
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        LeaveGroupReq.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a LeaveGroupReq message.
-         * @function verify
-         * @memberof protocol.LeaveGroupReq
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        LeaveGroupReq.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.groupId != null && message.hasOwnProperty("groupId"))
-                if (!$util.isString(message.groupId))
-                    return "groupId: string expected";
-            if (message.uid != null && message.hasOwnProperty("uid"))
-                if (!$util.isString(message.uid))
-                    return "uid: string expected";
-            return null;
-        };
-
-        /**
-         * Creates a LeaveGroupReq message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof protocol.LeaveGroupReq
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {protocol.LeaveGroupReq} LeaveGroupReq
-         */
-        LeaveGroupReq.fromObject = function fromObject(object) {
-            if (object instanceof $root.protocol.LeaveGroupReq)
-                return object;
-            var message = new $root.protocol.LeaveGroupReq();
-            if (object.groupId != null)
-                message.groupId = String(object.groupId);
-            if (object.uid != null)
-                message.uid = String(object.uid);
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a LeaveGroupReq message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof protocol.LeaveGroupReq
-         * @static
-         * @param {protocol.LeaveGroupReq} message LeaveGroupReq
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        LeaveGroupReq.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            var object = {};
-            if (options.defaults) {
-                object.groupId = "";
-                object.uid = "";
-            }
-            if (message.groupId != null && message.hasOwnProperty("groupId"))
-                object.groupId = message.groupId;
-            if (message.uid != null && message.hasOwnProperty("uid"))
-                object.uid = message.uid;
-            return object;
-        };
-
-        /**
-         * Converts this LeaveGroupReq to JSON.
-         * @function toJSON
-         * @memberof protocol.LeaveGroupReq
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        LeaveGroupReq.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        /**
-         * Gets the default type url for LeaveGroupReq
-         * @function getTypeUrl
-         * @memberof protocol.LeaveGroupReq
-         * @static
-         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns {string} The default type url
-         */
-        LeaveGroupReq.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-            if (typeUrlPrefix === undefined) {
-                typeUrlPrefix = "type.googleapis.com";
-            }
-            return typeUrlPrefix + "/protocol.LeaveGroupReq";
-        };
-
-        return LeaveGroupReq;
-    })();
-
-    protocol.LeaveGroupResp = (function() {
-
-        /**
-         * Properties of a LeaveGroupResp.
-         * @memberof protocol
-         * @interface ILeaveGroupResp
-         * @property {number|null} [code] LeaveGroupResp code
-         * @property {string|null} [msg] LeaveGroupResp msg
-         */
-
-        /**
-         * Constructs a new LeaveGroupResp.
-         * @memberof protocol
-         * @classdesc Represents a LeaveGroupResp.
-         * @implements ILeaveGroupResp
-         * @constructor
-         * @param {protocol.ILeaveGroupResp=} [properties] Properties to set
-         */
-        function LeaveGroupResp(properties) {
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * LeaveGroupResp code.
-         * @member {number} code
-         * @memberof protocol.LeaveGroupResp
-         * @instance
-         */
-        LeaveGroupResp.prototype.code = 0;
-
-        /**
-         * LeaveGroupResp msg.
-         * @member {string} msg
-         * @memberof protocol.LeaveGroupResp
-         * @instance
-         */
-        LeaveGroupResp.prototype.msg = "";
-
-        /**
-         * Creates a new LeaveGroupResp instance using the specified properties.
-         * @function create
-         * @memberof protocol.LeaveGroupResp
-         * @static
-         * @param {protocol.ILeaveGroupResp=} [properties] Properties to set
-         * @returns {protocol.LeaveGroupResp} LeaveGroupResp instance
-         */
-        LeaveGroupResp.create = function create(properties) {
-            return new LeaveGroupResp(properties);
-        };
-
-        /**
-         * Encodes the specified LeaveGroupResp message. Does not implicitly {@link protocol.LeaveGroupResp.verify|verify} messages.
-         * @function encode
-         * @memberof protocol.LeaveGroupResp
-         * @static
-         * @param {protocol.ILeaveGroupResp} message LeaveGroupResp message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        LeaveGroupResp.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.code != null && Object.hasOwnProperty.call(message, "code"))
-                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.code);
-            if (message.msg != null && Object.hasOwnProperty.call(message, "msg"))
-                writer.uint32(/* id 2, wireType 2 =*/18).string(message.msg);
-            return writer;
-        };
-
-        /**
-         * Encodes the specified LeaveGroupResp message, length delimited. Does not implicitly {@link protocol.LeaveGroupResp.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof protocol.LeaveGroupResp
-         * @static
-         * @param {protocol.ILeaveGroupResp} message LeaveGroupResp message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        LeaveGroupResp.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a LeaveGroupResp message from the specified reader or buffer.
-         * @function decode
-         * @memberof protocol.LeaveGroupResp
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {protocol.LeaveGroupResp} LeaveGroupResp
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        LeaveGroupResp.decode = function decode(reader, length, error) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.LeaveGroupResp();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                if (tag === error)
-                    break;
-                switch (tag >>> 3) {
-                case 1: {
-                        message.code = reader.int32();
-                        break;
-                    }
-                case 2: {
-                        message.msg = reader.string();
-                        break;
-                    }
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a LeaveGroupResp message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof protocol.LeaveGroupResp
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {protocol.LeaveGroupResp} LeaveGroupResp
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        LeaveGroupResp.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a LeaveGroupResp message.
-         * @function verify
-         * @memberof protocol.LeaveGroupResp
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        LeaveGroupResp.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.code != null && message.hasOwnProperty("code"))
-                if (!$util.isInteger(message.code))
-                    return "code: integer expected";
-            if (message.msg != null && message.hasOwnProperty("msg"))
-                if (!$util.isString(message.msg))
-                    return "msg: string expected";
-            return null;
-        };
-
-        /**
-         * Creates a LeaveGroupResp message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof protocol.LeaveGroupResp
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {protocol.LeaveGroupResp} LeaveGroupResp
-         */
-        LeaveGroupResp.fromObject = function fromObject(object) {
-            if (object instanceof $root.protocol.LeaveGroupResp)
-                return object;
-            var message = new $root.protocol.LeaveGroupResp();
-            if (object.code != null)
-                message.code = object.code | 0;
-            if (object.msg != null)
-                message.msg = String(object.msg);
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a LeaveGroupResp message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof protocol.LeaveGroupResp
-         * @static
-         * @param {protocol.LeaveGroupResp} message LeaveGroupResp
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        LeaveGroupResp.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            var object = {};
-            if (options.defaults) {
-                object.code = 0;
-                object.msg = "";
-            }
-            if (message.code != null && message.hasOwnProperty("code"))
-                object.code = message.code;
-            if (message.msg != null && message.hasOwnProperty("msg"))
-                object.msg = message.msg;
-            return object;
-        };
-
-        /**
-         * Converts this LeaveGroupResp to JSON.
-         * @function toJSON
-         * @memberof protocol.LeaveGroupResp
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        LeaveGroupResp.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        /**
-         * Gets the default type url for LeaveGroupResp
-         * @function getTypeUrl
-         * @memberof protocol.LeaveGroupResp
-         * @static
-         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns {string} The default type url
-         */
-        LeaveGroupResp.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-            if (typeUrlPrefix === undefined) {
-                typeUrlPrefix = "type.googleapis.com";
-            }
-            return typeUrlPrefix + "/protocol.LeaveGroupResp";
-        };
-
-        return LeaveGroupResp;
-    })();
-
     protocol.GroupListReq = (function() {
 
         /**
@@ -6697,6 +6629,468 @@ $root.protocol = (function() {
         };
 
         return GroupListResp;
+    })();
+
+    protocol.GroupInfoReq = (function() {
+
+        /**
+         * Properties of a GroupInfoReq.
+         * @memberof protocol
+         * @interface IGroupInfoReq
+         * @property {string|null} [groupId] GroupInfoReq groupId
+         */
+
+        /**
+         * Constructs a new GroupInfoReq.
+         * @memberof protocol
+         * @classdesc Represents a GroupInfoReq.
+         * @implements IGroupInfoReq
+         * @constructor
+         * @param {protocol.IGroupInfoReq=} [properties] Properties to set
+         */
+        function GroupInfoReq(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * GroupInfoReq groupId.
+         * @member {string} groupId
+         * @memberof protocol.GroupInfoReq
+         * @instance
+         */
+        GroupInfoReq.prototype.groupId = "";
+
+        /**
+         * Creates a new GroupInfoReq instance using the specified properties.
+         * @function create
+         * @memberof protocol.GroupInfoReq
+         * @static
+         * @param {protocol.IGroupInfoReq=} [properties] Properties to set
+         * @returns {protocol.GroupInfoReq} GroupInfoReq instance
+         */
+        GroupInfoReq.create = function create(properties) {
+            return new GroupInfoReq(properties);
+        };
+
+        /**
+         * Encodes the specified GroupInfoReq message. Does not implicitly {@link protocol.GroupInfoReq.verify|verify} messages.
+         * @function encode
+         * @memberof protocol.GroupInfoReq
+         * @static
+         * @param {protocol.IGroupInfoReq} message GroupInfoReq message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GroupInfoReq.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.groupId != null && Object.hasOwnProperty.call(message, "groupId"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.groupId);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified GroupInfoReq message, length delimited. Does not implicitly {@link protocol.GroupInfoReq.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof protocol.GroupInfoReq
+         * @static
+         * @param {protocol.IGroupInfoReq} message GroupInfoReq message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GroupInfoReq.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a GroupInfoReq message from the specified reader or buffer.
+         * @function decode
+         * @memberof protocol.GroupInfoReq
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {protocol.GroupInfoReq} GroupInfoReq
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GroupInfoReq.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.GroupInfoReq();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.groupId = reader.string();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a GroupInfoReq message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof protocol.GroupInfoReq
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {protocol.GroupInfoReq} GroupInfoReq
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GroupInfoReq.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a GroupInfoReq message.
+         * @function verify
+         * @memberof protocol.GroupInfoReq
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        GroupInfoReq.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.groupId != null && message.hasOwnProperty("groupId"))
+                if (!$util.isString(message.groupId))
+                    return "groupId: string expected";
+            return null;
+        };
+
+        /**
+         * Creates a GroupInfoReq message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof protocol.GroupInfoReq
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {protocol.GroupInfoReq} GroupInfoReq
+         */
+        GroupInfoReq.fromObject = function fromObject(object) {
+            if (object instanceof $root.protocol.GroupInfoReq)
+                return object;
+            var message = new $root.protocol.GroupInfoReq();
+            if (object.groupId != null)
+                message.groupId = String(object.groupId);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a GroupInfoReq message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof protocol.GroupInfoReq
+         * @static
+         * @param {protocol.GroupInfoReq} message GroupInfoReq
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        GroupInfoReq.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults)
+                object.groupId = "";
+            if (message.groupId != null && message.hasOwnProperty("groupId"))
+                object.groupId = message.groupId;
+            return object;
+        };
+
+        /**
+         * Converts this GroupInfoReq to JSON.
+         * @function toJSON
+         * @memberof protocol.GroupInfoReq
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        GroupInfoReq.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for GroupInfoReq
+         * @function getTypeUrl
+         * @memberof protocol.GroupInfoReq
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        GroupInfoReq.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/protocol.GroupInfoReq";
+        };
+
+        return GroupInfoReq;
+    })();
+
+    protocol.GroupInfoResp = (function() {
+
+        /**
+         * Properties of a GroupInfoResp.
+         * @memberof protocol
+         * @interface IGroupInfoResp
+         * @property {number|null} [code] GroupInfoResp code
+         * @property {string|null} [msg] GroupInfoResp msg
+         * @property {protocol.IGroup|null} [group] GroupInfoResp group
+         */
+
+        /**
+         * Constructs a new GroupInfoResp.
+         * @memberof protocol
+         * @classdesc Represents a GroupInfoResp.
+         * @implements IGroupInfoResp
+         * @constructor
+         * @param {protocol.IGroupInfoResp=} [properties] Properties to set
+         */
+        function GroupInfoResp(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * GroupInfoResp code.
+         * @member {number} code
+         * @memberof protocol.GroupInfoResp
+         * @instance
+         */
+        GroupInfoResp.prototype.code = 0;
+
+        /**
+         * GroupInfoResp msg.
+         * @member {string} msg
+         * @memberof protocol.GroupInfoResp
+         * @instance
+         */
+        GroupInfoResp.prototype.msg = "";
+
+        /**
+         * GroupInfoResp group.
+         * @member {protocol.IGroup|null|undefined} group
+         * @memberof protocol.GroupInfoResp
+         * @instance
+         */
+        GroupInfoResp.prototype.group = null;
+
+        /**
+         * Creates a new GroupInfoResp instance using the specified properties.
+         * @function create
+         * @memberof protocol.GroupInfoResp
+         * @static
+         * @param {protocol.IGroupInfoResp=} [properties] Properties to set
+         * @returns {protocol.GroupInfoResp} GroupInfoResp instance
+         */
+        GroupInfoResp.create = function create(properties) {
+            return new GroupInfoResp(properties);
+        };
+
+        /**
+         * Encodes the specified GroupInfoResp message. Does not implicitly {@link protocol.GroupInfoResp.verify|verify} messages.
+         * @function encode
+         * @memberof protocol.GroupInfoResp
+         * @static
+         * @param {protocol.IGroupInfoResp} message GroupInfoResp message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GroupInfoResp.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.code != null && Object.hasOwnProperty.call(message, "code"))
+                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.code);
+            if (message.msg != null && Object.hasOwnProperty.call(message, "msg"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.msg);
+            if (message.group != null && Object.hasOwnProperty.call(message, "group"))
+                $root.protocol.Group.encode(message.group, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified GroupInfoResp message, length delimited. Does not implicitly {@link protocol.GroupInfoResp.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof protocol.GroupInfoResp
+         * @static
+         * @param {protocol.IGroupInfoResp} message GroupInfoResp message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GroupInfoResp.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a GroupInfoResp message from the specified reader or buffer.
+         * @function decode
+         * @memberof protocol.GroupInfoResp
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {protocol.GroupInfoResp} GroupInfoResp
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GroupInfoResp.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.GroupInfoResp();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.code = reader.int32();
+                        break;
+                    }
+                case 2: {
+                        message.msg = reader.string();
+                        break;
+                    }
+                case 3: {
+                        message.group = $root.protocol.Group.decode(reader, reader.uint32());
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a GroupInfoResp message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof protocol.GroupInfoResp
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {protocol.GroupInfoResp} GroupInfoResp
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GroupInfoResp.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a GroupInfoResp message.
+         * @function verify
+         * @memberof protocol.GroupInfoResp
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        GroupInfoResp.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.code != null && message.hasOwnProperty("code"))
+                if (!$util.isInteger(message.code))
+                    return "code: integer expected";
+            if (message.msg != null && message.hasOwnProperty("msg"))
+                if (!$util.isString(message.msg))
+                    return "msg: string expected";
+            if (message.group != null && message.hasOwnProperty("group")) {
+                var error = $root.protocol.Group.verify(message.group);
+                if (error)
+                    return "group." + error;
+            }
+            return null;
+        };
+
+        /**
+         * Creates a GroupInfoResp message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof protocol.GroupInfoResp
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {protocol.GroupInfoResp} GroupInfoResp
+         */
+        GroupInfoResp.fromObject = function fromObject(object) {
+            if (object instanceof $root.protocol.GroupInfoResp)
+                return object;
+            var message = new $root.protocol.GroupInfoResp();
+            if (object.code != null)
+                message.code = object.code | 0;
+            if (object.msg != null)
+                message.msg = String(object.msg);
+            if (object.group != null) {
+                if (typeof object.group !== "object")
+                    throw TypeError(".protocol.GroupInfoResp.group: object expected");
+                message.group = $root.protocol.Group.fromObject(object.group);
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a GroupInfoResp message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof protocol.GroupInfoResp
+         * @static
+         * @param {protocol.GroupInfoResp} message GroupInfoResp
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        GroupInfoResp.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                object.code = 0;
+                object.msg = "";
+                object.group = null;
+            }
+            if (message.code != null && message.hasOwnProperty("code"))
+                object.code = message.code;
+            if (message.msg != null && message.hasOwnProperty("msg"))
+                object.msg = message.msg;
+            if (message.group != null && message.hasOwnProperty("group"))
+                object.group = $root.protocol.Group.toObject(message.group, options);
+            return object;
+        };
+
+        /**
+         * Converts this GroupInfoResp to JSON.
+         * @function toJSON
+         * @memberof protocol.GroupInfoResp
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        GroupInfoResp.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for GroupInfoResp
+         * @function getTypeUrl
+         * @memberof protocol.GroupInfoResp
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        GroupInfoResp.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/protocol.GroupInfoResp";
+        };
+
+        return GroupInfoResp;
     })();
 
     protocol.GroupMembersReq = (function() {
@@ -7178,24 +7572,25 @@ $root.protocol = (function() {
         return GroupMembersResp;
     })();
 
-    protocol.GroupInfoReq = (function() {
+    protocol.LeaveGroupReq = (function() {
 
         /**
-         * Properties of a GroupInfoReq.
+         * Properties of a LeaveGroupReq.
          * @memberof protocol
-         * @interface IGroupInfoReq
-         * @property {string|null} [groupId] GroupInfoReq groupId
+         * @interface ILeaveGroupReq
+         * @property {string|null} [groupId] LeaveGroupReq groupId
+         * @property {string|null} [uid] LeaveGroupReq uid
          */
 
         /**
-         * Constructs a new GroupInfoReq.
+         * Constructs a new LeaveGroupReq.
          * @memberof protocol
-         * @classdesc Represents a GroupInfoReq.
-         * @implements IGroupInfoReq
+         * @classdesc Represents a LeaveGroupReq.
+         * @implements ILeaveGroupReq
          * @constructor
-         * @param {protocol.IGroupInfoReq=} [properties] Properties to set
+         * @param {protocol.ILeaveGroupReq=} [properties] Properties to set
          */
-        function GroupInfoReq(properties) {
+        function LeaveGroupReq(properties) {
             if (properties)
                 for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -7203,70 +7598,80 @@ $root.protocol = (function() {
         }
 
         /**
-         * GroupInfoReq groupId.
+         * LeaveGroupReq groupId.
          * @member {string} groupId
-         * @memberof protocol.GroupInfoReq
+         * @memberof protocol.LeaveGroupReq
          * @instance
          */
-        GroupInfoReq.prototype.groupId = "";
+        LeaveGroupReq.prototype.groupId = "";
 
         /**
-         * Creates a new GroupInfoReq instance using the specified properties.
-         * @function create
-         * @memberof protocol.GroupInfoReq
-         * @static
-         * @param {protocol.IGroupInfoReq=} [properties] Properties to set
-         * @returns {protocol.GroupInfoReq} GroupInfoReq instance
+         * LeaveGroupReq uid.
+         * @member {string} uid
+         * @memberof protocol.LeaveGroupReq
+         * @instance
          */
-        GroupInfoReq.create = function create(properties) {
-            return new GroupInfoReq(properties);
+        LeaveGroupReq.prototype.uid = "";
+
+        /**
+         * Creates a new LeaveGroupReq instance using the specified properties.
+         * @function create
+         * @memberof protocol.LeaveGroupReq
+         * @static
+         * @param {protocol.ILeaveGroupReq=} [properties] Properties to set
+         * @returns {protocol.LeaveGroupReq} LeaveGroupReq instance
+         */
+        LeaveGroupReq.create = function create(properties) {
+            return new LeaveGroupReq(properties);
         };
 
         /**
-         * Encodes the specified GroupInfoReq message. Does not implicitly {@link protocol.GroupInfoReq.verify|verify} messages.
+         * Encodes the specified LeaveGroupReq message. Does not implicitly {@link protocol.LeaveGroupReq.verify|verify} messages.
          * @function encode
-         * @memberof protocol.GroupInfoReq
+         * @memberof protocol.LeaveGroupReq
          * @static
-         * @param {protocol.IGroupInfoReq} message GroupInfoReq message or plain object to encode
+         * @param {protocol.ILeaveGroupReq} message LeaveGroupReq message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        GroupInfoReq.encode = function encode(message, writer) {
+        LeaveGroupReq.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
             if (message.groupId != null && Object.hasOwnProperty.call(message, "groupId"))
                 writer.uint32(/* id 1, wireType 2 =*/10).string(message.groupId);
+            if (message.uid != null && Object.hasOwnProperty.call(message, "uid"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.uid);
             return writer;
         };
 
         /**
-         * Encodes the specified GroupInfoReq message, length delimited. Does not implicitly {@link protocol.GroupInfoReq.verify|verify} messages.
+         * Encodes the specified LeaveGroupReq message, length delimited. Does not implicitly {@link protocol.LeaveGroupReq.verify|verify} messages.
          * @function encodeDelimited
-         * @memberof protocol.GroupInfoReq
+         * @memberof protocol.LeaveGroupReq
          * @static
-         * @param {protocol.IGroupInfoReq} message GroupInfoReq message or plain object to encode
+         * @param {protocol.ILeaveGroupReq} message LeaveGroupReq message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        GroupInfoReq.encodeDelimited = function encodeDelimited(message, writer) {
+        LeaveGroupReq.encodeDelimited = function encodeDelimited(message, writer) {
             return this.encode(message, writer).ldelim();
         };
 
         /**
-         * Decodes a GroupInfoReq message from the specified reader or buffer.
+         * Decodes a LeaveGroupReq message from the specified reader or buffer.
          * @function decode
-         * @memberof protocol.GroupInfoReq
+         * @memberof protocol.LeaveGroupReq
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
          * @param {number} [length] Message length if known beforehand
-         * @returns {protocol.GroupInfoReq} GroupInfoReq
+         * @returns {protocol.LeaveGroupReq} LeaveGroupReq
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        GroupInfoReq.decode = function decode(reader, length, error) {
+        LeaveGroupReq.decode = function decode(reader, length, error) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.GroupInfoReq();
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.LeaveGroupReq();
             while (reader.pos < end) {
                 var tag = reader.uint32();
                 if (tag === error)
@@ -7274,6 +7679,10 @@ $root.protocol = (function() {
                 switch (tag >>> 3) {
                 case 1: {
                         message.groupId = reader.string();
+                        break;
+                    }
+                case 2: {
+                        message.uid = reader.string();
                         break;
                     }
                 default:
@@ -7285,124 +7694,132 @@ $root.protocol = (function() {
         };
 
         /**
-         * Decodes a GroupInfoReq message from the specified reader or buffer, length delimited.
+         * Decodes a LeaveGroupReq message from the specified reader or buffer, length delimited.
          * @function decodeDelimited
-         * @memberof protocol.GroupInfoReq
+         * @memberof protocol.LeaveGroupReq
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {protocol.GroupInfoReq} GroupInfoReq
+         * @returns {protocol.LeaveGroupReq} LeaveGroupReq
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        GroupInfoReq.decodeDelimited = function decodeDelimited(reader) {
+        LeaveGroupReq.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
         };
 
         /**
-         * Verifies a GroupInfoReq message.
+         * Verifies a LeaveGroupReq message.
          * @function verify
-         * @memberof protocol.GroupInfoReq
+         * @memberof protocol.LeaveGroupReq
          * @static
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        GroupInfoReq.verify = function verify(message) {
+        LeaveGroupReq.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
             if (message.groupId != null && message.hasOwnProperty("groupId"))
                 if (!$util.isString(message.groupId))
                     return "groupId: string expected";
+            if (message.uid != null && message.hasOwnProperty("uid"))
+                if (!$util.isString(message.uid))
+                    return "uid: string expected";
             return null;
         };
 
         /**
-         * Creates a GroupInfoReq message from a plain object. Also converts values to their respective internal types.
+         * Creates a LeaveGroupReq message from a plain object. Also converts values to their respective internal types.
          * @function fromObject
-         * @memberof protocol.GroupInfoReq
+         * @memberof protocol.LeaveGroupReq
          * @static
          * @param {Object.<string,*>} object Plain object
-         * @returns {protocol.GroupInfoReq} GroupInfoReq
+         * @returns {protocol.LeaveGroupReq} LeaveGroupReq
          */
-        GroupInfoReq.fromObject = function fromObject(object) {
-            if (object instanceof $root.protocol.GroupInfoReq)
+        LeaveGroupReq.fromObject = function fromObject(object) {
+            if (object instanceof $root.protocol.LeaveGroupReq)
                 return object;
-            var message = new $root.protocol.GroupInfoReq();
+            var message = new $root.protocol.LeaveGroupReq();
             if (object.groupId != null)
                 message.groupId = String(object.groupId);
+            if (object.uid != null)
+                message.uid = String(object.uid);
             return message;
         };
 
         /**
-         * Creates a plain object from a GroupInfoReq message. Also converts values to other types if specified.
+         * Creates a plain object from a LeaveGroupReq message. Also converts values to other types if specified.
          * @function toObject
-         * @memberof protocol.GroupInfoReq
+         * @memberof protocol.LeaveGroupReq
          * @static
-         * @param {protocol.GroupInfoReq} message GroupInfoReq
+         * @param {protocol.LeaveGroupReq} message LeaveGroupReq
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        GroupInfoReq.toObject = function toObject(message, options) {
+        LeaveGroupReq.toObject = function toObject(message, options) {
             if (!options)
                 options = {};
             var object = {};
-            if (options.defaults)
+            if (options.defaults) {
                 object.groupId = "";
+                object.uid = "";
+            }
             if (message.groupId != null && message.hasOwnProperty("groupId"))
                 object.groupId = message.groupId;
+            if (message.uid != null && message.hasOwnProperty("uid"))
+                object.uid = message.uid;
             return object;
         };
 
         /**
-         * Converts this GroupInfoReq to JSON.
+         * Converts this LeaveGroupReq to JSON.
          * @function toJSON
-         * @memberof protocol.GroupInfoReq
+         * @memberof protocol.LeaveGroupReq
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        GroupInfoReq.prototype.toJSON = function toJSON() {
+        LeaveGroupReq.prototype.toJSON = function toJSON() {
             return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
         };
 
         /**
-         * Gets the default type url for GroupInfoReq
+         * Gets the default type url for LeaveGroupReq
          * @function getTypeUrl
-         * @memberof protocol.GroupInfoReq
+         * @memberof protocol.LeaveGroupReq
          * @static
          * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
          * @returns {string} The default type url
          */
-        GroupInfoReq.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+        LeaveGroupReq.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
             if (typeUrlPrefix === undefined) {
                 typeUrlPrefix = "type.googleapis.com";
             }
-            return typeUrlPrefix + "/protocol.GroupInfoReq";
+            return typeUrlPrefix + "/protocol.LeaveGroupReq";
         };
 
-        return GroupInfoReq;
+        return LeaveGroupReq;
     })();
 
-    protocol.GroupInfoResp = (function() {
+    protocol.LeaveGroupResp = (function() {
 
         /**
-         * Properties of a GroupInfoResp.
+         * Properties of a LeaveGroupResp.
          * @memberof protocol
-         * @interface IGroupInfoResp
-         * @property {number|null} [code] GroupInfoResp code
-         * @property {string|null} [msg] GroupInfoResp msg
-         * @property {protocol.IGroup|null} [group] GroupInfoResp group
+         * @interface ILeaveGroupResp
+         * @property {number|null} [code] LeaveGroupResp code
+         * @property {string|null} [msg] LeaveGroupResp msg
          */
 
         /**
-         * Constructs a new GroupInfoResp.
+         * Constructs a new LeaveGroupResp.
          * @memberof protocol
-         * @classdesc Represents a GroupInfoResp.
-         * @implements IGroupInfoResp
+         * @classdesc Represents a LeaveGroupResp.
+         * @implements ILeaveGroupResp
          * @constructor
-         * @param {protocol.IGroupInfoResp=} [properties] Properties to set
+         * @param {protocol.ILeaveGroupResp=} [properties] Properties to set
          */
-        function GroupInfoResp(properties) {
+        function LeaveGroupResp(properties) {
             if (properties)
                 for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -7410,90 +7827,549 @@ $root.protocol = (function() {
         }
 
         /**
-         * GroupInfoResp code.
+         * LeaveGroupResp code.
          * @member {number} code
-         * @memberof protocol.GroupInfoResp
+         * @memberof protocol.LeaveGroupResp
          * @instance
          */
-        GroupInfoResp.prototype.code = 0;
+        LeaveGroupResp.prototype.code = 0;
 
         /**
-         * GroupInfoResp msg.
+         * LeaveGroupResp msg.
          * @member {string} msg
-         * @memberof protocol.GroupInfoResp
+         * @memberof protocol.LeaveGroupResp
          * @instance
          */
-        GroupInfoResp.prototype.msg = "";
+        LeaveGroupResp.prototype.msg = "";
 
         /**
-         * GroupInfoResp group.
-         * @member {protocol.IGroup|null|undefined} group
-         * @memberof protocol.GroupInfoResp
-         * @instance
-         */
-        GroupInfoResp.prototype.group = null;
-
-        /**
-         * Creates a new GroupInfoResp instance using the specified properties.
+         * Creates a new LeaveGroupResp instance using the specified properties.
          * @function create
-         * @memberof protocol.GroupInfoResp
+         * @memberof protocol.LeaveGroupResp
          * @static
-         * @param {protocol.IGroupInfoResp=} [properties] Properties to set
-         * @returns {protocol.GroupInfoResp} GroupInfoResp instance
+         * @param {protocol.ILeaveGroupResp=} [properties] Properties to set
+         * @returns {protocol.LeaveGroupResp} LeaveGroupResp instance
          */
-        GroupInfoResp.create = function create(properties) {
-            return new GroupInfoResp(properties);
+        LeaveGroupResp.create = function create(properties) {
+            return new LeaveGroupResp(properties);
         };
 
         /**
-         * Encodes the specified GroupInfoResp message. Does not implicitly {@link protocol.GroupInfoResp.verify|verify} messages.
+         * Encodes the specified LeaveGroupResp message. Does not implicitly {@link protocol.LeaveGroupResp.verify|verify} messages.
          * @function encode
-         * @memberof protocol.GroupInfoResp
+         * @memberof protocol.LeaveGroupResp
          * @static
-         * @param {protocol.IGroupInfoResp} message GroupInfoResp message or plain object to encode
+         * @param {protocol.ILeaveGroupResp} message LeaveGroupResp message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        GroupInfoResp.encode = function encode(message, writer) {
+        LeaveGroupResp.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
             if (message.code != null && Object.hasOwnProperty.call(message, "code"))
                 writer.uint32(/* id 1, wireType 0 =*/8).int32(message.code);
             if (message.msg != null && Object.hasOwnProperty.call(message, "msg"))
                 writer.uint32(/* id 2, wireType 2 =*/18).string(message.msg);
-            if (message.group != null && Object.hasOwnProperty.call(message, "group"))
-                $root.protocol.Group.encode(message.group, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
             return writer;
         };
 
         /**
-         * Encodes the specified GroupInfoResp message, length delimited. Does not implicitly {@link protocol.GroupInfoResp.verify|verify} messages.
+         * Encodes the specified LeaveGroupResp message, length delimited. Does not implicitly {@link protocol.LeaveGroupResp.verify|verify} messages.
          * @function encodeDelimited
-         * @memberof protocol.GroupInfoResp
+         * @memberof protocol.LeaveGroupResp
          * @static
-         * @param {protocol.IGroupInfoResp} message GroupInfoResp message or plain object to encode
+         * @param {protocol.ILeaveGroupResp} message LeaveGroupResp message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        GroupInfoResp.encodeDelimited = function encodeDelimited(message, writer) {
+        LeaveGroupResp.encodeDelimited = function encodeDelimited(message, writer) {
             return this.encode(message, writer).ldelim();
         };
 
         /**
-         * Decodes a GroupInfoResp message from the specified reader or buffer.
+         * Decodes a LeaveGroupResp message from the specified reader or buffer.
          * @function decode
-         * @memberof protocol.GroupInfoResp
+         * @memberof protocol.LeaveGroupResp
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
          * @param {number} [length] Message length if known beforehand
-         * @returns {protocol.GroupInfoResp} GroupInfoResp
+         * @returns {protocol.LeaveGroupResp} LeaveGroupResp
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        GroupInfoResp.decode = function decode(reader, length, error) {
+        LeaveGroupResp.decode = function decode(reader, length, error) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.GroupInfoResp();
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.LeaveGroupResp();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.code = reader.int32();
+                        break;
+                    }
+                case 2: {
+                        message.msg = reader.string();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a LeaveGroupResp message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof protocol.LeaveGroupResp
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {protocol.LeaveGroupResp} LeaveGroupResp
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        LeaveGroupResp.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a LeaveGroupResp message.
+         * @function verify
+         * @memberof protocol.LeaveGroupResp
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        LeaveGroupResp.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.code != null && message.hasOwnProperty("code"))
+                if (!$util.isInteger(message.code))
+                    return "code: integer expected";
+            if (message.msg != null && message.hasOwnProperty("msg"))
+                if (!$util.isString(message.msg))
+                    return "msg: string expected";
+            return null;
+        };
+
+        /**
+         * Creates a LeaveGroupResp message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof protocol.LeaveGroupResp
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {protocol.LeaveGroupResp} LeaveGroupResp
+         */
+        LeaveGroupResp.fromObject = function fromObject(object) {
+            if (object instanceof $root.protocol.LeaveGroupResp)
+                return object;
+            var message = new $root.protocol.LeaveGroupResp();
+            if (object.code != null)
+                message.code = object.code | 0;
+            if (object.msg != null)
+                message.msg = String(object.msg);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a LeaveGroupResp message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof protocol.LeaveGroupResp
+         * @static
+         * @param {protocol.LeaveGroupResp} message LeaveGroupResp
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        LeaveGroupResp.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                object.code = 0;
+                object.msg = "";
+            }
+            if (message.code != null && message.hasOwnProperty("code"))
+                object.code = message.code;
+            if (message.msg != null && message.hasOwnProperty("msg"))
+                object.msg = message.msg;
+            return object;
+        };
+
+        /**
+         * Converts this LeaveGroupResp to JSON.
+         * @function toJSON
+         * @memberof protocol.LeaveGroupResp
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        LeaveGroupResp.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for LeaveGroupResp
+         * @function getTypeUrl
+         * @memberof protocol.LeaveGroupResp
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        LeaveGroupResp.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/protocol.LeaveGroupResp";
+        };
+
+        return LeaveGroupResp;
+    })();
+
+    protocol.GroupMemberRoleReq = (function() {
+
+        /**
+         * Properties of a GroupMemberRoleReq.
+         * @memberof protocol
+         * @interface IGroupMemberRoleReq
+         * @property {string|null} [groupId] GroupMemberRoleReq groupId
+         * @property {string|null} [uid] GroupMemberRoleReq uid
+         */
+
+        /**
+         * Constructs a new GroupMemberRoleReq.
+         * @memberof protocol
+         * @classdesc Represents a GroupMemberRoleReq.
+         * @implements IGroupMemberRoleReq
+         * @constructor
+         * @param {protocol.IGroupMemberRoleReq=} [properties] Properties to set
+         */
+        function GroupMemberRoleReq(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * GroupMemberRoleReq groupId.
+         * @member {string} groupId
+         * @memberof protocol.GroupMemberRoleReq
+         * @instance
+         */
+        GroupMemberRoleReq.prototype.groupId = "";
+
+        /**
+         * GroupMemberRoleReq uid.
+         * @member {string} uid
+         * @memberof protocol.GroupMemberRoleReq
+         * @instance
+         */
+        GroupMemberRoleReq.prototype.uid = "";
+
+        /**
+         * Creates a new GroupMemberRoleReq instance using the specified properties.
+         * @function create
+         * @memberof protocol.GroupMemberRoleReq
+         * @static
+         * @param {protocol.IGroupMemberRoleReq=} [properties] Properties to set
+         * @returns {protocol.GroupMemberRoleReq} GroupMemberRoleReq instance
+         */
+        GroupMemberRoleReq.create = function create(properties) {
+            return new GroupMemberRoleReq(properties);
+        };
+
+        /**
+         * Encodes the specified GroupMemberRoleReq message. Does not implicitly {@link protocol.GroupMemberRoleReq.verify|verify} messages.
+         * @function encode
+         * @memberof protocol.GroupMemberRoleReq
+         * @static
+         * @param {protocol.IGroupMemberRoleReq} message GroupMemberRoleReq message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GroupMemberRoleReq.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.groupId != null && Object.hasOwnProperty.call(message, "groupId"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.groupId);
+            if (message.uid != null && Object.hasOwnProperty.call(message, "uid"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.uid);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified GroupMemberRoleReq message, length delimited. Does not implicitly {@link protocol.GroupMemberRoleReq.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof protocol.GroupMemberRoleReq
+         * @static
+         * @param {protocol.IGroupMemberRoleReq} message GroupMemberRoleReq message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GroupMemberRoleReq.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a GroupMemberRoleReq message from the specified reader or buffer.
+         * @function decode
+         * @memberof protocol.GroupMemberRoleReq
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {protocol.GroupMemberRoleReq} GroupMemberRoleReq
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GroupMemberRoleReq.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.GroupMemberRoleReq();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.groupId = reader.string();
+                        break;
+                    }
+                case 2: {
+                        message.uid = reader.string();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a GroupMemberRoleReq message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof protocol.GroupMemberRoleReq
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {protocol.GroupMemberRoleReq} GroupMemberRoleReq
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GroupMemberRoleReq.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a GroupMemberRoleReq message.
+         * @function verify
+         * @memberof protocol.GroupMemberRoleReq
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        GroupMemberRoleReq.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.groupId != null && message.hasOwnProperty("groupId"))
+                if (!$util.isString(message.groupId))
+                    return "groupId: string expected";
+            if (message.uid != null && message.hasOwnProperty("uid"))
+                if (!$util.isString(message.uid))
+                    return "uid: string expected";
+            return null;
+        };
+
+        /**
+         * Creates a GroupMemberRoleReq message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof protocol.GroupMemberRoleReq
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {protocol.GroupMemberRoleReq} GroupMemberRoleReq
+         */
+        GroupMemberRoleReq.fromObject = function fromObject(object) {
+            if (object instanceof $root.protocol.GroupMemberRoleReq)
+                return object;
+            var message = new $root.protocol.GroupMemberRoleReq();
+            if (object.groupId != null)
+                message.groupId = String(object.groupId);
+            if (object.uid != null)
+                message.uid = String(object.uid);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a GroupMemberRoleReq message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof protocol.GroupMemberRoleReq
+         * @static
+         * @param {protocol.GroupMemberRoleReq} message GroupMemberRoleReq
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        GroupMemberRoleReq.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                object.groupId = "";
+                object.uid = "";
+            }
+            if (message.groupId != null && message.hasOwnProperty("groupId"))
+                object.groupId = message.groupId;
+            if (message.uid != null && message.hasOwnProperty("uid"))
+                object.uid = message.uid;
+            return object;
+        };
+
+        /**
+         * Converts this GroupMemberRoleReq to JSON.
+         * @function toJSON
+         * @memberof protocol.GroupMemberRoleReq
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        GroupMemberRoleReq.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for GroupMemberRoleReq
+         * @function getTypeUrl
+         * @memberof protocol.GroupMemberRoleReq
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        GroupMemberRoleReq.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/protocol.GroupMemberRoleReq";
+        };
+
+        return GroupMemberRoleReq;
+    })();
+
+    protocol.GroupMemberRoleResp = (function() {
+
+        /**
+         * Properties of a GroupMemberRoleResp.
+         * @memberof protocol
+         * @interface IGroupMemberRoleResp
+         * @property {number|null} [code] GroupMemberRoleResp code
+         * @property {string|null} [msg] GroupMemberRoleResp msg
+         * @property {string|null} [role] GroupMemberRoleResp role
+         */
+
+        /**
+         * Constructs a new GroupMemberRoleResp.
+         * @memberof protocol
+         * @classdesc Represents a GroupMemberRoleResp.
+         * @implements IGroupMemberRoleResp
+         * @constructor
+         * @param {protocol.IGroupMemberRoleResp=} [properties] Properties to set
+         */
+        function GroupMemberRoleResp(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * GroupMemberRoleResp code.
+         * @member {number} code
+         * @memberof protocol.GroupMemberRoleResp
+         * @instance
+         */
+        GroupMemberRoleResp.prototype.code = 0;
+
+        /**
+         * GroupMemberRoleResp msg.
+         * @member {string} msg
+         * @memberof protocol.GroupMemberRoleResp
+         * @instance
+         */
+        GroupMemberRoleResp.prototype.msg = "";
+
+        /**
+         * GroupMemberRoleResp role.
+         * @member {string} role
+         * @memberof protocol.GroupMemberRoleResp
+         * @instance
+         */
+        GroupMemberRoleResp.prototype.role = "";
+
+        /**
+         * Creates a new GroupMemberRoleResp instance using the specified properties.
+         * @function create
+         * @memberof protocol.GroupMemberRoleResp
+         * @static
+         * @param {protocol.IGroupMemberRoleResp=} [properties] Properties to set
+         * @returns {protocol.GroupMemberRoleResp} GroupMemberRoleResp instance
+         */
+        GroupMemberRoleResp.create = function create(properties) {
+            return new GroupMemberRoleResp(properties);
+        };
+
+        /**
+         * Encodes the specified GroupMemberRoleResp message. Does not implicitly {@link protocol.GroupMemberRoleResp.verify|verify} messages.
+         * @function encode
+         * @memberof protocol.GroupMemberRoleResp
+         * @static
+         * @param {protocol.IGroupMemberRoleResp} message GroupMemberRoleResp message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GroupMemberRoleResp.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.code != null && Object.hasOwnProperty.call(message, "code"))
+                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.code);
+            if (message.msg != null && Object.hasOwnProperty.call(message, "msg"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.msg);
+            if (message.role != null && Object.hasOwnProperty.call(message, "role"))
+                writer.uint32(/* id 3, wireType 2 =*/26).string(message.role);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified GroupMemberRoleResp message, length delimited. Does not implicitly {@link protocol.GroupMemberRoleResp.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof protocol.GroupMemberRoleResp
+         * @static
+         * @param {protocol.IGroupMemberRoleResp} message GroupMemberRoleResp message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GroupMemberRoleResp.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a GroupMemberRoleResp message from the specified reader or buffer.
+         * @function decode
+         * @memberof protocol.GroupMemberRoleResp
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {protocol.GroupMemberRoleResp} GroupMemberRoleResp
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GroupMemberRoleResp.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.GroupMemberRoleResp();
             while (reader.pos < end) {
                 var tag = reader.uint32();
                 if (tag === error)
@@ -7508,7 +8384,7 @@ $root.protocol = (function() {
                         break;
                     }
                 case 3: {
-                        message.group = $root.protocol.Group.decode(reader, reader.uint32());
+                        message.role = reader.string();
                         break;
                     }
                 default:
@@ -7520,30 +8396,30 @@ $root.protocol = (function() {
         };
 
         /**
-         * Decodes a GroupInfoResp message from the specified reader or buffer, length delimited.
+         * Decodes a GroupMemberRoleResp message from the specified reader or buffer, length delimited.
          * @function decodeDelimited
-         * @memberof protocol.GroupInfoResp
+         * @memberof protocol.GroupMemberRoleResp
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {protocol.GroupInfoResp} GroupInfoResp
+         * @returns {protocol.GroupMemberRoleResp} GroupMemberRoleResp
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        GroupInfoResp.decodeDelimited = function decodeDelimited(reader) {
+        GroupMemberRoleResp.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
         };
 
         /**
-         * Verifies a GroupInfoResp message.
+         * Verifies a GroupMemberRoleResp message.
          * @function verify
-         * @memberof protocol.GroupInfoResp
+         * @memberof protocol.GroupMemberRoleResp
          * @static
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        GroupInfoResp.verify = function verify(message) {
+        GroupMemberRoleResp.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
             if (message.code != null && message.hasOwnProperty("code"))
@@ -7552,92 +8428,674 @@ $root.protocol = (function() {
             if (message.msg != null && message.hasOwnProperty("msg"))
                 if (!$util.isString(message.msg))
                     return "msg: string expected";
-            if (message.group != null && message.hasOwnProperty("group")) {
-                var error = $root.protocol.Group.verify(message.group);
-                if (error)
-                    return "group." + error;
-            }
+            if (message.role != null && message.hasOwnProperty("role"))
+                if (!$util.isString(message.role))
+                    return "role: string expected";
             return null;
         };
 
         /**
-         * Creates a GroupInfoResp message from a plain object. Also converts values to their respective internal types.
+         * Creates a GroupMemberRoleResp message from a plain object. Also converts values to their respective internal types.
          * @function fromObject
-         * @memberof protocol.GroupInfoResp
+         * @memberof protocol.GroupMemberRoleResp
          * @static
          * @param {Object.<string,*>} object Plain object
-         * @returns {protocol.GroupInfoResp} GroupInfoResp
+         * @returns {protocol.GroupMemberRoleResp} GroupMemberRoleResp
          */
-        GroupInfoResp.fromObject = function fromObject(object) {
-            if (object instanceof $root.protocol.GroupInfoResp)
+        GroupMemberRoleResp.fromObject = function fromObject(object) {
+            if (object instanceof $root.protocol.GroupMemberRoleResp)
                 return object;
-            var message = new $root.protocol.GroupInfoResp();
+            var message = new $root.protocol.GroupMemberRoleResp();
             if (object.code != null)
                 message.code = object.code | 0;
             if (object.msg != null)
                 message.msg = String(object.msg);
-            if (object.group != null) {
-                if (typeof object.group !== "object")
-                    throw TypeError(".protocol.GroupInfoResp.group: object expected");
-                message.group = $root.protocol.Group.fromObject(object.group);
-            }
+            if (object.role != null)
+                message.role = String(object.role);
             return message;
         };
 
         /**
-         * Creates a plain object from a GroupInfoResp message. Also converts values to other types if specified.
+         * Creates a plain object from a GroupMemberRoleResp message. Also converts values to other types if specified.
          * @function toObject
-         * @memberof protocol.GroupInfoResp
+         * @memberof protocol.GroupMemberRoleResp
          * @static
-         * @param {protocol.GroupInfoResp} message GroupInfoResp
+         * @param {protocol.GroupMemberRoleResp} message GroupMemberRoleResp
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        GroupInfoResp.toObject = function toObject(message, options) {
+        GroupMemberRoleResp.toObject = function toObject(message, options) {
             if (!options)
                 options = {};
             var object = {};
             if (options.defaults) {
                 object.code = 0;
                 object.msg = "";
-                object.group = null;
+                object.role = "";
             }
             if (message.code != null && message.hasOwnProperty("code"))
                 object.code = message.code;
             if (message.msg != null && message.hasOwnProperty("msg"))
                 object.msg = message.msg;
-            if (message.group != null && message.hasOwnProperty("group"))
-                object.group = $root.protocol.Group.toObject(message.group, options);
+            if (message.role != null && message.hasOwnProperty("role"))
+                object.role = message.role;
             return object;
         };
 
         /**
-         * Converts this GroupInfoResp to JSON.
+         * Converts this GroupMemberRoleResp to JSON.
          * @function toJSON
-         * @memberof protocol.GroupInfoResp
+         * @memberof protocol.GroupMemberRoleResp
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        GroupInfoResp.prototype.toJSON = function toJSON() {
+        GroupMemberRoleResp.prototype.toJSON = function toJSON() {
             return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
         };
 
         /**
-         * Gets the default type url for GroupInfoResp
+         * Gets the default type url for GroupMemberRoleResp
          * @function getTypeUrl
-         * @memberof protocol.GroupInfoResp
+         * @memberof protocol.GroupMemberRoleResp
          * @static
          * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
          * @returns {string} The default type url
          */
-        GroupInfoResp.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+        GroupMemberRoleResp.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
             if (typeUrlPrefix === undefined) {
                 typeUrlPrefix = "type.googleapis.com";
             }
-            return typeUrlPrefix + "/protocol.GroupInfoResp";
+            return typeUrlPrefix + "/protocol.GroupMemberRoleResp";
         };
 
-        return GroupInfoResp;
+        return GroupMemberRoleResp;
+    })();
+
+    protocol.GroupMemberInfoReq = (function() {
+
+        /**
+         * Properties of a GroupMemberInfoReq.
+         * @memberof protocol
+         * @interface IGroupMemberInfoReq
+         * @property {string|null} [groupId] GroupMemberInfoReq groupId
+         * @property {string|null} [uid] GroupMemberInfoReq uid
+         */
+
+        /**
+         * Constructs a new GroupMemberInfoReq.
+         * @memberof protocol
+         * @classdesc Represents a GroupMemberInfoReq.
+         * @implements IGroupMemberInfoReq
+         * @constructor
+         * @param {protocol.IGroupMemberInfoReq=} [properties] Properties to set
+         */
+        function GroupMemberInfoReq(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * GroupMemberInfoReq groupId.
+         * @member {string} groupId
+         * @memberof protocol.GroupMemberInfoReq
+         * @instance
+         */
+        GroupMemberInfoReq.prototype.groupId = "";
+
+        /**
+         * GroupMemberInfoReq uid.
+         * @member {string} uid
+         * @memberof protocol.GroupMemberInfoReq
+         * @instance
+         */
+        GroupMemberInfoReq.prototype.uid = "";
+
+        /**
+         * Creates a new GroupMemberInfoReq instance using the specified properties.
+         * @function create
+         * @memberof protocol.GroupMemberInfoReq
+         * @static
+         * @param {protocol.IGroupMemberInfoReq=} [properties] Properties to set
+         * @returns {protocol.GroupMemberInfoReq} GroupMemberInfoReq instance
+         */
+        GroupMemberInfoReq.create = function create(properties) {
+            return new GroupMemberInfoReq(properties);
+        };
+
+        /**
+         * Encodes the specified GroupMemberInfoReq message. Does not implicitly {@link protocol.GroupMemberInfoReq.verify|verify} messages.
+         * @function encode
+         * @memberof protocol.GroupMemberInfoReq
+         * @static
+         * @param {protocol.IGroupMemberInfoReq} message GroupMemberInfoReq message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GroupMemberInfoReq.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.groupId != null && Object.hasOwnProperty.call(message, "groupId"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.groupId);
+            if (message.uid != null && Object.hasOwnProperty.call(message, "uid"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.uid);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified GroupMemberInfoReq message, length delimited. Does not implicitly {@link protocol.GroupMemberInfoReq.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof protocol.GroupMemberInfoReq
+         * @static
+         * @param {protocol.IGroupMemberInfoReq} message GroupMemberInfoReq message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GroupMemberInfoReq.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a GroupMemberInfoReq message from the specified reader or buffer.
+         * @function decode
+         * @memberof protocol.GroupMemberInfoReq
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {protocol.GroupMemberInfoReq} GroupMemberInfoReq
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GroupMemberInfoReq.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.GroupMemberInfoReq();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.groupId = reader.string();
+                        break;
+                    }
+                case 2: {
+                        message.uid = reader.string();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a GroupMemberInfoReq message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof protocol.GroupMemberInfoReq
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {protocol.GroupMemberInfoReq} GroupMemberInfoReq
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GroupMemberInfoReq.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a GroupMemberInfoReq message.
+         * @function verify
+         * @memberof protocol.GroupMemberInfoReq
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        GroupMemberInfoReq.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.groupId != null && message.hasOwnProperty("groupId"))
+                if (!$util.isString(message.groupId))
+                    return "groupId: string expected";
+            if (message.uid != null && message.hasOwnProperty("uid"))
+                if (!$util.isString(message.uid))
+                    return "uid: string expected";
+            return null;
+        };
+
+        /**
+         * Creates a GroupMemberInfoReq message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof protocol.GroupMemberInfoReq
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {protocol.GroupMemberInfoReq} GroupMemberInfoReq
+         */
+        GroupMemberInfoReq.fromObject = function fromObject(object) {
+            if (object instanceof $root.protocol.GroupMemberInfoReq)
+                return object;
+            var message = new $root.protocol.GroupMemberInfoReq();
+            if (object.groupId != null)
+                message.groupId = String(object.groupId);
+            if (object.uid != null)
+                message.uid = String(object.uid);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a GroupMemberInfoReq message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof protocol.GroupMemberInfoReq
+         * @static
+         * @param {protocol.GroupMemberInfoReq} message GroupMemberInfoReq
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        GroupMemberInfoReq.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                object.groupId = "";
+                object.uid = "";
+            }
+            if (message.groupId != null && message.hasOwnProperty("groupId"))
+                object.groupId = message.groupId;
+            if (message.uid != null && message.hasOwnProperty("uid"))
+                object.uid = message.uid;
+            return object;
+        };
+
+        /**
+         * Converts this GroupMemberInfoReq to JSON.
+         * @function toJSON
+         * @memberof protocol.GroupMemberInfoReq
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        GroupMemberInfoReq.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for GroupMemberInfoReq
+         * @function getTypeUrl
+         * @memberof protocol.GroupMemberInfoReq
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        GroupMemberInfoReq.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/protocol.GroupMemberInfoReq";
+        };
+
+        return GroupMemberInfoReq;
+    })();
+
+    protocol.GroupMemberInfoResp = (function() {
+
+        /**
+         * Properties of a GroupMemberInfoResp.
+         * @memberof protocol
+         * @interface IGroupMemberInfoResp
+         * @property {number|null} [code] GroupMemberInfoResp code
+         * @property {string|null} [msg] GroupMemberInfoResp msg
+         * @property {string|null} [uid] GroupMemberInfoResp uid
+         * @property {string|null} [username] GroupMemberInfoResp username
+         * @property {string|null} [nickname] GroupMemberInfoResp nickname
+         * @property {string|null} [role] GroupMemberInfoResp role
+         * @property {number|Long|null} [joinTime] GroupMemberInfoResp joinTime
+         */
+
+        /**
+         * Constructs a new GroupMemberInfoResp.
+         * @memberof protocol
+         * @classdesc Represents a GroupMemberInfoResp.
+         * @implements IGroupMemberInfoResp
+         * @constructor
+         * @param {protocol.IGroupMemberInfoResp=} [properties] Properties to set
+         */
+        function GroupMemberInfoResp(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * GroupMemberInfoResp code.
+         * @member {number} code
+         * @memberof protocol.GroupMemberInfoResp
+         * @instance
+         */
+        GroupMemberInfoResp.prototype.code = 0;
+
+        /**
+         * GroupMemberInfoResp msg.
+         * @member {string} msg
+         * @memberof protocol.GroupMemberInfoResp
+         * @instance
+         */
+        GroupMemberInfoResp.prototype.msg = "";
+
+        /**
+         * GroupMemberInfoResp uid.
+         * @member {string} uid
+         * @memberof protocol.GroupMemberInfoResp
+         * @instance
+         */
+        GroupMemberInfoResp.prototype.uid = "";
+
+        /**
+         * GroupMemberInfoResp username.
+         * @member {string} username
+         * @memberof protocol.GroupMemberInfoResp
+         * @instance
+         */
+        GroupMemberInfoResp.prototype.username = "";
+
+        /**
+         * GroupMemberInfoResp nickname.
+         * @member {string} nickname
+         * @memberof protocol.GroupMemberInfoResp
+         * @instance
+         */
+        GroupMemberInfoResp.prototype.nickname = "";
+
+        /**
+         * GroupMemberInfoResp role.
+         * @member {string} role
+         * @memberof protocol.GroupMemberInfoResp
+         * @instance
+         */
+        GroupMemberInfoResp.prototype.role = "";
+
+        /**
+         * GroupMemberInfoResp joinTime.
+         * @member {number|Long} joinTime
+         * @memberof protocol.GroupMemberInfoResp
+         * @instance
+         */
+        GroupMemberInfoResp.prototype.joinTime = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
+
+        /**
+         * Creates a new GroupMemberInfoResp instance using the specified properties.
+         * @function create
+         * @memberof protocol.GroupMemberInfoResp
+         * @static
+         * @param {protocol.IGroupMemberInfoResp=} [properties] Properties to set
+         * @returns {protocol.GroupMemberInfoResp} GroupMemberInfoResp instance
+         */
+        GroupMemberInfoResp.create = function create(properties) {
+            return new GroupMemberInfoResp(properties);
+        };
+
+        /**
+         * Encodes the specified GroupMemberInfoResp message. Does not implicitly {@link protocol.GroupMemberInfoResp.verify|verify} messages.
+         * @function encode
+         * @memberof protocol.GroupMemberInfoResp
+         * @static
+         * @param {protocol.IGroupMemberInfoResp} message GroupMemberInfoResp message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GroupMemberInfoResp.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.code != null && Object.hasOwnProperty.call(message, "code"))
+                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.code);
+            if (message.msg != null && Object.hasOwnProperty.call(message, "msg"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.msg);
+            if (message.uid != null && Object.hasOwnProperty.call(message, "uid"))
+                writer.uint32(/* id 3, wireType 2 =*/26).string(message.uid);
+            if (message.username != null && Object.hasOwnProperty.call(message, "username"))
+                writer.uint32(/* id 4, wireType 2 =*/34).string(message.username);
+            if (message.nickname != null && Object.hasOwnProperty.call(message, "nickname"))
+                writer.uint32(/* id 5, wireType 2 =*/42).string(message.nickname);
+            if (message.role != null && Object.hasOwnProperty.call(message, "role"))
+                writer.uint32(/* id 6, wireType 2 =*/50).string(message.role);
+            if (message.joinTime != null && Object.hasOwnProperty.call(message, "joinTime"))
+                writer.uint32(/* id 7, wireType 0 =*/56).int64(message.joinTime);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified GroupMemberInfoResp message, length delimited. Does not implicitly {@link protocol.GroupMemberInfoResp.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof protocol.GroupMemberInfoResp
+         * @static
+         * @param {protocol.IGroupMemberInfoResp} message GroupMemberInfoResp message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GroupMemberInfoResp.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a GroupMemberInfoResp message from the specified reader or buffer.
+         * @function decode
+         * @memberof protocol.GroupMemberInfoResp
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {protocol.GroupMemberInfoResp} GroupMemberInfoResp
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GroupMemberInfoResp.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.GroupMemberInfoResp();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.code = reader.int32();
+                        break;
+                    }
+                case 2: {
+                        message.msg = reader.string();
+                        break;
+                    }
+                case 3: {
+                        message.uid = reader.string();
+                        break;
+                    }
+                case 4: {
+                        message.username = reader.string();
+                        break;
+                    }
+                case 5: {
+                        message.nickname = reader.string();
+                        break;
+                    }
+                case 6: {
+                        message.role = reader.string();
+                        break;
+                    }
+                case 7: {
+                        message.joinTime = reader.int64();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a GroupMemberInfoResp message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof protocol.GroupMemberInfoResp
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {protocol.GroupMemberInfoResp} GroupMemberInfoResp
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GroupMemberInfoResp.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a GroupMemberInfoResp message.
+         * @function verify
+         * @memberof protocol.GroupMemberInfoResp
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        GroupMemberInfoResp.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.code != null && message.hasOwnProperty("code"))
+                if (!$util.isInteger(message.code))
+                    return "code: integer expected";
+            if (message.msg != null && message.hasOwnProperty("msg"))
+                if (!$util.isString(message.msg))
+                    return "msg: string expected";
+            if (message.uid != null && message.hasOwnProperty("uid"))
+                if (!$util.isString(message.uid))
+                    return "uid: string expected";
+            if (message.username != null && message.hasOwnProperty("username"))
+                if (!$util.isString(message.username))
+                    return "username: string expected";
+            if (message.nickname != null && message.hasOwnProperty("nickname"))
+                if (!$util.isString(message.nickname))
+                    return "nickname: string expected";
+            if (message.role != null && message.hasOwnProperty("role"))
+                if (!$util.isString(message.role))
+                    return "role: string expected";
+            if (message.joinTime != null && message.hasOwnProperty("joinTime"))
+                if (!$util.isInteger(message.joinTime) && !(message.joinTime && $util.isInteger(message.joinTime.low) && $util.isInteger(message.joinTime.high)))
+                    return "joinTime: integer|Long expected";
+            return null;
+        };
+
+        /**
+         * Creates a GroupMemberInfoResp message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof protocol.GroupMemberInfoResp
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {protocol.GroupMemberInfoResp} GroupMemberInfoResp
+         */
+        GroupMemberInfoResp.fromObject = function fromObject(object) {
+            if (object instanceof $root.protocol.GroupMemberInfoResp)
+                return object;
+            var message = new $root.protocol.GroupMemberInfoResp();
+            if (object.code != null)
+                message.code = object.code | 0;
+            if (object.msg != null)
+                message.msg = String(object.msg);
+            if (object.uid != null)
+                message.uid = String(object.uid);
+            if (object.username != null)
+                message.username = String(object.username);
+            if (object.nickname != null)
+                message.nickname = String(object.nickname);
+            if (object.role != null)
+                message.role = String(object.role);
+            if (object.joinTime != null)
+                if ($util.Long)
+                    (message.joinTime = $util.Long.fromValue(object.joinTime)).unsigned = false;
+                else if (typeof object.joinTime === "string")
+                    message.joinTime = parseInt(object.joinTime, 10);
+                else if (typeof object.joinTime === "number")
+                    message.joinTime = object.joinTime;
+                else if (typeof object.joinTime === "object")
+                    message.joinTime = new $util.LongBits(object.joinTime.low >>> 0, object.joinTime.high >>> 0).toNumber();
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a GroupMemberInfoResp message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof protocol.GroupMemberInfoResp
+         * @static
+         * @param {protocol.GroupMemberInfoResp} message GroupMemberInfoResp
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        GroupMemberInfoResp.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                object.code = 0;
+                object.msg = "";
+                object.uid = "";
+                object.username = "";
+                object.nickname = "";
+                object.role = "";
+                if ($util.Long) {
+                    var long = new $util.Long(0, 0, false);
+                    object.joinTime = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                } else
+                    object.joinTime = options.longs === String ? "0" : 0;
+            }
+            if (message.code != null && message.hasOwnProperty("code"))
+                object.code = message.code;
+            if (message.msg != null && message.hasOwnProperty("msg"))
+                object.msg = message.msg;
+            if (message.uid != null && message.hasOwnProperty("uid"))
+                object.uid = message.uid;
+            if (message.username != null && message.hasOwnProperty("username"))
+                object.username = message.username;
+            if (message.nickname != null && message.hasOwnProperty("nickname"))
+                object.nickname = message.nickname;
+            if (message.role != null && message.hasOwnProperty("role"))
+                object.role = message.role;
+            if (message.joinTime != null && message.hasOwnProperty("joinTime"))
+                if (typeof message.joinTime === "number")
+                    object.joinTime = options.longs === String ? String(message.joinTime) : message.joinTime;
+                else
+                    object.joinTime = options.longs === String ? $util.Long.prototype.toString.call(message.joinTime) : options.longs === Number ? new $util.LongBits(message.joinTime.low >>> 0, message.joinTime.high >>> 0).toNumber() : message.joinTime;
+            return object;
+        };
+
+        /**
+         * Converts this GroupMemberInfoResp to JSON.
+         * @function toJSON
+         * @memberof protocol.GroupMemberInfoResp
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        GroupMemberInfoResp.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for GroupMemberInfoResp
+         * @function getTypeUrl
+         * @memberof protocol.GroupMemberInfoResp
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        GroupMemberInfoResp.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/protocol.GroupMemberInfoResp";
+        };
+
+        return GroupMemberInfoResp;
     })();
 
     protocol.InviteToGroupReq = (function() {
@@ -8138,487 +9596,6 @@ $root.protocol = (function() {
         return InviteToGroupResp;
     })();
 
-    protocol.KickFromGroupReq = (function() {
-
-        /**
-         * Properties of a KickFromGroupReq.
-         * @memberof protocol
-         * @interface IKickFromGroupReq
-         * @property {string|null} [groupId] KickFromGroupReq groupId
-         * @property {string|null} [operatorUid] KickFromGroupReq operatorUid
-         * @property {string|null} [targetUid] KickFromGroupReq targetUid
-         */
-
-        /**
-         * Constructs a new KickFromGroupReq.
-         * @memberof protocol
-         * @classdesc Represents a KickFromGroupReq.
-         * @implements IKickFromGroupReq
-         * @constructor
-         * @param {protocol.IKickFromGroupReq=} [properties] Properties to set
-         */
-        function KickFromGroupReq(properties) {
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * KickFromGroupReq groupId.
-         * @member {string} groupId
-         * @memberof protocol.KickFromGroupReq
-         * @instance
-         */
-        KickFromGroupReq.prototype.groupId = "";
-
-        /**
-         * KickFromGroupReq operatorUid.
-         * @member {string} operatorUid
-         * @memberof protocol.KickFromGroupReq
-         * @instance
-         */
-        KickFromGroupReq.prototype.operatorUid = "";
-
-        /**
-         * KickFromGroupReq targetUid.
-         * @member {string} targetUid
-         * @memberof protocol.KickFromGroupReq
-         * @instance
-         */
-        KickFromGroupReq.prototype.targetUid = "";
-
-        /**
-         * Creates a new KickFromGroupReq instance using the specified properties.
-         * @function create
-         * @memberof protocol.KickFromGroupReq
-         * @static
-         * @param {protocol.IKickFromGroupReq=} [properties] Properties to set
-         * @returns {protocol.KickFromGroupReq} KickFromGroupReq instance
-         */
-        KickFromGroupReq.create = function create(properties) {
-            return new KickFromGroupReq(properties);
-        };
-
-        /**
-         * Encodes the specified KickFromGroupReq message. Does not implicitly {@link protocol.KickFromGroupReq.verify|verify} messages.
-         * @function encode
-         * @memberof protocol.KickFromGroupReq
-         * @static
-         * @param {protocol.IKickFromGroupReq} message KickFromGroupReq message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        KickFromGroupReq.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.groupId != null && Object.hasOwnProperty.call(message, "groupId"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.groupId);
-            if (message.operatorUid != null && Object.hasOwnProperty.call(message, "operatorUid"))
-                writer.uint32(/* id 2, wireType 2 =*/18).string(message.operatorUid);
-            if (message.targetUid != null && Object.hasOwnProperty.call(message, "targetUid"))
-                writer.uint32(/* id 3, wireType 2 =*/26).string(message.targetUid);
-            return writer;
-        };
-
-        /**
-         * Encodes the specified KickFromGroupReq message, length delimited. Does not implicitly {@link protocol.KickFromGroupReq.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof protocol.KickFromGroupReq
-         * @static
-         * @param {protocol.IKickFromGroupReq} message KickFromGroupReq message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        KickFromGroupReq.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a KickFromGroupReq message from the specified reader or buffer.
-         * @function decode
-         * @memberof protocol.KickFromGroupReq
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {protocol.KickFromGroupReq} KickFromGroupReq
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        KickFromGroupReq.decode = function decode(reader, length, error) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.KickFromGroupReq();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                if (tag === error)
-                    break;
-                switch (tag >>> 3) {
-                case 1: {
-                        message.groupId = reader.string();
-                        break;
-                    }
-                case 2: {
-                        message.operatorUid = reader.string();
-                        break;
-                    }
-                case 3: {
-                        message.targetUid = reader.string();
-                        break;
-                    }
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a KickFromGroupReq message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof protocol.KickFromGroupReq
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {protocol.KickFromGroupReq} KickFromGroupReq
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        KickFromGroupReq.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a KickFromGroupReq message.
-         * @function verify
-         * @memberof protocol.KickFromGroupReq
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        KickFromGroupReq.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.groupId != null && message.hasOwnProperty("groupId"))
-                if (!$util.isString(message.groupId))
-                    return "groupId: string expected";
-            if (message.operatorUid != null && message.hasOwnProperty("operatorUid"))
-                if (!$util.isString(message.operatorUid))
-                    return "operatorUid: string expected";
-            if (message.targetUid != null && message.hasOwnProperty("targetUid"))
-                if (!$util.isString(message.targetUid))
-                    return "targetUid: string expected";
-            return null;
-        };
-
-        /**
-         * Creates a KickFromGroupReq message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof protocol.KickFromGroupReq
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {protocol.KickFromGroupReq} KickFromGroupReq
-         */
-        KickFromGroupReq.fromObject = function fromObject(object) {
-            if (object instanceof $root.protocol.KickFromGroupReq)
-                return object;
-            var message = new $root.protocol.KickFromGroupReq();
-            if (object.groupId != null)
-                message.groupId = String(object.groupId);
-            if (object.operatorUid != null)
-                message.operatorUid = String(object.operatorUid);
-            if (object.targetUid != null)
-                message.targetUid = String(object.targetUid);
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a KickFromGroupReq message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof protocol.KickFromGroupReq
-         * @static
-         * @param {protocol.KickFromGroupReq} message KickFromGroupReq
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        KickFromGroupReq.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            var object = {};
-            if (options.defaults) {
-                object.groupId = "";
-                object.operatorUid = "";
-                object.targetUid = "";
-            }
-            if (message.groupId != null && message.hasOwnProperty("groupId"))
-                object.groupId = message.groupId;
-            if (message.operatorUid != null && message.hasOwnProperty("operatorUid"))
-                object.operatorUid = message.operatorUid;
-            if (message.targetUid != null && message.hasOwnProperty("targetUid"))
-                object.targetUid = message.targetUid;
-            return object;
-        };
-
-        /**
-         * Converts this KickFromGroupReq to JSON.
-         * @function toJSON
-         * @memberof protocol.KickFromGroupReq
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        KickFromGroupReq.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        /**
-         * Gets the default type url for KickFromGroupReq
-         * @function getTypeUrl
-         * @memberof protocol.KickFromGroupReq
-         * @static
-         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns {string} The default type url
-         */
-        KickFromGroupReq.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-            if (typeUrlPrefix === undefined) {
-                typeUrlPrefix = "type.googleapis.com";
-            }
-            return typeUrlPrefix + "/protocol.KickFromGroupReq";
-        };
-
-        return KickFromGroupReq;
-    })();
-
-    protocol.KickFromGroupResp = (function() {
-
-        /**
-         * Properties of a KickFromGroupResp.
-         * @memberof protocol
-         * @interface IKickFromGroupResp
-         * @property {number|null} [code] KickFromGroupResp code
-         * @property {string|null} [msg] KickFromGroupResp msg
-         */
-
-        /**
-         * Constructs a new KickFromGroupResp.
-         * @memberof protocol
-         * @classdesc Represents a KickFromGroupResp.
-         * @implements IKickFromGroupResp
-         * @constructor
-         * @param {protocol.IKickFromGroupResp=} [properties] Properties to set
-         */
-        function KickFromGroupResp(properties) {
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * KickFromGroupResp code.
-         * @member {number} code
-         * @memberof protocol.KickFromGroupResp
-         * @instance
-         */
-        KickFromGroupResp.prototype.code = 0;
-
-        /**
-         * KickFromGroupResp msg.
-         * @member {string} msg
-         * @memberof protocol.KickFromGroupResp
-         * @instance
-         */
-        KickFromGroupResp.prototype.msg = "";
-
-        /**
-         * Creates a new KickFromGroupResp instance using the specified properties.
-         * @function create
-         * @memberof protocol.KickFromGroupResp
-         * @static
-         * @param {protocol.IKickFromGroupResp=} [properties] Properties to set
-         * @returns {protocol.KickFromGroupResp} KickFromGroupResp instance
-         */
-        KickFromGroupResp.create = function create(properties) {
-            return new KickFromGroupResp(properties);
-        };
-
-        /**
-         * Encodes the specified KickFromGroupResp message. Does not implicitly {@link protocol.KickFromGroupResp.verify|verify} messages.
-         * @function encode
-         * @memberof protocol.KickFromGroupResp
-         * @static
-         * @param {protocol.IKickFromGroupResp} message KickFromGroupResp message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        KickFromGroupResp.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.code != null && Object.hasOwnProperty.call(message, "code"))
-                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.code);
-            if (message.msg != null && Object.hasOwnProperty.call(message, "msg"))
-                writer.uint32(/* id 2, wireType 2 =*/18).string(message.msg);
-            return writer;
-        };
-
-        /**
-         * Encodes the specified KickFromGroupResp message, length delimited. Does not implicitly {@link protocol.KickFromGroupResp.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof protocol.KickFromGroupResp
-         * @static
-         * @param {protocol.IKickFromGroupResp} message KickFromGroupResp message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        KickFromGroupResp.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a KickFromGroupResp message from the specified reader or buffer.
-         * @function decode
-         * @memberof protocol.KickFromGroupResp
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {protocol.KickFromGroupResp} KickFromGroupResp
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        KickFromGroupResp.decode = function decode(reader, length, error) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.KickFromGroupResp();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                if (tag === error)
-                    break;
-                switch (tag >>> 3) {
-                case 1: {
-                        message.code = reader.int32();
-                        break;
-                    }
-                case 2: {
-                        message.msg = reader.string();
-                        break;
-                    }
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a KickFromGroupResp message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof protocol.KickFromGroupResp
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {protocol.KickFromGroupResp} KickFromGroupResp
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        KickFromGroupResp.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a KickFromGroupResp message.
-         * @function verify
-         * @memberof protocol.KickFromGroupResp
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        KickFromGroupResp.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.code != null && message.hasOwnProperty("code"))
-                if (!$util.isInteger(message.code))
-                    return "code: integer expected";
-            if (message.msg != null && message.hasOwnProperty("msg"))
-                if (!$util.isString(message.msg))
-                    return "msg: string expected";
-            return null;
-        };
-
-        /**
-         * Creates a KickFromGroupResp message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof protocol.KickFromGroupResp
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {protocol.KickFromGroupResp} KickFromGroupResp
-         */
-        KickFromGroupResp.fromObject = function fromObject(object) {
-            if (object instanceof $root.protocol.KickFromGroupResp)
-                return object;
-            var message = new $root.protocol.KickFromGroupResp();
-            if (object.code != null)
-                message.code = object.code | 0;
-            if (object.msg != null)
-                message.msg = String(object.msg);
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a KickFromGroupResp message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof protocol.KickFromGroupResp
-         * @static
-         * @param {protocol.KickFromGroupResp} message KickFromGroupResp
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        KickFromGroupResp.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            var object = {};
-            if (options.defaults) {
-                object.code = 0;
-                object.msg = "";
-            }
-            if (message.code != null && message.hasOwnProperty("code"))
-                object.code = message.code;
-            if (message.msg != null && message.hasOwnProperty("msg"))
-                object.msg = message.msg;
-            return object;
-        };
-
-        /**
-         * Converts this KickFromGroupResp to JSON.
-         * @function toJSON
-         * @memberof protocol.KickFromGroupResp
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        KickFromGroupResp.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        /**
-         * Gets the default type url for KickFromGroupResp
-         * @function getTypeUrl
-         * @memberof protocol.KickFromGroupResp
-         * @static
-         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns {string} The default type url
-         */
-        KickFromGroupResp.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-            if (typeUrlPrefix === undefined) {
-                typeUrlPrefix = "type.googleapis.com";
-            }
-            return typeUrlPrefix + "/protocol.KickFromGroupResp";
-        };
-
-        return KickFromGroupResp;
-    })();
-
     protocol.SetGroupNicknameReq = (function() {
 
         /**
@@ -9098,487 +10075,6 @@ $root.protocol = (function() {
         };
 
         return SetGroupNicknameResp;
-    })();
-
-    protocol.UpdateGroupNameReq = (function() {
-
-        /**
-         * Properties of an UpdateGroupNameReq.
-         * @memberof protocol
-         * @interface IUpdateGroupNameReq
-         * @property {string|null} [groupId] UpdateGroupNameReq groupId
-         * @property {string|null} [operatorUid] UpdateGroupNameReq operatorUid
-         * @property {string|null} [newName] UpdateGroupNameReq newName
-         */
-
-        /**
-         * Constructs a new UpdateGroupNameReq.
-         * @memberof protocol
-         * @classdesc Represents an UpdateGroupNameReq.
-         * @implements IUpdateGroupNameReq
-         * @constructor
-         * @param {protocol.IUpdateGroupNameReq=} [properties] Properties to set
-         */
-        function UpdateGroupNameReq(properties) {
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * UpdateGroupNameReq groupId.
-         * @member {string} groupId
-         * @memberof protocol.UpdateGroupNameReq
-         * @instance
-         */
-        UpdateGroupNameReq.prototype.groupId = "";
-
-        /**
-         * UpdateGroupNameReq operatorUid.
-         * @member {string} operatorUid
-         * @memberof protocol.UpdateGroupNameReq
-         * @instance
-         */
-        UpdateGroupNameReq.prototype.operatorUid = "";
-
-        /**
-         * UpdateGroupNameReq newName.
-         * @member {string} newName
-         * @memberof protocol.UpdateGroupNameReq
-         * @instance
-         */
-        UpdateGroupNameReq.prototype.newName = "";
-
-        /**
-         * Creates a new UpdateGroupNameReq instance using the specified properties.
-         * @function create
-         * @memberof protocol.UpdateGroupNameReq
-         * @static
-         * @param {protocol.IUpdateGroupNameReq=} [properties] Properties to set
-         * @returns {protocol.UpdateGroupNameReq} UpdateGroupNameReq instance
-         */
-        UpdateGroupNameReq.create = function create(properties) {
-            return new UpdateGroupNameReq(properties);
-        };
-
-        /**
-         * Encodes the specified UpdateGroupNameReq message. Does not implicitly {@link protocol.UpdateGroupNameReq.verify|verify} messages.
-         * @function encode
-         * @memberof protocol.UpdateGroupNameReq
-         * @static
-         * @param {protocol.IUpdateGroupNameReq} message UpdateGroupNameReq message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        UpdateGroupNameReq.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.groupId != null && Object.hasOwnProperty.call(message, "groupId"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.groupId);
-            if (message.operatorUid != null && Object.hasOwnProperty.call(message, "operatorUid"))
-                writer.uint32(/* id 2, wireType 2 =*/18).string(message.operatorUid);
-            if (message.newName != null && Object.hasOwnProperty.call(message, "newName"))
-                writer.uint32(/* id 3, wireType 2 =*/26).string(message.newName);
-            return writer;
-        };
-
-        /**
-         * Encodes the specified UpdateGroupNameReq message, length delimited. Does not implicitly {@link protocol.UpdateGroupNameReq.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof protocol.UpdateGroupNameReq
-         * @static
-         * @param {protocol.IUpdateGroupNameReq} message UpdateGroupNameReq message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        UpdateGroupNameReq.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes an UpdateGroupNameReq message from the specified reader or buffer.
-         * @function decode
-         * @memberof protocol.UpdateGroupNameReq
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {protocol.UpdateGroupNameReq} UpdateGroupNameReq
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        UpdateGroupNameReq.decode = function decode(reader, length, error) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.UpdateGroupNameReq();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                if (tag === error)
-                    break;
-                switch (tag >>> 3) {
-                case 1: {
-                        message.groupId = reader.string();
-                        break;
-                    }
-                case 2: {
-                        message.operatorUid = reader.string();
-                        break;
-                    }
-                case 3: {
-                        message.newName = reader.string();
-                        break;
-                    }
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes an UpdateGroupNameReq message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof protocol.UpdateGroupNameReq
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {protocol.UpdateGroupNameReq} UpdateGroupNameReq
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        UpdateGroupNameReq.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies an UpdateGroupNameReq message.
-         * @function verify
-         * @memberof protocol.UpdateGroupNameReq
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        UpdateGroupNameReq.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.groupId != null && message.hasOwnProperty("groupId"))
-                if (!$util.isString(message.groupId))
-                    return "groupId: string expected";
-            if (message.operatorUid != null && message.hasOwnProperty("operatorUid"))
-                if (!$util.isString(message.operatorUid))
-                    return "operatorUid: string expected";
-            if (message.newName != null && message.hasOwnProperty("newName"))
-                if (!$util.isString(message.newName))
-                    return "newName: string expected";
-            return null;
-        };
-
-        /**
-         * Creates an UpdateGroupNameReq message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof protocol.UpdateGroupNameReq
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {protocol.UpdateGroupNameReq} UpdateGroupNameReq
-         */
-        UpdateGroupNameReq.fromObject = function fromObject(object) {
-            if (object instanceof $root.protocol.UpdateGroupNameReq)
-                return object;
-            var message = new $root.protocol.UpdateGroupNameReq();
-            if (object.groupId != null)
-                message.groupId = String(object.groupId);
-            if (object.operatorUid != null)
-                message.operatorUid = String(object.operatorUid);
-            if (object.newName != null)
-                message.newName = String(object.newName);
-            return message;
-        };
-
-        /**
-         * Creates a plain object from an UpdateGroupNameReq message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof protocol.UpdateGroupNameReq
-         * @static
-         * @param {protocol.UpdateGroupNameReq} message UpdateGroupNameReq
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        UpdateGroupNameReq.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            var object = {};
-            if (options.defaults) {
-                object.groupId = "";
-                object.operatorUid = "";
-                object.newName = "";
-            }
-            if (message.groupId != null && message.hasOwnProperty("groupId"))
-                object.groupId = message.groupId;
-            if (message.operatorUid != null && message.hasOwnProperty("operatorUid"))
-                object.operatorUid = message.operatorUid;
-            if (message.newName != null && message.hasOwnProperty("newName"))
-                object.newName = message.newName;
-            return object;
-        };
-
-        /**
-         * Converts this UpdateGroupNameReq to JSON.
-         * @function toJSON
-         * @memberof protocol.UpdateGroupNameReq
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        UpdateGroupNameReq.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        /**
-         * Gets the default type url for UpdateGroupNameReq
-         * @function getTypeUrl
-         * @memberof protocol.UpdateGroupNameReq
-         * @static
-         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns {string} The default type url
-         */
-        UpdateGroupNameReq.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-            if (typeUrlPrefix === undefined) {
-                typeUrlPrefix = "type.googleapis.com";
-            }
-            return typeUrlPrefix + "/protocol.UpdateGroupNameReq";
-        };
-
-        return UpdateGroupNameReq;
-    })();
-
-    protocol.UpdateGroupNameResp = (function() {
-
-        /**
-         * Properties of an UpdateGroupNameResp.
-         * @memberof protocol
-         * @interface IUpdateGroupNameResp
-         * @property {number|null} [code] UpdateGroupNameResp code
-         * @property {string|null} [msg] UpdateGroupNameResp msg
-         */
-
-        /**
-         * Constructs a new UpdateGroupNameResp.
-         * @memberof protocol
-         * @classdesc Represents an UpdateGroupNameResp.
-         * @implements IUpdateGroupNameResp
-         * @constructor
-         * @param {protocol.IUpdateGroupNameResp=} [properties] Properties to set
-         */
-        function UpdateGroupNameResp(properties) {
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * UpdateGroupNameResp code.
-         * @member {number} code
-         * @memberof protocol.UpdateGroupNameResp
-         * @instance
-         */
-        UpdateGroupNameResp.prototype.code = 0;
-
-        /**
-         * UpdateGroupNameResp msg.
-         * @member {string} msg
-         * @memberof protocol.UpdateGroupNameResp
-         * @instance
-         */
-        UpdateGroupNameResp.prototype.msg = "";
-
-        /**
-         * Creates a new UpdateGroupNameResp instance using the specified properties.
-         * @function create
-         * @memberof protocol.UpdateGroupNameResp
-         * @static
-         * @param {protocol.IUpdateGroupNameResp=} [properties] Properties to set
-         * @returns {protocol.UpdateGroupNameResp} UpdateGroupNameResp instance
-         */
-        UpdateGroupNameResp.create = function create(properties) {
-            return new UpdateGroupNameResp(properties);
-        };
-
-        /**
-         * Encodes the specified UpdateGroupNameResp message. Does not implicitly {@link protocol.UpdateGroupNameResp.verify|verify} messages.
-         * @function encode
-         * @memberof protocol.UpdateGroupNameResp
-         * @static
-         * @param {protocol.IUpdateGroupNameResp} message UpdateGroupNameResp message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        UpdateGroupNameResp.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.code != null && Object.hasOwnProperty.call(message, "code"))
-                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.code);
-            if (message.msg != null && Object.hasOwnProperty.call(message, "msg"))
-                writer.uint32(/* id 2, wireType 2 =*/18).string(message.msg);
-            return writer;
-        };
-
-        /**
-         * Encodes the specified UpdateGroupNameResp message, length delimited. Does not implicitly {@link protocol.UpdateGroupNameResp.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof protocol.UpdateGroupNameResp
-         * @static
-         * @param {protocol.IUpdateGroupNameResp} message UpdateGroupNameResp message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        UpdateGroupNameResp.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes an UpdateGroupNameResp message from the specified reader or buffer.
-         * @function decode
-         * @memberof protocol.UpdateGroupNameResp
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {protocol.UpdateGroupNameResp} UpdateGroupNameResp
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        UpdateGroupNameResp.decode = function decode(reader, length, error) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.UpdateGroupNameResp();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                if (tag === error)
-                    break;
-                switch (tag >>> 3) {
-                case 1: {
-                        message.code = reader.int32();
-                        break;
-                    }
-                case 2: {
-                        message.msg = reader.string();
-                        break;
-                    }
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes an UpdateGroupNameResp message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof protocol.UpdateGroupNameResp
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {protocol.UpdateGroupNameResp} UpdateGroupNameResp
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        UpdateGroupNameResp.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies an UpdateGroupNameResp message.
-         * @function verify
-         * @memberof protocol.UpdateGroupNameResp
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        UpdateGroupNameResp.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.code != null && message.hasOwnProperty("code"))
-                if (!$util.isInteger(message.code))
-                    return "code: integer expected";
-            if (message.msg != null && message.hasOwnProperty("msg"))
-                if (!$util.isString(message.msg))
-                    return "msg: string expected";
-            return null;
-        };
-
-        /**
-         * Creates an UpdateGroupNameResp message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof protocol.UpdateGroupNameResp
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {protocol.UpdateGroupNameResp} UpdateGroupNameResp
-         */
-        UpdateGroupNameResp.fromObject = function fromObject(object) {
-            if (object instanceof $root.protocol.UpdateGroupNameResp)
-                return object;
-            var message = new $root.protocol.UpdateGroupNameResp();
-            if (object.code != null)
-                message.code = object.code | 0;
-            if (object.msg != null)
-                message.msg = String(object.msg);
-            return message;
-        };
-
-        /**
-         * Creates a plain object from an UpdateGroupNameResp message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof protocol.UpdateGroupNameResp
-         * @static
-         * @param {protocol.UpdateGroupNameResp} message UpdateGroupNameResp
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        UpdateGroupNameResp.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            var object = {};
-            if (options.defaults) {
-                object.code = 0;
-                object.msg = "";
-            }
-            if (message.code != null && message.hasOwnProperty("code"))
-                object.code = message.code;
-            if (message.msg != null && message.hasOwnProperty("msg"))
-                object.msg = message.msg;
-            return object;
-        };
-
-        /**
-         * Converts this UpdateGroupNameResp to JSON.
-         * @function toJSON
-         * @memberof protocol.UpdateGroupNameResp
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        UpdateGroupNameResp.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        /**
-         * Gets the default type url for UpdateGroupNameResp
-         * @function getTypeUrl
-         * @memberof protocol.UpdateGroupNameResp
-         * @static
-         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns {string} The default type url
-         */
-        UpdateGroupNameResp.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-            if (typeUrlPrefix === undefined) {
-                typeUrlPrefix = "type.googleapis.com";
-            }
-            return typeUrlPrefix + "/protocol.UpdateGroupNameResp";
-        };
-
-        return UpdateGroupNameResp;
     })();
 
     protocol.SetGroupRemarkReq = (function() {
@@ -11047,6 +11543,968 @@ $root.protocol = (function() {
         return SetGroupMuteResp;
     })();
 
+    protocol.KickFromGroupReq = (function() {
+
+        /**
+         * Properties of a KickFromGroupReq.
+         * @memberof protocol
+         * @interface IKickFromGroupReq
+         * @property {string|null} [groupId] KickFromGroupReq groupId
+         * @property {string|null} [operatorUid] KickFromGroupReq operatorUid
+         * @property {string|null} [targetUid] KickFromGroupReq targetUid
+         */
+
+        /**
+         * Constructs a new KickFromGroupReq.
+         * @memberof protocol
+         * @classdesc Represents a KickFromGroupReq.
+         * @implements IKickFromGroupReq
+         * @constructor
+         * @param {protocol.IKickFromGroupReq=} [properties] Properties to set
+         */
+        function KickFromGroupReq(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * KickFromGroupReq groupId.
+         * @member {string} groupId
+         * @memberof protocol.KickFromGroupReq
+         * @instance
+         */
+        KickFromGroupReq.prototype.groupId = "";
+
+        /**
+         * KickFromGroupReq operatorUid.
+         * @member {string} operatorUid
+         * @memberof protocol.KickFromGroupReq
+         * @instance
+         */
+        KickFromGroupReq.prototype.operatorUid = "";
+
+        /**
+         * KickFromGroupReq targetUid.
+         * @member {string} targetUid
+         * @memberof protocol.KickFromGroupReq
+         * @instance
+         */
+        KickFromGroupReq.prototype.targetUid = "";
+
+        /**
+         * Creates a new KickFromGroupReq instance using the specified properties.
+         * @function create
+         * @memberof protocol.KickFromGroupReq
+         * @static
+         * @param {protocol.IKickFromGroupReq=} [properties] Properties to set
+         * @returns {protocol.KickFromGroupReq} KickFromGroupReq instance
+         */
+        KickFromGroupReq.create = function create(properties) {
+            return new KickFromGroupReq(properties);
+        };
+
+        /**
+         * Encodes the specified KickFromGroupReq message. Does not implicitly {@link protocol.KickFromGroupReq.verify|verify} messages.
+         * @function encode
+         * @memberof protocol.KickFromGroupReq
+         * @static
+         * @param {protocol.IKickFromGroupReq} message KickFromGroupReq message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        KickFromGroupReq.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.groupId != null && Object.hasOwnProperty.call(message, "groupId"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.groupId);
+            if (message.operatorUid != null && Object.hasOwnProperty.call(message, "operatorUid"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.operatorUid);
+            if (message.targetUid != null && Object.hasOwnProperty.call(message, "targetUid"))
+                writer.uint32(/* id 3, wireType 2 =*/26).string(message.targetUid);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified KickFromGroupReq message, length delimited. Does not implicitly {@link protocol.KickFromGroupReq.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof protocol.KickFromGroupReq
+         * @static
+         * @param {protocol.IKickFromGroupReq} message KickFromGroupReq message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        KickFromGroupReq.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a KickFromGroupReq message from the specified reader or buffer.
+         * @function decode
+         * @memberof protocol.KickFromGroupReq
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {protocol.KickFromGroupReq} KickFromGroupReq
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        KickFromGroupReq.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.KickFromGroupReq();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.groupId = reader.string();
+                        break;
+                    }
+                case 2: {
+                        message.operatorUid = reader.string();
+                        break;
+                    }
+                case 3: {
+                        message.targetUid = reader.string();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a KickFromGroupReq message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof protocol.KickFromGroupReq
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {protocol.KickFromGroupReq} KickFromGroupReq
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        KickFromGroupReq.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a KickFromGroupReq message.
+         * @function verify
+         * @memberof protocol.KickFromGroupReq
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        KickFromGroupReq.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.groupId != null && message.hasOwnProperty("groupId"))
+                if (!$util.isString(message.groupId))
+                    return "groupId: string expected";
+            if (message.operatorUid != null && message.hasOwnProperty("operatorUid"))
+                if (!$util.isString(message.operatorUid))
+                    return "operatorUid: string expected";
+            if (message.targetUid != null && message.hasOwnProperty("targetUid"))
+                if (!$util.isString(message.targetUid))
+                    return "targetUid: string expected";
+            return null;
+        };
+
+        /**
+         * Creates a KickFromGroupReq message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof protocol.KickFromGroupReq
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {protocol.KickFromGroupReq} KickFromGroupReq
+         */
+        KickFromGroupReq.fromObject = function fromObject(object) {
+            if (object instanceof $root.protocol.KickFromGroupReq)
+                return object;
+            var message = new $root.protocol.KickFromGroupReq();
+            if (object.groupId != null)
+                message.groupId = String(object.groupId);
+            if (object.operatorUid != null)
+                message.operatorUid = String(object.operatorUid);
+            if (object.targetUid != null)
+                message.targetUid = String(object.targetUid);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a KickFromGroupReq message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof protocol.KickFromGroupReq
+         * @static
+         * @param {protocol.KickFromGroupReq} message KickFromGroupReq
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        KickFromGroupReq.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                object.groupId = "";
+                object.operatorUid = "";
+                object.targetUid = "";
+            }
+            if (message.groupId != null && message.hasOwnProperty("groupId"))
+                object.groupId = message.groupId;
+            if (message.operatorUid != null && message.hasOwnProperty("operatorUid"))
+                object.operatorUid = message.operatorUid;
+            if (message.targetUid != null && message.hasOwnProperty("targetUid"))
+                object.targetUid = message.targetUid;
+            return object;
+        };
+
+        /**
+         * Converts this KickFromGroupReq to JSON.
+         * @function toJSON
+         * @memberof protocol.KickFromGroupReq
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        KickFromGroupReq.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for KickFromGroupReq
+         * @function getTypeUrl
+         * @memberof protocol.KickFromGroupReq
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        KickFromGroupReq.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/protocol.KickFromGroupReq";
+        };
+
+        return KickFromGroupReq;
+    })();
+
+    protocol.KickFromGroupResp = (function() {
+
+        /**
+         * Properties of a KickFromGroupResp.
+         * @memberof protocol
+         * @interface IKickFromGroupResp
+         * @property {number|null} [code] KickFromGroupResp code
+         * @property {string|null} [msg] KickFromGroupResp msg
+         */
+
+        /**
+         * Constructs a new KickFromGroupResp.
+         * @memberof protocol
+         * @classdesc Represents a KickFromGroupResp.
+         * @implements IKickFromGroupResp
+         * @constructor
+         * @param {protocol.IKickFromGroupResp=} [properties] Properties to set
+         */
+        function KickFromGroupResp(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * KickFromGroupResp code.
+         * @member {number} code
+         * @memberof protocol.KickFromGroupResp
+         * @instance
+         */
+        KickFromGroupResp.prototype.code = 0;
+
+        /**
+         * KickFromGroupResp msg.
+         * @member {string} msg
+         * @memberof protocol.KickFromGroupResp
+         * @instance
+         */
+        KickFromGroupResp.prototype.msg = "";
+
+        /**
+         * Creates a new KickFromGroupResp instance using the specified properties.
+         * @function create
+         * @memberof protocol.KickFromGroupResp
+         * @static
+         * @param {protocol.IKickFromGroupResp=} [properties] Properties to set
+         * @returns {protocol.KickFromGroupResp} KickFromGroupResp instance
+         */
+        KickFromGroupResp.create = function create(properties) {
+            return new KickFromGroupResp(properties);
+        };
+
+        /**
+         * Encodes the specified KickFromGroupResp message. Does not implicitly {@link protocol.KickFromGroupResp.verify|verify} messages.
+         * @function encode
+         * @memberof protocol.KickFromGroupResp
+         * @static
+         * @param {protocol.IKickFromGroupResp} message KickFromGroupResp message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        KickFromGroupResp.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.code != null && Object.hasOwnProperty.call(message, "code"))
+                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.code);
+            if (message.msg != null && Object.hasOwnProperty.call(message, "msg"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.msg);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified KickFromGroupResp message, length delimited. Does not implicitly {@link protocol.KickFromGroupResp.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof protocol.KickFromGroupResp
+         * @static
+         * @param {protocol.IKickFromGroupResp} message KickFromGroupResp message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        KickFromGroupResp.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a KickFromGroupResp message from the specified reader or buffer.
+         * @function decode
+         * @memberof protocol.KickFromGroupResp
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {protocol.KickFromGroupResp} KickFromGroupResp
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        KickFromGroupResp.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.KickFromGroupResp();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.code = reader.int32();
+                        break;
+                    }
+                case 2: {
+                        message.msg = reader.string();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a KickFromGroupResp message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof protocol.KickFromGroupResp
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {protocol.KickFromGroupResp} KickFromGroupResp
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        KickFromGroupResp.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a KickFromGroupResp message.
+         * @function verify
+         * @memberof protocol.KickFromGroupResp
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        KickFromGroupResp.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.code != null && message.hasOwnProperty("code"))
+                if (!$util.isInteger(message.code))
+                    return "code: integer expected";
+            if (message.msg != null && message.hasOwnProperty("msg"))
+                if (!$util.isString(message.msg))
+                    return "msg: string expected";
+            return null;
+        };
+
+        /**
+         * Creates a KickFromGroupResp message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof protocol.KickFromGroupResp
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {protocol.KickFromGroupResp} KickFromGroupResp
+         */
+        KickFromGroupResp.fromObject = function fromObject(object) {
+            if (object instanceof $root.protocol.KickFromGroupResp)
+                return object;
+            var message = new $root.protocol.KickFromGroupResp();
+            if (object.code != null)
+                message.code = object.code | 0;
+            if (object.msg != null)
+                message.msg = String(object.msg);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a KickFromGroupResp message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof protocol.KickFromGroupResp
+         * @static
+         * @param {protocol.KickFromGroupResp} message KickFromGroupResp
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        KickFromGroupResp.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                object.code = 0;
+                object.msg = "";
+            }
+            if (message.code != null && message.hasOwnProperty("code"))
+                object.code = message.code;
+            if (message.msg != null && message.hasOwnProperty("msg"))
+                object.msg = message.msg;
+            return object;
+        };
+
+        /**
+         * Converts this KickFromGroupResp to JSON.
+         * @function toJSON
+         * @memberof protocol.KickFromGroupResp
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        KickFromGroupResp.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for KickFromGroupResp
+         * @function getTypeUrl
+         * @memberof protocol.KickFromGroupResp
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        KickFromGroupResp.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/protocol.KickFromGroupResp";
+        };
+
+        return KickFromGroupResp;
+    })();
+
+    protocol.UpdateGroupNameReq = (function() {
+
+        /**
+         * Properties of an UpdateGroupNameReq.
+         * @memberof protocol
+         * @interface IUpdateGroupNameReq
+         * @property {string|null} [groupId] UpdateGroupNameReq groupId
+         * @property {string|null} [operatorUid] UpdateGroupNameReq operatorUid
+         * @property {string|null} [newName] UpdateGroupNameReq newName
+         */
+
+        /**
+         * Constructs a new UpdateGroupNameReq.
+         * @memberof protocol
+         * @classdesc Represents an UpdateGroupNameReq.
+         * @implements IUpdateGroupNameReq
+         * @constructor
+         * @param {protocol.IUpdateGroupNameReq=} [properties] Properties to set
+         */
+        function UpdateGroupNameReq(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * UpdateGroupNameReq groupId.
+         * @member {string} groupId
+         * @memberof protocol.UpdateGroupNameReq
+         * @instance
+         */
+        UpdateGroupNameReq.prototype.groupId = "";
+
+        /**
+         * UpdateGroupNameReq operatorUid.
+         * @member {string} operatorUid
+         * @memberof protocol.UpdateGroupNameReq
+         * @instance
+         */
+        UpdateGroupNameReq.prototype.operatorUid = "";
+
+        /**
+         * UpdateGroupNameReq newName.
+         * @member {string} newName
+         * @memberof protocol.UpdateGroupNameReq
+         * @instance
+         */
+        UpdateGroupNameReq.prototype.newName = "";
+
+        /**
+         * Creates a new UpdateGroupNameReq instance using the specified properties.
+         * @function create
+         * @memberof protocol.UpdateGroupNameReq
+         * @static
+         * @param {protocol.IUpdateGroupNameReq=} [properties] Properties to set
+         * @returns {protocol.UpdateGroupNameReq} UpdateGroupNameReq instance
+         */
+        UpdateGroupNameReq.create = function create(properties) {
+            return new UpdateGroupNameReq(properties);
+        };
+
+        /**
+         * Encodes the specified UpdateGroupNameReq message. Does not implicitly {@link protocol.UpdateGroupNameReq.verify|verify} messages.
+         * @function encode
+         * @memberof protocol.UpdateGroupNameReq
+         * @static
+         * @param {protocol.IUpdateGroupNameReq} message UpdateGroupNameReq message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        UpdateGroupNameReq.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.groupId != null && Object.hasOwnProperty.call(message, "groupId"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.groupId);
+            if (message.operatorUid != null && Object.hasOwnProperty.call(message, "operatorUid"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.operatorUid);
+            if (message.newName != null && Object.hasOwnProperty.call(message, "newName"))
+                writer.uint32(/* id 3, wireType 2 =*/26).string(message.newName);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified UpdateGroupNameReq message, length delimited. Does not implicitly {@link protocol.UpdateGroupNameReq.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof protocol.UpdateGroupNameReq
+         * @static
+         * @param {protocol.IUpdateGroupNameReq} message UpdateGroupNameReq message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        UpdateGroupNameReq.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes an UpdateGroupNameReq message from the specified reader or buffer.
+         * @function decode
+         * @memberof protocol.UpdateGroupNameReq
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {protocol.UpdateGroupNameReq} UpdateGroupNameReq
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        UpdateGroupNameReq.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.UpdateGroupNameReq();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.groupId = reader.string();
+                        break;
+                    }
+                case 2: {
+                        message.operatorUid = reader.string();
+                        break;
+                    }
+                case 3: {
+                        message.newName = reader.string();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes an UpdateGroupNameReq message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof protocol.UpdateGroupNameReq
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {protocol.UpdateGroupNameReq} UpdateGroupNameReq
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        UpdateGroupNameReq.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies an UpdateGroupNameReq message.
+         * @function verify
+         * @memberof protocol.UpdateGroupNameReq
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        UpdateGroupNameReq.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.groupId != null && message.hasOwnProperty("groupId"))
+                if (!$util.isString(message.groupId))
+                    return "groupId: string expected";
+            if (message.operatorUid != null && message.hasOwnProperty("operatorUid"))
+                if (!$util.isString(message.operatorUid))
+                    return "operatorUid: string expected";
+            if (message.newName != null && message.hasOwnProperty("newName"))
+                if (!$util.isString(message.newName))
+                    return "newName: string expected";
+            return null;
+        };
+
+        /**
+         * Creates an UpdateGroupNameReq message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof protocol.UpdateGroupNameReq
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {protocol.UpdateGroupNameReq} UpdateGroupNameReq
+         */
+        UpdateGroupNameReq.fromObject = function fromObject(object) {
+            if (object instanceof $root.protocol.UpdateGroupNameReq)
+                return object;
+            var message = new $root.protocol.UpdateGroupNameReq();
+            if (object.groupId != null)
+                message.groupId = String(object.groupId);
+            if (object.operatorUid != null)
+                message.operatorUid = String(object.operatorUid);
+            if (object.newName != null)
+                message.newName = String(object.newName);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from an UpdateGroupNameReq message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof protocol.UpdateGroupNameReq
+         * @static
+         * @param {protocol.UpdateGroupNameReq} message UpdateGroupNameReq
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        UpdateGroupNameReq.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                object.groupId = "";
+                object.operatorUid = "";
+                object.newName = "";
+            }
+            if (message.groupId != null && message.hasOwnProperty("groupId"))
+                object.groupId = message.groupId;
+            if (message.operatorUid != null && message.hasOwnProperty("operatorUid"))
+                object.operatorUid = message.operatorUid;
+            if (message.newName != null && message.hasOwnProperty("newName"))
+                object.newName = message.newName;
+            return object;
+        };
+
+        /**
+         * Converts this UpdateGroupNameReq to JSON.
+         * @function toJSON
+         * @memberof protocol.UpdateGroupNameReq
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        UpdateGroupNameReq.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for UpdateGroupNameReq
+         * @function getTypeUrl
+         * @memberof protocol.UpdateGroupNameReq
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        UpdateGroupNameReq.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/protocol.UpdateGroupNameReq";
+        };
+
+        return UpdateGroupNameReq;
+    })();
+
+    protocol.UpdateGroupNameResp = (function() {
+
+        /**
+         * Properties of an UpdateGroupNameResp.
+         * @memberof protocol
+         * @interface IUpdateGroupNameResp
+         * @property {number|null} [code] UpdateGroupNameResp code
+         * @property {string|null} [msg] UpdateGroupNameResp msg
+         */
+
+        /**
+         * Constructs a new UpdateGroupNameResp.
+         * @memberof protocol
+         * @classdesc Represents an UpdateGroupNameResp.
+         * @implements IUpdateGroupNameResp
+         * @constructor
+         * @param {protocol.IUpdateGroupNameResp=} [properties] Properties to set
+         */
+        function UpdateGroupNameResp(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * UpdateGroupNameResp code.
+         * @member {number} code
+         * @memberof protocol.UpdateGroupNameResp
+         * @instance
+         */
+        UpdateGroupNameResp.prototype.code = 0;
+
+        /**
+         * UpdateGroupNameResp msg.
+         * @member {string} msg
+         * @memberof protocol.UpdateGroupNameResp
+         * @instance
+         */
+        UpdateGroupNameResp.prototype.msg = "";
+
+        /**
+         * Creates a new UpdateGroupNameResp instance using the specified properties.
+         * @function create
+         * @memberof protocol.UpdateGroupNameResp
+         * @static
+         * @param {protocol.IUpdateGroupNameResp=} [properties] Properties to set
+         * @returns {protocol.UpdateGroupNameResp} UpdateGroupNameResp instance
+         */
+        UpdateGroupNameResp.create = function create(properties) {
+            return new UpdateGroupNameResp(properties);
+        };
+
+        /**
+         * Encodes the specified UpdateGroupNameResp message. Does not implicitly {@link protocol.UpdateGroupNameResp.verify|verify} messages.
+         * @function encode
+         * @memberof protocol.UpdateGroupNameResp
+         * @static
+         * @param {protocol.IUpdateGroupNameResp} message UpdateGroupNameResp message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        UpdateGroupNameResp.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.code != null && Object.hasOwnProperty.call(message, "code"))
+                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.code);
+            if (message.msg != null && Object.hasOwnProperty.call(message, "msg"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.msg);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified UpdateGroupNameResp message, length delimited. Does not implicitly {@link protocol.UpdateGroupNameResp.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof protocol.UpdateGroupNameResp
+         * @static
+         * @param {protocol.IUpdateGroupNameResp} message UpdateGroupNameResp message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        UpdateGroupNameResp.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes an UpdateGroupNameResp message from the specified reader or buffer.
+         * @function decode
+         * @memberof protocol.UpdateGroupNameResp
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {protocol.UpdateGroupNameResp} UpdateGroupNameResp
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        UpdateGroupNameResp.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.UpdateGroupNameResp();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.code = reader.int32();
+                        break;
+                    }
+                case 2: {
+                        message.msg = reader.string();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes an UpdateGroupNameResp message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof protocol.UpdateGroupNameResp
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {protocol.UpdateGroupNameResp} UpdateGroupNameResp
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        UpdateGroupNameResp.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies an UpdateGroupNameResp message.
+         * @function verify
+         * @memberof protocol.UpdateGroupNameResp
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        UpdateGroupNameResp.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.code != null && message.hasOwnProperty("code"))
+                if (!$util.isInteger(message.code))
+                    return "code: integer expected";
+            if (message.msg != null && message.hasOwnProperty("msg"))
+                if (!$util.isString(message.msg))
+                    return "msg: string expected";
+            return null;
+        };
+
+        /**
+         * Creates an UpdateGroupNameResp message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof protocol.UpdateGroupNameResp
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {protocol.UpdateGroupNameResp} UpdateGroupNameResp
+         */
+        UpdateGroupNameResp.fromObject = function fromObject(object) {
+            if (object instanceof $root.protocol.UpdateGroupNameResp)
+                return object;
+            var message = new $root.protocol.UpdateGroupNameResp();
+            if (object.code != null)
+                message.code = object.code | 0;
+            if (object.msg != null)
+                message.msg = String(object.msg);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from an UpdateGroupNameResp message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof protocol.UpdateGroupNameResp
+         * @static
+         * @param {protocol.UpdateGroupNameResp} message UpdateGroupNameResp
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        UpdateGroupNameResp.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                object.code = 0;
+                object.msg = "";
+            }
+            if (message.code != null && message.hasOwnProperty("code"))
+                object.code = message.code;
+            if (message.msg != null && message.hasOwnProperty("msg"))
+                object.msg = message.msg;
+            return object;
+        };
+
+        /**
+         * Converts this UpdateGroupNameResp to JSON.
+         * @function toJSON
+         * @memberof protocol.UpdateGroupNameResp
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        UpdateGroupNameResp.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for UpdateGroupNameResp
+         * @function getTypeUrl
+         * @memberof protocol.UpdateGroupNameResp
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        UpdateGroupNameResp.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/protocol.UpdateGroupNameResp";
+        };
+
+        return UpdateGroupNameResp;
+    })();
+
     protocol.SetGroupAdminReq = (function() {
 
         /**
@@ -12009,25 +13467,25 @@ $root.protocol = (function() {
         return DismissGroupResp;
     })();
 
-    protocol.GroupMemberRoleReq = (function() {
+    protocol.GroupRequestListReq = (function() {
 
         /**
-         * Properties of a GroupMemberRoleReq.
+         * Properties of a GroupRequestListReq.
          * @memberof protocol
-         * @interface IGroupMemberRoleReq
-         * @property {string|null} [groupId] GroupMemberRoleReq groupId
-         * @property {string|null} [uid] GroupMemberRoleReq uid
+         * @interface IGroupRequestListReq
+         * @property {string|null} [uid] GroupRequestListReq uid
+         * @property {string|null} [token] GroupRequestListReq token
          */
 
         /**
-         * Constructs a new GroupMemberRoleReq.
+         * Constructs a new GroupRequestListReq.
          * @memberof protocol
-         * @classdesc Represents a GroupMemberRoleReq.
-         * @implements IGroupMemberRoleReq
+         * @classdesc Represents a GroupRequestListReq.
+         * @implements IGroupRequestListReq
          * @constructor
-         * @param {protocol.IGroupMemberRoleReq=} [properties] Properties to set
+         * @param {protocol.IGroupRequestListReq=} [properties] Properties to set
          */
-        function GroupMemberRoleReq(properties) {
+        function GroupRequestListReq(properties) {
             if (properties)
                 for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -12035,1501 +13493,43 @@ $root.protocol = (function() {
         }
 
         /**
-         * GroupMemberRoleReq groupId.
-         * @member {string} groupId
-         * @memberof protocol.GroupMemberRoleReq
-         * @instance
-         */
-        GroupMemberRoleReq.prototype.groupId = "";
-
-        /**
-         * GroupMemberRoleReq uid.
+         * GroupRequestListReq uid.
          * @member {string} uid
-         * @memberof protocol.GroupMemberRoleReq
+         * @memberof protocol.GroupRequestListReq
          * @instance
          */
-        GroupMemberRoleReq.prototype.uid = "";
+        GroupRequestListReq.prototype.uid = "";
 
         /**
-         * Creates a new GroupMemberRoleReq instance using the specified properties.
-         * @function create
-         * @memberof protocol.GroupMemberRoleReq
-         * @static
-         * @param {protocol.IGroupMemberRoleReq=} [properties] Properties to set
-         * @returns {protocol.GroupMemberRoleReq} GroupMemberRoleReq instance
-         */
-        GroupMemberRoleReq.create = function create(properties) {
-            return new GroupMemberRoleReq(properties);
-        };
-
-        /**
-         * Encodes the specified GroupMemberRoleReq message. Does not implicitly {@link protocol.GroupMemberRoleReq.verify|verify} messages.
-         * @function encode
-         * @memberof protocol.GroupMemberRoleReq
-         * @static
-         * @param {protocol.IGroupMemberRoleReq} message GroupMemberRoleReq message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        GroupMemberRoleReq.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.groupId != null && Object.hasOwnProperty.call(message, "groupId"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.groupId);
-            if (message.uid != null && Object.hasOwnProperty.call(message, "uid"))
-                writer.uint32(/* id 2, wireType 2 =*/18).string(message.uid);
-            return writer;
-        };
-
-        /**
-         * Encodes the specified GroupMemberRoleReq message, length delimited. Does not implicitly {@link protocol.GroupMemberRoleReq.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof protocol.GroupMemberRoleReq
-         * @static
-         * @param {protocol.IGroupMemberRoleReq} message GroupMemberRoleReq message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        GroupMemberRoleReq.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a GroupMemberRoleReq message from the specified reader or buffer.
-         * @function decode
-         * @memberof protocol.GroupMemberRoleReq
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {protocol.GroupMemberRoleReq} GroupMemberRoleReq
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        GroupMemberRoleReq.decode = function decode(reader, length, error) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.GroupMemberRoleReq();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                if (tag === error)
-                    break;
-                switch (tag >>> 3) {
-                case 1: {
-                        message.groupId = reader.string();
-                        break;
-                    }
-                case 2: {
-                        message.uid = reader.string();
-                        break;
-                    }
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a GroupMemberRoleReq message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof protocol.GroupMemberRoleReq
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {protocol.GroupMemberRoleReq} GroupMemberRoleReq
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        GroupMemberRoleReq.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a GroupMemberRoleReq message.
-         * @function verify
-         * @memberof protocol.GroupMemberRoleReq
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        GroupMemberRoleReq.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.groupId != null && message.hasOwnProperty("groupId"))
-                if (!$util.isString(message.groupId))
-                    return "groupId: string expected";
-            if (message.uid != null && message.hasOwnProperty("uid"))
-                if (!$util.isString(message.uid))
-                    return "uid: string expected";
-            return null;
-        };
-
-        /**
-         * Creates a GroupMemberRoleReq message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof protocol.GroupMemberRoleReq
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {protocol.GroupMemberRoleReq} GroupMemberRoleReq
-         */
-        GroupMemberRoleReq.fromObject = function fromObject(object) {
-            if (object instanceof $root.protocol.GroupMemberRoleReq)
-                return object;
-            var message = new $root.protocol.GroupMemberRoleReq();
-            if (object.groupId != null)
-                message.groupId = String(object.groupId);
-            if (object.uid != null)
-                message.uid = String(object.uid);
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a GroupMemberRoleReq message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof protocol.GroupMemberRoleReq
-         * @static
-         * @param {protocol.GroupMemberRoleReq} message GroupMemberRoleReq
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        GroupMemberRoleReq.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            var object = {};
-            if (options.defaults) {
-                object.groupId = "";
-                object.uid = "";
-            }
-            if (message.groupId != null && message.hasOwnProperty("groupId"))
-                object.groupId = message.groupId;
-            if (message.uid != null && message.hasOwnProperty("uid"))
-                object.uid = message.uid;
-            return object;
-        };
-
-        /**
-         * Converts this GroupMemberRoleReq to JSON.
-         * @function toJSON
-         * @memberof protocol.GroupMemberRoleReq
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        GroupMemberRoleReq.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        /**
-         * Gets the default type url for GroupMemberRoleReq
-         * @function getTypeUrl
-         * @memberof protocol.GroupMemberRoleReq
-         * @static
-         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns {string} The default type url
-         */
-        GroupMemberRoleReq.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-            if (typeUrlPrefix === undefined) {
-                typeUrlPrefix = "type.googleapis.com";
-            }
-            return typeUrlPrefix + "/protocol.GroupMemberRoleReq";
-        };
-
-        return GroupMemberRoleReq;
-    })();
-
-    protocol.GroupMemberRoleResp = (function() {
-
-        /**
-         * Properties of a GroupMemberRoleResp.
-         * @memberof protocol
-         * @interface IGroupMemberRoleResp
-         * @property {number|null} [code] GroupMemberRoleResp code
-         * @property {string|null} [msg] GroupMemberRoleResp msg
-         * @property {string|null} [role] GroupMemberRoleResp role
-         */
-
-        /**
-         * Constructs a new GroupMemberRoleResp.
-         * @memberof protocol
-         * @classdesc Represents a GroupMemberRoleResp.
-         * @implements IGroupMemberRoleResp
-         * @constructor
-         * @param {protocol.IGroupMemberRoleResp=} [properties] Properties to set
-         */
-        function GroupMemberRoleResp(properties) {
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * GroupMemberRoleResp code.
-         * @member {number} code
-         * @memberof protocol.GroupMemberRoleResp
-         * @instance
-         */
-        GroupMemberRoleResp.prototype.code = 0;
-
-        /**
-         * GroupMemberRoleResp msg.
-         * @member {string} msg
-         * @memberof protocol.GroupMemberRoleResp
-         * @instance
-         */
-        GroupMemberRoleResp.prototype.msg = "";
-
-        /**
-         * GroupMemberRoleResp role.
-         * @member {string} role
-         * @memberof protocol.GroupMemberRoleResp
-         * @instance
-         */
-        GroupMemberRoleResp.prototype.role = "";
-
-        /**
-         * Creates a new GroupMemberRoleResp instance using the specified properties.
-         * @function create
-         * @memberof protocol.GroupMemberRoleResp
-         * @static
-         * @param {protocol.IGroupMemberRoleResp=} [properties] Properties to set
-         * @returns {protocol.GroupMemberRoleResp} GroupMemberRoleResp instance
-         */
-        GroupMemberRoleResp.create = function create(properties) {
-            return new GroupMemberRoleResp(properties);
-        };
-
-        /**
-         * Encodes the specified GroupMemberRoleResp message. Does not implicitly {@link protocol.GroupMemberRoleResp.verify|verify} messages.
-         * @function encode
-         * @memberof protocol.GroupMemberRoleResp
-         * @static
-         * @param {protocol.IGroupMemberRoleResp} message GroupMemberRoleResp message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        GroupMemberRoleResp.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.code != null && Object.hasOwnProperty.call(message, "code"))
-                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.code);
-            if (message.msg != null && Object.hasOwnProperty.call(message, "msg"))
-                writer.uint32(/* id 2, wireType 2 =*/18).string(message.msg);
-            if (message.role != null && Object.hasOwnProperty.call(message, "role"))
-                writer.uint32(/* id 3, wireType 2 =*/26).string(message.role);
-            return writer;
-        };
-
-        /**
-         * Encodes the specified GroupMemberRoleResp message, length delimited. Does not implicitly {@link protocol.GroupMemberRoleResp.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof protocol.GroupMemberRoleResp
-         * @static
-         * @param {protocol.IGroupMemberRoleResp} message GroupMemberRoleResp message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        GroupMemberRoleResp.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a GroupMemberRoleResp message from the specified reader or buffer.
-         * @function decode
-         * @memberof protocol.GroupMemberRoleResp
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {protocol.GroupMemberRoleResp} GroupMemberRoleResp
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        GroupMemberRoleResp.decode = function decode(reader, length, error) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.GroupMemberRoleResp();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                if (tag === error)
-                    break;
-                switch (tag >>> 3) {
-                case 1: {
-                        message.code = reader.int32();
-                        break;
-                    }
-                case 2: {
-                        message.msg = reader.string();
-                        break;
-                    }
-                case 3: {
-                        message.role = reader.string();
-                        break;
-                    }
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a GroupMemberRoleResp message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof protocol.GroupMemberRoleResp
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {protocol.GroupMemberRoleResp} GroupMemberRoleResp
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        GroupMemberRoleResp.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a GroupMemberRoleResp message.
-         * @function verify
-         * @memberof protocol.GroupMemberRoleResp
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        GroupMemberRoleResp.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.code != null && message.hasOwnProperty("code"))
-                if (!$util.isInteger(message.code))
-                    return "code: integer expected";
-            if (message.msg != null && message.hasOwnProperty("msg"))
-                if (!$util.isString(message.msg))
-                    return "msg: string expected";
-            if (message.role != null && message.hasOwnProperty("role"))
-                if (!$util.isString(message.role))
-                    return "role: string expected";
-            return null;
-        };
-
-        /**
-         * Creates a GroupMemberRoleResp message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof protocol.GroupMemberRoleResp
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {protocol.GroupMemberRoleResp} GroupMemberRoleResp
-         */
-        GroupMemberRoleResp.fromObject = function fromObject(object) {
-            if (object instanceof $root.protocol.GroupMemberRoleResp)
-                return object;
-            var message = new $root.protocol.GroupMemberRoleResp();
-            if (object.code != null)
-                message.code = object.code | 0;
-            if (object.msg != null)
-                message.msg = String(object.msg);
-            if (object.role != null)
-                message.role = String(object.role);
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a GroupMemberRoleResp message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof protocol.GroupMemberRoleResp
-         * @static
-         * @param {protocol.GroupMemberRoleResp} message GroupMemberRoleResp
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        GroupMemberRoleResp.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            var object = {};
-            if (options.defaults) {
-                object.code = 0;
-                object.msg = "";
-                object.role = "";
-            }
-            if (message.code != null && message.hasOwnProperty("code"))
-                object.code = message.code;
-            if (message.msg != null && message.hasOwnProperty("msg"))
-                object.msg = message.msg;
-            if (message.role != null && message.hasOwnProperty("role"))
-                object.role = message.role;
-            return object;
-        };
-
-        /**
-         * Converts this GroupMemberRoleResp to JSON.
-         * @function toJSON
-         * @memberof protocol.GroupMemberRoleResp
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        GroupMemberRoleResp.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        /**
-         * Gets the default type url for GroupMemberRoleResp
-         * @function getTypeUrl
-         * @memberof protocol.GroupMemberRoleResp
-         * @static
-         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns {string} The default type url
-         */
-        GroupMemberRoleResp.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-            if (typeUrlPrefix === undefined) {
-                typeUrlPrefix = "type.googleapis.com";
-            }
-            return typeUrlPrefix + "/protocol.GroupMemberRoleResp";
-        };
-
-        return GroupMemberRoleResp;
-    })();
-
-    protocol.GroupMemberInfoReq = (function() {
-
-        /**
-         * Properties of a GroupMemberInfoReq.
-         * @memberof protocol
-         * @interface IGroupMemberInfoReq
-         * @property {string|null} [groupId] GroupMemberInfoReq groupId
-         * @property {string|null} [uid] GroupMemberInfoReq uid
-         */
-
-        /**
-         * Constructs a new GroupMemberInfoReq.
-         * @memberof protocol
-         * @classdesc Represents a GroupMemberInfoReq.
-         * @implements IGroupMemberInfoReq
-         * @constructor
-         * @param {protocol.IGroupMemberInfoReq=} [properties] Properties to set
-         */
-        function GroupMemberInfoReq(properties) {
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * GroupMemberInfoReq groupId.
-         * @member {string} groupId
-         * @memberof protocol.GroupMemberInfoReq
-         * @instance
-         */
-        GroupMemberInfoReq.prototype.groupId = "";
-
-        /**
-         * GroupMemberInfoReq uid.
-         * @member {string} uid
-         * @memberof protocol.GroupMemberInfoReq
-         * @instance
-         */
-        GroupMemberInfoReq.prototype.uid = "";
-
-        /**
-         * Creates a new GroupMemberInfoReq instance using the specified properties.
-         * @function create
-         * @memberof protocol.GroupMemberInfoReq
-         * @static
-         * @param {protocol.IGroupMemberInfoReq=} [properties] Properties to set
-         * @returns {protocol.GroupMemberInfoReq} GroupMemberInfoReq instance
-         */
-        GroupMemberInfoReq.create = function create(properties) {
-            return new GroupMemberInfoReq(properties);
-        };
-
-        /**
-         * Encodes the specified GroupMemberInfoReq message. Does not implicitly {@link protocol.GroupMemberInfoReq.verify|verify} messages.
-         * @function encode
-         * @memberof protocol.GroupMemberInfoReq
-         * @static
-         * @param {protocol.IGroupMemberInfoReq} message GroupMemberInfoReq message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        GroupMemberInfoReq.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.groupId != null && Object.hasOwnProperty.call(message, "groupId"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.groupId);
-            if (message.uid != null && Object.hasOwnProperty.call(message, "uid"))
-                writer.uint32(/* id 2, wireType 2 =*/18).string(message.uid);
-            return writer;
-        };
-
-        /**
-         * Encodes the specified GroupMemberInfoReq message, length delimited. Does not implicitly {@link protocol.GroupMemberInfoReq.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof protocol.GroupMemberInfoReq
-         * @static
-         * @param {protocol.IGroupMemberInfoReq} message GroupMemberInfoReq message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        GroupMemberInfoReq.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a GroupMemberInfoReq message from the specified reader or buffer.
-         * @function decode
-         * @memberof protocol.GroupMemberInfoReq
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {protocol.GroupMemberInfoReq} GroupMemberInfoReq
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        GroupMemberInfoReq.decode = function decode(reader, length, error) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.GroupMemberInfoReq();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                if (tag === error)
-                    break;
-                switch (tag >>> 3) {
-                case 1: {
-                        message.groupId = reader.string();
-                        break;
-                    }
-                case 2: {
-                        message.uid = reader.string();
-                        break;
-                    }
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a GroupMemberInfoReq message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof protocol.GroupMemberInfoReq
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {protocol.GroupMemberInfoReq} GroupMemberInfoReq
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        GroupMemberInfoReq.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a GroupMemberInfoReq message.
-         * @function verify
-         * @memberof protocol.GroupMemberInfoReq
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        GroupMemberInfoReq.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.groupId != null && message.hasOwnProperty("groupId"))
-                if (!$util.isString(message.groupId))
-                    return "groupId: string expected";
-            if (message.uid != null && message.hasOwnProperty("uid"))
-                if (!$util.isString(message.uid))
-                    return "uid: string expected";
-            return null;
-        };
-
-        /**
-         * Creates a GroupMemberInfoReq message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof protocol.GroupMemberInfoReq
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {protocol.GroupMemberInfoReq} GroupMemberInfoReq
-         */
-        GroupMemberInfoReq.fromObject = function fromObject(object) {
-            if (object instanceof $root.protocol.GroupMemberInfoReq)
-                return object;
-            var message = new $root.protocol.GroupMemberInfoReq();
-            if (object.groupId != null)
-                message.groupId = String(object.groupId);
-            if (object.uid != null)
-                message.uid = String(object.uid);
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a GroupMemberInfoReq message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof protocol.GroupMemberInfoReq
-         * @static
-         * @param {protocol.GroupMemberInfoReq} message GroupMemberInfoReq
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        GroupMemberInfoReq.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            var object = {};
-            if (options.defaults) {
-                object.groupId = "";
-                object.uid = "";
-            }
-            if (message.groupId != null && message.hasOwnProperty("groupId"))
-                object.groupId = message.groupId;
-            if (message.uid != null && message.hasOwnProperty("uid"))
-                object.uid = message.uid;
-            return object;
-        };
-
-        /**
-         * Converts this GroupMemberInfoReq to JSON.
-         * @function toJSON
-         * @memberof protocol.GroupMemberInfoReq
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        GroupMemberInfoReq.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        /**
-         * Gets the default type url for GroupMemberInfoReq
-         * @function getTypeUrl
-         * @memberof protocol.GroupMemberInfoReq
-         * @static
-         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns {string} The default type url
-         */
-        GroupMemberInfoReq.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-            if (typeUrlPrefix === undefined) {
-                typeUrlPrefix = "type.googleapis.com";
-            }
-            return typeUrlPrefix + "/protocol.GroupMemberInfoReq";
-        };
-
-        return GroupMemberInfoReq;
-    })();
-
-    protocol.GroupMemberInfoResp = (function() {
-
-        /**
-         * Properties of a GroupMemberInfoResp.
-         * @memberof protocol
-         * @interface IGroupMemberInfoResp
-         * @property {number|null} [code] GroupMemberInfoResp code
-         * @property {string|null} [msg] GroupMemberInfoResp msg
-         * @property {string|null} [uid] GroupMemberInfoResp uid
-         * @property {string|null} [username] GroupMemberInfoResp username
-         * @property {string|null} [nickname] GroupMemberInfoResp nickname
-         * @property {string|null} [role] GroupMemberInfoResp role
-         * @property {number|Long|null} [joinTime] GroupMemberInfoResp joinTime
-         */
-
-        /**
-         * Constructs a new GroupMemberInfoResp.
-         * @memberof protocol
-         * @classdesc Represents a GroupMemberInfoResp.
-         * @implements IGroupMemberInfoResp
-         * @constructor
-         * @param {protocol.IGroupMemberInfoResp=} [properties] Properties to set
-         */
-        function GroupMemberInfoResp(properties) {
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * GroupMemberInfoResp code.
-         * @member {number} code
-         * @memberof protocol.GroupMemberInfoResp
-         * @instance
-         */
-        GroupMemberInfoResp.prototype.code = 0;
-
-        /**
-         * GroupMemberInfoResp msg.
-         * @member {string} msg
-         * @memberof protocol.GroupMemberInfoResp
-         * @instance
-         */
-        GroupMemberInfoResp.prototype.msg = "";
-
-        /**
-         * GroupMemberInfoResp uid.
-         * @member {string} uid
-         * @memberof protocol.GroupMemberInfoResp
-         * @instance
-         */
-        GroupMemberInfoResp.prototype.uid = "";
-
-        /**
-         * GroupMemberInfoResp username.
-         * @member {string} username
-         * @memberof protocol.GroupMemberInfoResp
-         * @instance
-         */
-        GroupMemberInfoResp.prototype.username = "";
-
-        /**
-         * GroupMemberInfoResp nickname.
-         * @member {string} nickname
-         * @memberof protocol.GroupMemberInfoResp
-         * @instance
-         */
-        GroupMemberInfoResp.prototype.nickname = "";
-
-        /**
-         * GroupMemberInfoResp role.
-         * @member {string} role
-         * @memberof protocol.GroupMemberInfoResp
-         * @instance
-         */
-        GroupMemberInfoResp.prototype.role = "";
-
-        /**
-         * GroupMemberInfoResp joinTime.
-         * @member {number|Long} joinTime
-         * @memberof protocol.GroupMemberInfoResp
-         * @instance
-         */
-        GroupMemberInfoResp.prototype.joinTime = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
-
-        /**
-         * Creates a new GroupMemberInfoResp instance using the specified properties.
-         * @function create
-         * @memberof protocol.GroupMemberInfoResp
-         * @static
-         * @param {protocol.IGroupMemberInfoResp=} [properties] Properties to set
-         * @returns {protocol.GroupMemberInfoResp} GroupMemberInfoResp instance
-         */
-        GroupMemberInfoResp.create = function create(properties) {
-            return new GroupMemberInfoResp(properties);
-        };
-
-        /**
-         * Encodes the specified GroupMemberInfoResp message. Does not implicitly {@link protocol.GroupMemberInfoResp.verify|verify} messages.
-         * @function encode
-         * @memberof protocol.GroupMemberInfoResp
-         * @static
-         * @param {protocol.IGroupMemberInfoResp} message GroupMemberInfoResp message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        GroupMemberInfoResp.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.code != null && Object.hasOwnProperty.call(message, "code"))
-                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.code);
-            if (message.msg != null && Object.hasOwnProperty.call(message, "msg"))
-                writer.uint32(/* id 2, wireType 2 =*/18).string(message.msg);
-            if (message.uid != null && Object.hasOwnProperty.call(message, "uid"))
-                writer.uint32(/* id 3, wireType 2 =*/26).string(message.uid);
-            if (message.username != null && Object.hasOwnProperty.call(message, "username"))
-                writer.uint32(/* id 4, wireType 2 =*/34).string(message.username);
-            if (message.nickname != null && Object.hasOwnProperty.call(message, "nickname"))
-                writer.uint32(/* id 5, wireType 2 =*/42).string(message.nickname);
-            if (message.role != null && Object.hasOwnProperty.call(message, "role"))
-                writer.uint32(/* id 6, wireType 2 =*/50).string(message.role);
-            if (message.joinTime != null && Object.hasOwnProperty.call(message, "joinTime"))
-                writer.uint32(/* id 7, wireType 0 =*/56).int64(message.joinTime);
-            return writer;
-        };
-
-        /**
-         * Encodes the specified GroupMemberInfoResp message, length delimited. Does not implicitly {@link protocol.GroupMemberInfoResp.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof protocol.GroupMemberInfoResp
-         * @static
-         * @param {protocol.IGroupMemberInfoResp} message GroupMemberInfoResp message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        GroupMemberInfoResp.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a GroupMemberInfoResp message from the specified reader or buffer.
-         * @function decode
-         * @memberof protocol.GroupMemberInfoResp
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {protocol.GroupMemberInfoResp} GroupMemberInfoResp
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        GroupMemberInfoResp.decode = function decode(reader, length, error) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.GroupMemberInfoResp();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                if (tag === error)
-                    break;
-                switch (tag >>> 3) {
-                case 1: {
-                        message.code = reader.int32();
-                        break;
-                    }
-                case 2: {
-                        message.msg = reader.string();
-                        break;
-                    }
-                case 3: {
-                        message.uid = reader.string();
-                        break;
-                    }
-                case 4: {
-                        message.username = reader.string();
-                        break;
-                    }
-                case 5: {
-                        message.nickname = reader.string();
-                        break;
-                    }
-                case 6: {
-                        message.role = reader.string();
-                        break;
-                    }
-                case 7: {
-                        message.joinTime = reader.int64();
-                        break;
-                    }
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a GroupMemberInfoResp message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof protocol.GroupMemberInfoResp
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {protocol.GroupMemberInfoResp} GroupMemberInfoResp
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        GroupMemberInfoResp.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a GroupMemberInfoResp message.
-         * @function verify
-         * @memberof protocol.GroupMemberInfoResp
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        GroupMemberInfoResp.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.code != null && message.hasOwnProperty("code"))
-                if (!$util.isInteger(message.code))
-                    return "code: integer expected";
-            if (message.msg != null && message.hasOwnProperty("msg"))
-                if (!$util.isString(message.msg))
-                    return "msg: string expected";
-            if (message.uid != null && message.hasOwnProperty("uid"))
-                if (!$util.isString(message.uid))
-                    return "uid: string expected";
-            if (message.username != null && message.hasOwnProperty("username"))
-                if (!$util.isString(message.username))
-                    return "username: string expected";
-            if (message.nickname != null && message.hasOwnProperty("nickname"))
-                if (!$util.isString(message.nickname))
-                    return "nickname: string expected";
-            if (message.role != null && message.hasOwnProperty("role"))
-                if (!$util.isString(message.role))
-                    return "role: string expected";
-            if (message.joinTime != null && message.hasOwnProperty("joinTime"))
-                if (!$util.isInteger(message.joinTime) && !(message.joinTime && $util.isInteger(message.joinTime.low) && $util.isInteger(message.joinTime.high)))
-                    return "joinTime: integer|Long expected";
-            return null;
-        };
-
-        /**
-         * Creates a GroupMemberInfoResp message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof protocol.GroupMemberInfoResp
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {protocol.GroupMemberInfoResp} GroupMemberInfoResp
-         */
-        GroupMemberInfoResp.fromObject = function fromObject(object) {
-            if (object instanceof $root.protocol.GroupMemberInfoResp)
-                return object;
-            var message = new $root.protocol.GroupMemberInfoResp();
-            if (object.code != null)
-                message.code = object.code | 0;
-            if (object.msg != null)
-                message.msg = String(object.msg);
-            if (object.uid != null)
-                message.uid = String(object.uid);
-            if (object.username != null)
-                message.username = String(object.username);
-            if (object.nickname != null)
-                message.nickname = String(object.nickname);
-            if (object.role != null)
-                message.role = String(object.role);
-            if (object.joinTime != null)
-                if ($util.Long)
-                    (message.joinTime = $util.Long.fromValue(object.joinTime)).unsigned = false;
-                else if (typeof object.joinTime === "string")
-                    message.joinTime = parseInt(object.joinTime, 10);
-                else if (typeof object.joinTime === "number")
-                    message.joinTime = object.joinTime;
-                else if (typeof object.joinTime === "object")
-                    message.joinTime = new $util.LongBits(object.joinTime.low >>> 0, object.joinTime.high >>> 0).toNumber();
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a GroupMemberInfoResp message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof protocol.GroupMemberInfoResp
-         * @static
-         * @param {protocol.GroupMemberInfoResp} message GroupMemberInfoResp
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        GroupMemberInfoResp.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            var object = {};
-            if (options.defaults) {
-                object.code = 0;
-                object.msg = "";
-                object.uid = "";
-                object.username = "";
-                object.nickname = "";
-                object.role = "";
-                if ($util.Long) {
-                    var long = new $util.Long(0, 0, false);
-                    object.joinTime = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
-                } else
-                    object.joinTime = options.longs === String ? "0" : 0;
-            }
-            if (message.code != null && message.hasOwnProperty("code"))
-                object.code = message.code;
-            if (message.msg != null && message.hasOwnProperty("msg"))
-                object.msg = message.msg;
-            if (message.uid != null && message.hasOwnProperty("uid"))
-                object.uid = message.uid;
-            if (message.username != null && message.hasOwnProperty("username"))
-                object.username = message.username;
-            if (message.nickname != null && message.hasOwnProperty("nickname"))
-                object.nickname = message.nickname;
-            if (message.role != null && message.hasOwnProperty("role"))
-                object.role = message.role;
-            if (message.joinTime != null && message.hasOwnProperty("joinTime"))
-                if (typeof message.joinTime === "number")
-                    object.joinTime = options.longs === String ? String(message.joinTime) : message.joinTime;
-                else
-                    object.joinTime = options.longs === String ? $util.Long.prototype.toString.call(message.joinTime) : options.longs === Number ? new $util.LongBits(message.joinTime.low >>> 0, message.joinTime.high >>> 0).toNumber() : message.joinTime;
-            return object;
-        };
-
-        /**
-         * Converts this GroupMemberInfoResp to JSON.
-         * @function toJSON
-         * @memberof protocol.GroupMemberInfoResp
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        GroupMemberInfoResp.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        /**
-         * Gets the default type url for GroupMemberInfoResp
-         * @function getTypeUrl
-         * @memberof protocol.GroupMemberInfoResp
-         * @static
-         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns {string} The default type url
-         */
-        GroupMemberInfoResp.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-            if (typeUrlPrefix === undefined) {
-                typeUrlPrefix = "type.googleapis.com";
-            }
-            return typeUrlPrefix + "/protocol.GroupMemberInfoResp";
-        };
-
-        return GroupMemberInfoResp;
-    })();
-
-    protocol.GroupInviteItem = (function() {
-
-        /**
-         * Properties of a GroupInviteItem.
-         * @memberof protocol
-         * @interface IGroupInviteItem
-         * @property {string|null} [id] GroupInviteItem id
-         * @property {string|null} [groupId] GroupInviteItem groupId
-         * @property {string|null} [groupName] GroupInviteItem groupName
-         * @property {string|null} [inviterUid] GroupInviteItem inviterUid
-         * @property {string|null} [inviteeUid] GroupInviteItem inviteeUid
-         * @property {string|null} [status] GroupInviteItem status
-         * @property {string|null} [createdAt] GroupInviteItem createdAt
-         * @property {string|null} [inviterUsername] GroupInviteItem inviterUsername
-         * @property {string|null} [inviteeUsername] GroupInviteItem inviteeUsername
-         */
-
-        /**
-         * Constructs a new GroupInviteItem.
-         * @memberof protocol
-         * @classdesc Represents a GroupInviteItem.
-         * @implements IGroupInviteItem
-         * @constructor
-         * @param {protocol.IGroupInviteItem=} [properties] Properties to set
-         */
-        function GroupInviteItem(properties) {
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * GroupInviteItem id.
-         * @member {string} id
-         * @memberof protocol.GroupInviteItem
-         * @instance
-         */
-        GroupInviteItem.prototype.id = "";
-
-        /**
-         * GroupInviteItem groupId.
-         * @member {string} groupId
-         * @memberof protocol.GroupInviteItem
-         * @instance
-         */
-        GroupInviteItem.prototype.groupId = "";
-
-        /**
-         * GroupInviteItem groupName.
-         * @member {string} groupName
-         * @memberof protocol.GroupInviteItem
-         * @instance
-         */
-        GroupInviteItem.prototype.groupName = "";
-
-        /**
-         * GroupInviteItem inviterUid.
-         * @member {string} inviterUid
-         * @memberof protocol.GroupInviteItem
-         * @instance
-         */
-        GroupInviteItem.prototype.inviterUid = "";
-
-        /**
-         * GroupInviteItem inviteeUid.
-         * @member {string} inviteeUid
-         * @memberof protocol.GroupInviteItem
-         * @instance
-         */
-        GroupInviteItem.prototype.inviteeUid = "";
-
-        /**
-         * GroupInviteItem status.
-         * @member {string} status
-         * @memberof protocol.GroupInviteItem
-         * @instance
-         */
-        GroupInviteItem.prototype.status = "";
-
-        /**
-         * GroupInviteItem createdAt.
-         * @member {string} createdAt
-         * @memberof protocol.GroupInviteItem
-         * @instance
-         */
-        GroupInviteItem.prototype.createdAt = "";
-
-        /**
-         * GroupInviteItem inviterUsername.
-         * @member {string} inviterUsername
-         * @memberof protocol.GroupInviteItem
-         * @instance
-         */
-        GroupInviteItem.prototype.inviterUsername = "";
-
-        /**
-         * GroupInviteItem inviteeUsername.
-         * @member {string} inviteeUsername
-         * @memberof protocol.GroupInviteItem
-         * @instance
-         */
-        GroupInviteItem.prototype.inviteeUsername = "";
-
-        /**
-         * Creates a new GroupInviteItem instance using the specified properties.
-         * @function create
-         * @memberof protocol.GroupInviteItem
-         * @static
-         * @param {protocol.IGroupInviteItem=} [properties] Properties to set
-         * @returns {protocol.GroupInviteItem} GroupInviteItem instance
-         */
-        GroupInviteItem.create = function create(properties) {
-            return new GroupInviteItem(properties);
-        };
-
-        /**
-         * Encodes the specified GroupInviteItem message. Does not implicitly {@link protocol.GroupInviteItem.verify|verify} messages.
-         * @function encode
-         * @memberof protocol.GroupInviteItem
-         * @static
-         * @param {protocol.IGroupInviteItem} message GroupInviteItem message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        GroupInviteItem.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.id != null && Object.hasOwnProperty.call(message, "id"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.id);
-            if (message.groupId != null && Object.hasOwnProperty.call(message, "groupId"))
-                writer.uint32(/* id 2, wireType 2 =*/18).string(message.groupId);
-            if (message.groupName != null && Object.hasOwnProperty.call(message, "groupName"))
-                writer.uint32(/* id 3, wireType 2 =*/26).string(message.groupName);
-            if (message.inviterUid != null && Object.hasOwnProperty.call(message, "inviterUid"))
-                writer.uint32(/* id 4, wireType 2 =*/34).string(message.inviterUid);
-            if (message.inviteeUid != null && Object.hasOwnProperty.call(message, "inviteeUid"))
-                writer.uint32(/* id 5, wireType 2 =*/42).string(message.inviteeUid);
-            if (message.status != null && Object.hasOwnProperty.call(message, "status"))
-                writer.uint32(/* id 6, wireType 2 =*/50).string(message.status);
-            if (message.createdAt != null && Object.hasOwnProperty.call(message, "createdAt"))
-                writer.uint32(/* id 7, wireType 2 =*/58).string(message.createdAt);
-            if (message.inviterUsername != null && Object.hasOwnProperty.call(message, "inviterUsername"))
-                writer.uint32(/* id 8, wireType 2 =*/66).string(message.inviterUsername);
-            if (message.inviteeUsername != null && Object.hasOwnProperty.call(message, "inviteeUsername"))
-                writer.uint32(/* id 9, wireType 2 =*/74).string(message.inviteeUsername);
-            return writer;
-        };
-
-        /**
-         * Encodes the specified GroupInviteItem message, length delimited. Does not implicitly {@link protocol.GroupInviteItem.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof protocol.GroupInviteItem
-         * @static
-         * @param {protocol.IGroupInviteItem} message GroupInviteItem message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        GroupInviteItem.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a GroupInviteItem message from the specified reader or buffer.
-         * @function decode
-         * @memberof protocol.GroupInviteItem
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {protocol.GroupInviteItem} GroupInviteItem
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        GroupInviteItem.decode = function decode(reader, length, error) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.GroupInviteItem();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                if (tag === error)
-                    break;
-                switch (tag >>> 3) {
-                case 1: {
-                        message.id = reader.string();
-                        break;
-                    }
-                case 2: {
-                        message.groupId = reader.string();
-                        break;
-                    }
-                case 3: {
-                        message.groupName = reader.string();
-                        break;
-                    }
-                case 4: {
-                        message.inviterUid = reader.string();
-                        break;
-                    }
-                case 5: {
-                        message.inviteeUid = reader.string();
-                        break;
-                    }
-                case 6: {
-                        message.status = reader.string();
-                        break;
-                    }
-                case 7: {
-                        message.createdAt = reader.string();
-                        break;
-                    }
-                case 8: {
-                        message.inviterUsername = reader.string();
-                        break;
-                    }
-                case 9: {
-                        message.inviteeUsername = reader.string();
-                        break;
-                    }
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a GroupInviteItem message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof protocol.GroupInviteItem
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {protocol.GroupInviteItem} GroupInviteItem
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        GroupInviteItem.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a GroupInviteItem message.
-         * @function verify
-         * @memberof protocol.GroupInviteItem
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        GroupInviteItem.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.id != null && message.hasOwnProperty("id"))
-                if (!$util.isString(message.id))
-                    return "id: string expected";
-            if (message.groupId != null && message.hasOwnProperty("groupId"))
-                if (!$util.isString(message.groupId))
-                    return "groupId: string expected";
-            if (message.groupName != null && message.hasOwnProperty("groupName"))
-                if (!$util.isString(message.groupName))
-                    return "groupName: string expected";
-            if (message.inviterUid != null && message.hasOwnProperty("inviterUid"))
-                if (!$util.isString(message.inviterUid))
-                    return "inviterUid: string expected";
-            if (message.inviteeUid != null && message.hasOwnProperty("inviteeUid"))
-                if (!$util.isString(message.inviteeUid))
-                    return "inviteeUid: string expected";
-            if (message.status != null && message.hasOwnProperty("status"))
-                if (!$util.isString(message.status))
-                    return "status: string expected";
-            if (message.createdAt != null && message.hasOwnProperty("createdAt"))
-                if (!$util.isString(message.createdAt))
-                    return "createdAt: string expected";
-            if (message.inviterUsername != null && message.hasOwnProperty("inviterUsername"))
-                if (!$util.isString(message.inviterUsername))
-                    return "inviterUsername: string expected";
-            if (message.inviteeUsername != null && message.hasOwnProperty("inviteeUsername"))
-                if (!$util.isString(message.inviteeUsername))
-                    return "inviteeUsername: string expected";
-            return null;
-        };
-
-        /**
-         * Creates a GroupInviteItem message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof protocol.GroupInviteItem
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {protocol.GroupInviteItem} GroupInviteItem
-         */
-        GroupInviteItem.fromObject = function fromObject(object) {
-            if (object instanceof $root.protocol.GroupInviteItem)
-                return object;
-            var message = new $root.protocol.GroupInviteItem();
-            if (object.id != null)
-                message.id = String(object.id);
-            if (object.groupId != null)
-                message.groupId = String(object.groupId);
-            if (object.groupName != null)
-                message.groupName = String(object.groupName);
-            if (object.inviterUid != null)
-                message.inviterUid = String(object.inviterUid);
-            if (object.inviteeUid != null)
-                message.inviteeUid = String(object.inviteeUid);
-            if (object.status != null)
-                message.status = String(object.status);
-            if (object.createdAt != null)
-                message.createdAt = String(object.createdAt);
-            if (object.inviterUsername != null)
-                message.inviterUsername = String(object.inviterUsername);
-            if (object.inviteeUsername != null)
-                message.inviteeUsername = String(object.inviteeUsername);
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a GroupInviteItem message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof protocol.GroupInviteItem
-         * @static
-         * @param {protocol.GroupInviteItem} message GroupInviteItem
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        GroupInviteItem.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            var object = {};
-            if (options.defaults) {
-                object.id = "";
-                object.groupId = "";
-                object.groupName = "";
-                object.inviterUid = "";
-                object.inviteeUid = "";
-                object.status = "";
-                object.createdAt = "";
-                object.inviterUsername = "";
-                object.inviteeUsername = "";
-            }
-            if (message.id != null && message.hasOwnProperty("id"))
-                object.id = message.id;
-            if (message.groupId != null && message.hasOwnProperty("groupId"))
-                object.groupId = message.groupId;
-            if (message.groupName != null && message.hasOwnProperty("groupName"))
-                object.groupName = message.groupName;
-            if (message.inviterUid != null && message.hasOwnProperty("inviterUid"))
-                object.inviterUid = message.inviterUid;
-            if (message.inviteeUid != null && message.hasOwnProperty("inviteeUid"))
-                object.inviteeUid = message.inviteeUid;
-            if (message.status != null && message.hasOwnProperty("status"))
-                object.status = message.status;
-            if (message.createdAt != null && message.hasOwnProperty("createdAt"))
-                object.createdAt = message.createdAt;
-            if (message.inviterUsername != null && message.hasOwnProperty("inviterUsername"))
-                object.inviterUsername = message.inviterUsername;
-            if (message.inviteeUsername != null && message.hasOwnProperty("inviteeUsername"))
-                object.inviteeUsername = message.inviteeUsername;
-            return object;
-        };
-
-        /**
-         * Converts this GroupInviteItem to JSON.
-         * @function toJSON
-         * @memberof protocol.GroupInviteItem
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        GroupInviteItem.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        /**
-         * Gets the default type url for GroupInviteItem
-         * @function getTypeUrl
-         * @memberof protocol.GroupInviteItem
-         * @static
-         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns {string} The default type url
-         */
-        GroupInviteItem.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-            if (typeUrlPrefix === undefined) {
-                typeUrlPrefix = "type.googleapis.com";
-            }
-            return typeUrlPrefix + "/protocol.GroupInviteItem";
-        };
-
-        return GroupInviteItem;
-    })();
-
-    protocol.GroupInviteListReq = (function() {
-
-        /**
-         * Properties of a GroupInviteListReq.
-         * @memberof protocol
-         * @interface IGroupInviteListReq
-         * @property {string|null} [uid] GroupInviteListReq uid
-         * @property {string|null} [token] GroupInviteListReq token
-         */
-
-        /**
-         * Constructs a new GroupInviteListReq.
-         * @memberof protocol
-         * @classdesc Represents a GroupInviteListReq.
-         * @implements IGroupInviteListReq
-         * @constructor
-         * @param {protocol.IGroupInviteListReq=} [properties] Properties to set
-         */
-        function GroupInviteListReq(properties) {
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * GroupInviteListReq uid.
-         * @member {string} uid
-         * @memberof protocol.GroupInviteListReq
-         * @instance
-         */
-        GroupInviteListReq.prototype.uid = "";
-
-        /**
-         * GroupInviteListReq token.
+         * GroupRequestListReq token.
          * @member {string} token
-         * @memberof protocol.GroupInviteListReq
+         * @memberof protocol.GroupRequestListReq
          * @instance
          */
-        GroupInviteListReq.prototype.token = "";
+        GroupRequestListReq.prototype.token = "";
 
         /**
-         * Creates a new GroupInviteListReq instance using the specified properties.
+         * Creates a new GroupRequestListReq instance using the specified properties.
          * @function create
-         * @memberof protocol.GroupInviteListReq
+         * @memberof protocol.GroupRequestListReq
          * @static
-         * @param {protocol.IGroupInviteListReq=} [properties] Properties to set
-         * @returns {protocol.GroupInviteListReq} GroupInviteListReq instance
+         * @param {protocol.IGroupRequestListReq=} [properties] Properties to set
+         * @returns {protocol.GroupRequestListReq} GroupRequestListReq instance
          */
-        GroupInviteListReq.create = function create(properties) {
-            return new GroupInviteListReq(properties);
+        GroupRequestListReq.create = function create(properties) {
+            return new GroupRequestListReq(properties);
         };
 
         /**
-         * Encodes the specified GroupInviteListReq message. Does not implicitly {@link protocol.GroupInviteListReq.verify|verify} messages.
+         * Encodes the specified GroupRequestListReq message. Does not implicitly {@link protocol.GroupRequestListReq.verify|verify} messages.
          * @function encode
-         * @memberof protocol.GroupInviteListReq
+         * @memberof protocol.GroupRequestListReq
          * @static
-         * @param {protocol.IGroupInviteListReq} message GroupInviteListReq message or plain object to encode
+         * @param {protocol.IGroupRequestListReq} message GroupRequestListReq message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        GroupInviteListReq.encode = function encode(message, writer) {
+        GroupRequestListReq.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
             if (message.uid != null && Object.hasOwnProperty.call(message, "uid"))
@@ -13540,33 +13540,33 @@ $root.protocol = (function() {
         };
 
         /**
-         * Encodes the specified GroupInviteListReq message, length delimited. Does not implicitly {@link protocol.GroupInviteListReq.verify|verify} messages.
+         * Encodes the specified GroupRequestListReq message, length delimited. Does not implicitly {@link protocol.GroupRequestListReq.verify|verify} messages.
          * @function encodeDelimited
-         * @memberof protocol.GroupInviteListReq
+         * @memberof protocol.GroupRequestListReq
          * @static
-         * @param {protocol.IGroupInviteListReq} message GroupInviteListReq message or plain object to encode
+         * @param {protocol.IGroupRequestListReq} message GroupRequestListReq message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        GroupInviteListReq.encodeDelimited = function encodeDelimited(message, writer) {
+        GroupRequestListReq.encodeDelimited = function encodeDelimited(message, writer) {
             return this.encode(message, writer).ldelim();
         };
 
         /**
-         * Decodes a GroupInviteListReq message from the specified reader or buffer.
+         * Decodes a GroupRequestListReq message from the specified reader or buffer.
          * @function decode
-         * @memberof protocol.GroupInviteListReq
+         * @memberof protocol.GroupRequestListReq
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
          * @param {number} [length] Message length if known beforehand
-         * @returns {protocol.GroupInviteListReq} GroupInviteListReq
+         * @returns {protocol.GroupRequestListReq} GroupRequestListReq
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        GroupInviteListReq.decode = function decode(reader, length, error) {
+        GroupRequestListReq.decode = function decode(reader, length, error) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.GroupInviteListReq();
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.GroupRequestListReq();
             while (reader.pos < end) {
                 var tag = reader.uint32();
                 if (tag === error)
@@ -13589,30 +13589,30 @@ $root.protocol = (function() {
         };
 
         /**
-         * Decodes a GroupInviteListReq message from the specified reader or buffer, length delimited.
+         * Decodes a GroupRequestListReq message from the specified reader or buffer, length delimited.
          * @function decodeDelimited
-         * @memberof protocol.GroupInviteListReq
+         * @memberof protocol.GroupRequestListReq
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {protocol.GroupInviteListReq} GroupInviteListReq
+         * @returns {protocol.GroupRequestListReq} GroupRequestListReq
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        GroupInviteListReq.decodeDelimited = function decodeDelimited(reader) {
+        GroupRequestListReq.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
         };
 
         /**
-         * Verifies a GroupInviteListReq message.
+         * Verifies a GroupRequestListReq message.
          * @function verify
-         * @memberof protocol.GroupInviteListReq
+         * @memberof protocol.GroupRequestListReq
          * @static
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        GroupInviteListReq.verify = function verify(message) {
+        GroupRequestListReq.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
             if (message.uid != null && message.hasOwnProperty("uid"))
@@ -13625,17 +13625,17 @@ $root.protocol = (function() {
         };
 
         /**
-         * Creates a GroupInviteListReq message from a plain object. Also converts values to their respective internal types.
+         * Creates a GroupRequestListReq message from a plain object. Also converts values to their respective internal types.
          * @function fromObject
-         * @memberof protocol.GroupInviteListReq
+         * @memberof protocol.GroupRequestListReq
          * @static
          * @param {Object.<string,*>} object Plain object
-         * @returns {protocol.GroupInviteListReq} GroupInviteListReq
+         * @returns {protocol.GroupRequestListReq} GroupRequestListReq
          */
-        GroupInviteListReq.fromObject = function fromObject(object) {
-            if (object instanceof $root.protocol.GroupInviteListReq)
+        GroupRequestListReq.fromObject = function fromObject(object) {
+            if (object instanceof $root.protocol.GroupRequestListReq)
                 return object;
-            var message = new $root.protocol.GroupInviteListReq();
+            var message = new $root.protocol.GroupRequestListReq();
             if (object.uid != null)
                 message.uid = String(object.uid);
             if (object.token != null)
@@ -13644,15 +13644,15 @@ $root.protocol = (function() {
         };
 
         /**
-         * Creates a plain object from a GroupInviteListReq message. Also converts values to other types if specified.
+         * Creates a plain object from a GroupRequestListReq message. Also converts values to other types if specified.
          * @function toObject
-         * @memberof protocol.GroupInviteListReq
+         * @memberof protocol.GroupRequestListReq
          * @static
-         * @param {protocol.GroupInviteListReq} message GroupInviteListReq
+         * @param {protocol.GroupRequestListReq} message GroupRequestListReq
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        GroupInviteListReq.toObject = function toObject(message, options) {
+        GroupRequestListReq.toObject = function toObject(message, options) {
             if (!options)
                 options = {};
             var object = {};
@@ -13668,54 +13668,54 @@ $root.protocol = (function() {
         };
 
         /**
-         * Converts this GroupInviteListReq to JSON.
+         * Converts this GroupRequestListReq to JSON.
          * @function toJSON
-         * @memberof protocol.GroupInviteListReq
+         * @memberof protocol.GroupRequestListReq
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        GroupInviteListReq.prototype.toJSON = function toJSON() {
+        GroupRequestListReq.prototype.toJSON = function toJSON() {
             return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
         };
 
         /**
-         * Gets the default type url for GroupInviteListReq
+         * Gets the default type url for GroupRequestListReq
          * @function getTypeUrl
-         * @memberof protocol.GroupInviteListReq
+         * @memberof protocol.GroupRequestListReq
          * @static
          * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
          * @returns {string} The default type url
          */
-        GroupInviteListReq.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+        GroupRequestListReq.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
             if (typeUrlPrefix === undefined) {
                 typeUrlPrefix = "type.googleapis.com";
             }
-            return typeUrlPrefix + "/protocol.GroupInviteListReq";
+            return typeUrlPrefix + "/protocol.GroupRequestListReq";
         };
 
-        return GroupInviteListReq;
+        return GroupRequestListReq;
     })();
 
-    protocol.GroupInviteListResp = (function() {
+    protocol.GroupRequestListResp = (function() {
 
         /**
-         * Properties of a GroupInviteListResp.
+         * Properties of a GroupRequestListResp.
          * @memberof protocol
-         * @interface IGroupInviteListResp
-         * @property {number|null} [code] GroupInviteListResp code
-         * @property {string|null} [msg] GroupInviteListResp msg
-         * @property {Array.<protocol.IGroupInviteItem>|null} [items] GroupInviteListResp items
+         * @interface IGroupRequestListResp
+         * @property {number|null} [code] GroupRequestListResp code
+         * @property {string|null} [msg] GroupRequestListResp msg
+         * @property {Array.<protocol.IGroupRequestItem>|null} [items] GroupRequestListResp items
          */
 
         /**
-         * Constructs a new GroupInviteListResp.
+         * Constructs a new GroupRequestListResp.
          * @memberof protocol
-         * @classdesc Represents a GroupInviteListResp.
-         * @implements IGroupInviteListResp
+         * @classdesc Represents a GroupRequestListResp.
+         * @implements IGroupRequestListResp
          * @constructor
-         * @param {protocol.IGroupInviteListResp=} [properties] Properties to set
+         * @param {protocol.IGroupRequestListResp=} [properties] Properties to set
          */
-        function GroupInviteListResp(properties) {
+        function GroupRequestListResp(properties) {
             this.items = [];
             if (properties)
                 for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
@@ -13724,51 +13724,51 @@ $root.protocol = (function() {
         }
 
         /**
-         * GroupInviteListResp code.
+         * GroupRequestListResp code.
          * @member {number} code
-         * @memberof protocol.GroupInviteListResp
+         * @memberof protocol.GroupRequestListResp
          * @instance
          */
-        GroupInviteListResp.prototype.code = 0;
+        GroupRequestListResp.prototype.code = 0;
 
         /**
-         * GroupInviteListResp msg.
+         * GroupRequestListResp msg.
          * @member {string} msg
-         * @memberof protocol.GroupInviteListResp
+         * @memberof protocol.GroupRequestListResp
          * @instance
          */
-        GroupInviteListResp.prototype.msg = "";
+        GroupRequestListResp.prototype.msg = "";
 
         /**
-         * GroupInviteListResp items.
-         * @member {Array.<protocol.IGroupInviteItem>} items
-         * @memberof protocol.GroupInviteListResp
+         * GroupRequestListResp items.
+         * @member {Array.<protocol.IGroupRequestItem>} items
+         * @memberof protocol.GroupRequestListResp
          * @instance
          */
-        GroupInviteListResp.prototype.items = $util.emptyArray;
+        GroupRequestListResp.prototype.items = $util.emptyArray;
 
         /**
-         * Creates a new GroupInviteListResp instance using the specified properties.
+         * Creates a new GroupRequestListResp instance using the specified properties.
          * @function create
-         * @memberof protocol.GroupInviteListResp
+         * @memberof protocol.GroupRequestListResp
          * @static
-         * @param {protocol.IGroupInviteListResp=} [properties] Properties to set
-         * @returns {protocol.GroupInviteListResp} GroupInviteListResp instance
+         * @param {protocol.IGroupRequestListResp=} [properties] Properties to set
+         * @returns {protocol.GroupRequestListResp} GroupRequestListResp instance
          */
-        GroupInviteListResp.create = function create(properties) {
-            return new GroupInviteListResp(properties);
+        GroupRequestListResp.create = function create(properties) {
+            return new GroupRequestListResp(properties);
         };
 
         /**
-         * Encodes the specified GroupInviteListResp message. Does not implicitly {@link protocol.GroupInviteListResp.verify|verify} messages.
+         * Encodes the specified GroupRequestListResp message. Does not implicitly {@link protocol.GroupRequestListResp.verify|verify} messages.
          * @function encode
-         * @memberof protocol.GroupInviteListResp
+         * @memberof protocol.GroupRequestListResp
          * @static
-         * @param {protocol.IGroupInviteListResp} message GroupInviteListResp message or plain object to encode
+         * @param {protocol.IGroupRequestListResp} message GroupRequestListResp message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        GroupInviteListResp.encode = function encode(message, writer) {
+        GroupRequestListResp.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
             if (message.code != null && Object.hasOwnProperty.call(message, "code"))
@@ -13777,38 +13777,38 @@ $root.protocol = (function() {
                 writer.uint32(/* id 2, wireType 2 =*/18).string(message.msg);
             if (message.items != null && message.items.length)
                 for (var i = 0; i < message.items.length; ++i)
-                    $root.protocol.GroupInviteItem.encode(message.items[i], writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    $root.protocol.GroupRequestItem.encode(message.items[i], writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
             return writer;
         };
 
         /**
-         * Encodes the specified GroupInviteListResp message, length delimited. Does not implicitly {@link protocol.GroupInviteListResp.verify|verify} messages.
+         * Encodes the specified GroupRequestListResp message, length delimited. Does not implicitly {@link protocol.GroupRequestListResp.verify|verify} messages.
          * @function encodeDelimited
-         * @memberof protocol.GroupInviteListResp
+         * @memberof protocol.GroupRequestListResp
          * @static
-         * @param {protocol.IGroupInviteListResp} message GroupInviteListResp message or plain object to encode
+         * @param {protocol.IGroupRequestListResp} message GroupRequestListResp message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        GroupInviteListResp.encodeDelimited = function encodeDelimited(message, writer) {
+        GroupRequestListResp.encodeDelimited = function encodeDelimited(message, writer) {
             return this.encode(message, writer).ldelim();
         };
 
         /**
-         * Decodes a GroupInviteListResp message from the specified reader or buffer.
+         * Decodes a GroupRequestListResp message from the specified reader or buffer.
          * @function decode
-         * @memberof protocol.GroupInviteListResp
+         * @memberof protocol.GroupRequestListResp
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
          * @param {number} [length] Message length if known beforehand
-         * @returns {protocol.GroupInviteListResp} GroupInviteListResp
+         * @returns {protocol.GroupRequestListResp} GroupRequestListResp
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        GroupInviteListResp.decode = function decode(reader, length, error) {
+        GroupRequestListResp.decode = function decode(reader, length, error) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.GroupInviteListResp();
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.GroupRequestListResp();
             while (reader.pos < end) {
                 var tag = reader.uint32();
                 if (tag === error)
@@ -13825,7 +13825,7 @@ $root.protocol = (function() {
                 case 3: {
                         if (!(message.items && message.items.length))
                             message.items = [];
-                        message.items.push($root.protocol.GroupInviteItem.decode(reader, reader.uint32()));
+                        message.items.push($root.protocol.GroupRequestItem.decode(reader, reader.uint32()));
                         break;
                     }
                 default:
@@ -13837,30 +13837,30 @@ $root.protocol = (function() {
         };
 
         /**
-         * Decodes a GroupInviteListResp message from the specified reader or buffer, length delimited.
+         * Decodes a GroupRequestListResp message from the specified reader or buffer, length delimited.
          * @function decodeDelimited
-         * @memberof protocol.GroupInviteListResp
+         * @memberof protocol.GroupRequestListResp
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {protocol.GroupInviteListResp} GroupInviteListResp
+         * @returns {protocol.GroupRequestListResp} GroupRequestListResp
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        GroupInviteListResp.decodeDelimited = function decodeDelimited(reader) {
+        GroupRequestListResp.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
         };
 
         /**
-         * Verifies a GroupInviteListResp message.
+         * Verifies a GroupRequestListResp message.
          * @function verify
-         * @memberof protocol.GroupInviteListResp
+         * @memberof protocol.GroupRequestListResp
          * @static
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        GroupInviteListResp.verify = function verify(message) {
+        GroupRequestListResp.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
             if (message.code != null && message.hasOwnProperty("code"))
@@ -13873,7 +13873,7 @@ $root.protocol = (function() {
                 if (!Array.isArray(message.items))
                     return "items: array expected";
                 for (var i = 0; i < message.items.length; ++i) {
-                    var error = $root.protocol.GroupInviteItem.verify(message.items[i]);
+                    var error = $root.protocol.GroupRequestItem.verify(message.items[i]);
                     if (error)
                         return "items." + error;
                 }
@@ -13882,44 +13882,44 @@ $root.protocol = (function() {
         };
 
         /**
-         * Creates a GroupInviteListResp message from a plain object. Also converts values to their respective internal types.
+         * Creates a GroupRequestListResp message from a plain object. Also converts values to their respective internal types.
          * @function fromObject
-         * @memberof protocol.GroupInviteListResp
+         * @memberof protocol.GroupRequestListResp
          * @static
          * @param {Object.<string,*>} object Plain object
-         * @returns {protocol.GroupInviteListResp} GroupInviteListResp
+         * @returns {protocol.GroupRequestListResp} GroupRequestListResp
          */
-        GroupInviteListResp.fromObject = function fromObject(object) {
-            if (object instanceof $root.protocol.GroupInviteListResp)
+        GroupRequestListResp.fromObject = function fromObject(object) {
+            if (object instanceof $root.protocol.GroupRequestListResp)
                 return object;
-            var message = new $root.protocol.GroupInviteListResp();
+            var message = new $root.protocol.GroupRequestListResp();
             if (object.code != null)
                 message.code = object.code | 0;
             if (object.msg != null)
                 message.msg = String(object.msg);
             if (object.items) {
                 if (!Array.isArray(object.items))
-                    throw TypeError(".protocol.GroupInviteListResp.items: array expected");
+                    throw TypeError(".protocol.GroupRequestListResp.items: array expected");
                 message.items = [];
                 for (var i = 0; i < object.items.length; ++i) {
                     if (typeof object.items[i] !== "object")
-                        throw TypeError(".protocol.GroupInviteListResp.items: object expected");
-                    message.items[i] = $root.protocol.GroupInviteItem.fromObject(object.items[i]);
+                        throw TypeError(".protocol.GroupRequestListResp.items: object expected");
+                    message.items[i] = $root.protocol.GroupRequestItem.fromObject(object.items[i]);
                 }
             }
             return message;
         };
 
         /**
-         * Creates a plain object from a GroupInviteListResp message. Also converts values to other types if specified.
+         * Creates a plain object from a GroupRequestListResp message. Also converts values to other types if specified.
          * @function toObject
-         * @memberof protocol.GroupInviteListResp
+         * @memberof protocol.GroupRequestListResp
          * @static
-         * @param {protocol.GroupInviteListResp} message GroupInviteListResp
+         * @param {protocol.GroupRequestListResp} message GroupRequestListResp
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        GroupInviteListResp.toObject = function toObject(message, options) {
+        GroupRequestListResp.toObject = function toObject(message, options) {
             if (!options)
                 options = {};
             var object = {};
@@ -13936,62 +13936,62 @@ $root.protocol = (function() {
             if (message.items && message.items.length) {
                 object.items = [];
                 for (var j = 0; j < message.items.length; ++j)
-                    object.items[j] = $root.protocol.GroupInviteItem.toObject(message.items[j], options);
+                    object.items[j] = $root.protocol.GroupRequestItem.toObject(message.items[j], options);
             }
             return object;
         };
 
         /**
-         * Converts this GroupInviteListResp to JSON.
+         * Converts this GroupRequestListResp to JSON.
          * @function toJSON
-         * @memberof protocol.GroupInviteListResp
+         * @memberof protocol.GroupRequestListResp
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        GroupInviteListResp.prototype.toJSON = function toJSON() {
+        GroupRequestListResp.prototype.toJSON = function toJSON() {
             return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
         };
 
         /**
-         * Gets the default type url for GroupInviteListResp
+         * Gets the default type url for GroupRequestListResp
          * @function getTypeUrl
-         * @memberof protocol.GroupInviteListResp
+         * @memberof protocol.GroupRequestListResp
          * @static
          * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
          * @returns {string} The default type url
          */
-        GroupInviteListResp.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+        GroupRequestListResp.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
             if (typeUrlPrefix === undefined) {
                 typeUrlPrefix = "type.googleapis.com";
             }
-            return typeUrlPrefix + "/protocol.GroupInviteListResp";
+            return typeUrlPrefix + "/protocol.GroupRequestListResp";
         };
 
-        return GroupInviteListResp;
+        return GroupRequestListResp;
     })();
 
-    protocol.HandleGroupInviteReq = (function() {
+    protocol.HandleGroupRequestReq = (function() {
 
         /**
-         * Properties of a HandleGroupInviteReq.
+         * Properties of a HandleGroupRequestReq.
          * @memberof protocol
-         * @interface IHandleGroupInviteReq
-         * @property {string|null} [id] HandleGroupInviteReq id
-         * @property {string|null} [token] HandleGroupInviteReq token
-         * @property {boolean|null} [approve] HandleGroupInviteReq approve
-         * @property {string|null} [groupId] HandleGroupInviteReq groupId
-         * @property {string|null} [inviteeUid] HandleGroupInviteReq inviteeUid
+         * @interface IHandleGroupRequestReq
+         * @property {string|null} [id] HandleGroupRequestReq id
+         * @property {string|null} [token] HandleGroupRequestReq token
+         * @property {boolean|null} [approve] HandleGroupRequestReq approve
+         * @property {string|null} [groupId] HandleGroupRequestReq groupId
+         * @property {string|null} [inviteeUid] HandleGroupRequestReq inviteeUid
          */
 
         /**
-         * Constructs a new HandleGroupInviteReq.
+         * Constructs a new HandleGroupRequestReq.
          * @memberof protocol
-         * @classdesc Represents a HandleGroupInviteReq.
-         * @implements IHandleGroupInviteReq
+         * @classdesc Represents a HandleGroupRequestReq.
+         * @implements IHandleGroupRequestReq
          * @constructor
-         * @param {protocol.IHandleGroupInviteReq=} [properties] Properties to set
+         * @param {protocol.IHandleGroupRequestReq=} [properties] Properties to set
          */
-        function HandleGroupInviteReq(properties) {
+        function HandleGroupRequestReq(properties) {
             if (properties)
                 for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -13999,67 +13999,67 @@ $root.protocol = (function() {
         }
 
         /**
-         * HandleGroupInviteReq id.
+         * HandleGroupRequestReq id.
          * @member {string} id
-         * @memberof protocol.HandleGroupInviteReq
+         * @memberof protocol.HandleGroupRequestReq
          * @instance
          */
-        HandleGroupInviteReq.prototype.id = "";
+        HandleGroupRequestReq.prototype.id = "";
 
         /**
-         * HandleGroupInviteReq token.
+         * HandleGroupRequestReq token.
          * @member {string} token
-         * @memberof protocol.HandleGroupInviteReq
+         * @memberof protocol.HandleGroupRequestReq
          * @instance
          */
-        HandleGroupInviteReq.prototype.token = "";
+        HandleGroupRequestReq.prototype.token = "";
 
         /**
-         * HandleGroupInviteReq approve.
+         * HandleGroupRequestReq approve.
          * @member {boolean} approve
-         * @memberof protocol.HandleGroupInviteReq
+         * @memberof protocol.HandleGroupRequestReq
          * @instance
          */
-        HandleGroupInviteReq.prototype.approve = false;
+        HandleGroupRequestReq.prototype.approve = false;
 
         /**
-         * HandleGroupInviteReq groupId.
+         * HandleGroupRequestReq groupId.
          * @member {string} groupId
-         * @memberof protocol.HandleGroupInviteReq
+         * @memberof protocol.HandleGroupRequestReq
          * @instance
          */
-        HandleGroupInviteReq.prototype.groupId = "";
+        HandleGroupRequestReq.prototype.groupId = "";
 
         /**
-         * HandleGroupInviteReq inviteeUid.
+         * HandleGroupRequestReq inviteeUid.
          * @member {string} inviteeUid
-         * @memberof protocol.HandleGroupInviteReq
+         * @memberof protocol.HandleGroupRequestReq
          * @instance
          */
-        HandleGroupInviteReq.prototype.inviteeUid = "";
+        HandleGroupRequestReq.prototype.inviteeUid = "";
 
         /**
-         * Creates a new HandleGroupInviteReq instance using the specified properties.
+         * Creates a new HandleGroupRequestReq instance using the specified properties.
          * @function create
-         * @memberof protocol.HandleGroupInviteReq
+         * @memberof protocol.HandleGroupRequestReq
          * @static
-         * @param {protocol.IHandleGroupInviteReq=} [properties] Properties to set
-         * @returns {protocol.HandleGroupInviteReq} HandleGroupInviteReq instance
+         * @param {protocol.IHandleGroupRequestReq=} [properties] Properties to set
+         * @returns {protocol.HandleGroupRequestReq} HandleGroupRequestReq instance
          */
-        HandleGroupInviteReq.create = function create(properties) {
-            return new HandleGroupInviteReq(properties);
+        HandleGroupRequestReq.create = function create(properties) {
+            return new HandleGroupRequestReq(properties);
         };
 
         /**
-         * Encodes the specified HandleGroupInviteReq message. Does not implicitly {@link protocol.HandleGroupInviteReq.verify|verify} messages.
+         * Encodes the specified HandleGroupRequestReq message. Does not implicitly {@link protocol.HandleGroupRequestReq.verify|verify} messages.
          * @function encode
-         * @memberof protocol.HandleGroupInviteReq
+         * @memberof protocol.HandleGroupRequestReq
          * @static
-         * @param {protocol.IHandleGroupInviteReq} message HandleGroupInviteReq message or plain object to encode
+         * @param {protocol.IHandleGroupRequestReq} message HandleGroupRequestReq message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        HandleGroupInviteReq.encode = function encode(message, writer) {
+        HandleGroupRequestReq.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
             if (message.id != null && Object.hasOwnProperty.call(message, "id"))
@@ -14076,33 +14076,33 @@ $root.protocol = (function() {
         };
 
         /**
-         * Encodes the specified HandleGroupInviteReq message, length delimited. Does not implicitly {@link protocol.HandleGroupInviteReq.verify|verify} messages.
+         * Encodes the specified HandleGroupRequestReq message, length delimited. Does not implicitly {@link protocol.HandleGroupRequestReq.verify|verify} messages.
          * @function encodeDelimited
-         * @memberof protocol.HandleGroupInviteReq
+         * @memberof protocol.HandleGroupRequestReq
          * @static
-         * @param {protocol.IHandleGroupInviteReq} message HandleGroupInviteReq message or plain object to encode
+         * @param {protocol.IHandleGroupRequestReq} message HandleGroupRequestReq message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        HandleGroupInviteReq.encodeDelimited = function encodeDelimited(message, writer) {
+        HandleGroupRequestReq.encodeDelimited = function encodeDelimited(message, writer) {
             return this.encode(message, writer).ldelim();
         };
 
         /**
-         * Decodes a HandleGroupInviteReq message from the specified reader or buffer.
+         * Decodes a HandleGroupRequestReq message from the specified reader or buffer.
          * @function decode
-         * @memberof protocol.HandleGroupInviteReq
+         * @memberof protocol.HandleGroupRequestReq
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
          * @param {number} [length] Message length if known beforehand
-         * @returns {protocol.HandleGroupInviteReq} HandleGroupInviteReq
+         * @returns {protocol.HandleGroupRequestReq} HandleGroupRequestReq
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        HandleGroupInviteReq.decode = function decode(reader, length, error) {
+        HandleGroupRequestReq.decode = function decode(reader, length, error) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.HandleGroupInviteReq();
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.HandleGroupRequestReq();
             while (reader.pos < end) {
                 var tag = reader.uint32();
                 if (tag === error)
@@ -14137,30 +14137,30 @@ $root.protocol = (function() {
         };
 
         /**
-         * Decodes a HandleGroupInviteReq message from the specified reader or buffer, length delimited.
+         * Decodes a HandleGroupRequestReq message from the specified reader or buffer, length delimited.
          * @function decodeDelimited
-         * @memberof protocol.HandleGroupInviteReq
+         * @memberof protocol.HandleGroupRequestReq
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {protocol.HandleGroupInviteReq} HandleGroupInviteReq
+         * @returns {protocol.HandleGroupRequestReq} HandleGroupRequestReq
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        HandleGroupInviteReq.decodeDelimited = function decodeDelimited(reader) {
+        HandleGroupRequestReq.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
         };
 
         /**
-         * Verifies a HandleGroupInviteReq message.
+         * Verifies a HandleGroupRequestReq message.
          * @function verify
-         * @memberof protocol.HandleGroupInviteReq
+         * @memberof protocol.HandleGroupRequestReq
          * @static
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        HandleGroupInviteReq.verify = function verify(message) {
+        HandleGroupRequestReq.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
             if (message.id != null && message.hasOwnProperty("id"))
@@ -14182,17 +14182,17 @@ $root.protocol = (function() {
         };
 
         /**
-         * Creates a HandleGroupInviteReq message from a plain object. Also converts values to their respective internal types.
+         * Creates a HandleGroupRequestReq message from a plain object. Also converts values to their respective internal types.
          * @function fromObject
-         * @memberof protocol.HandleGroupInviteReq
+         * @memberof protocol.HandleGroupRequestReq
          * @static
          * @param {Object.<string,*>} object Plain object
-         * @returns {protocol.HandleGroupInviteReq} HandleGroupInviteReq
+         * @returns {protocol.HandleGroupRequestReq} HandleGroupRequestReq
          */
-        HandleGroupInviteReq.fromObject = function fromObject(object) {
-            if (object instanceof $root.protocol.HandleGroupInviteReq)
+        HandleGroupRequestReq.fromObject = function fromObject(object) {
+            if (object instanceof $root.protocol.HandleGroupRequestReq)
                 return object;
-            var message = new $root.protocol.HandleGroupInviteReq();
+            var message = new $root.protocol.HandleGroupRequestReq();
             if (object.id != null)
                 message.id = String(object.id);
             if (object.token != null)
@@ -14207,15 +14207,15 @@ $root.protocol = (function() {
         };
 
         /**
-         * Creates a plain object from a HandleGroupInviteReq message. Also converts values to other types if specified.
+         * Creates a plain object from a HandleGroupRequestReq message. Also converts values to other types if specified.
          * @function toObject
-         * @memberof protocol.HandleGroupInviteReq
+         * @memberof protocol.HandleGroupRequestReq
          * @static
-         * @param {protocol.HandleGroupInviteReq} message HandleGroupInviteReq
+         * @param {protocol.HandleGroupRequestReq} message HandleGroupRequestReq
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        HandleGroupInviteReq.toObject = function toObject(message, options) {
+        HandleGroupRequestReq.toObject = function toObject(message, options) {
             if (!options)
                 options = {};
             var object = {};
@@ -14240,32 +14240,32 @@ $root.protocol = (function() {
         };
 
         /**
-         * Converts this HandleGroupInviteReq to JSON.
+         * Converts this HandleGroupRequestReq to JSON.
          * @function toJSON
-         * @memberof protocol.HandleGroupInviteReq
+         * @memberof protocol.HandleGroupRequestReq
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        HandleGroupInviteReq.prototype.toJSON = function toJSON() {
+        HandleGroupRequestReq.prototype.toJSON = function toJSON() {
             return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
         };
 
         /**
-         * Gets the default type url for HandleGroupInviteReq
+         * Gets the default type url for HandleGroupRequestReq
          * @function getTypeUrl
-         * @memberof protocol.HandleGroupInviteReq
+         * @memberof protocol.HandleGroupRequestReq
          * @static
          * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
          * @returns {string} The default type url
          */
-        HandleGroupInviteReq.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+        HandleGroupRequestReq.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
             if (typeUrlPrefix === undefined) {
                 typeUrlPrefix = "type.googleapis.com";
             }
-            return typeUrlPrefix + "/protocol.HandleGroupInviteReq";
+            return typeUrlPrefix + "/protocol.HandleGroupRequestReq";
         };
 
-        return HandleGroupInviteReq;
+        return HandleGroupRequestReq;
     })();
 
     protocol.IMMessage = (function() {
@@ -14785,267 +14785,6 @@ $root.protocol = (function() {
         };
 
         return IMMessage;
-    })();
-
-    protocol.APIResp = (function() {
-
-        /**
-         * Properties of a APIResp.
-         * @memberof protocol
-         * @interface IAPIResp
-         * @property {number|null} [code] APIResp code
-         * @property {string|null} [msg] APIResp msg
-         * @property {Uint8Array|null} [data] APIResp data
-         */
-
-        /**
-         * Constructs a new APIResp.
-         * @memberof protocol
-         * @classdesc Represents a APIResp.
-         * @implements IAPIResp
-         * @constructor
-         * @param {protocol.IAPIResp=} [properties] Properties to set
-         */
-        function APIResp(properties) {
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * APIResp code.
-         * @member {number} code
-         * @memberof protocol.APIResp
-         * @instance
-         */
-        APIResp.prototype.code = 0;
-
-        /**
-         * APIResp msg.
-         * @member {string} msg
-         * @memberof protocol.APIResp
-         * @instance
-         */
-        APIResp.prototype.msg = "";
-
-        /**
-         * APIResp data.
-         * @member {Uint8Array} data
-         * @memberof protocol.APIResp
-         * @instance
-         */
-        APIResp.prototype.data = $util.newBuffer([]);
-
-        /**
-         * Creates a new APIResp instance using the specified properties.
-         * @function create
-         * @memberof protocol.APIResp
-         * @static
-         * @param {protocol.IAPIResp=} [properties] Properties to set
-         * @returns {protocol.APIResp} APIResp instance
-         */
-        APIResp.create = function create(properties) {
-            return new APIResp(properties);
-        };
-
-        /**
-         * Encodes the specified APIResp message. Does not implicitly {@link protocol.APIResp.verify|verify} messages.
-         * @function encode
-         * @memberof protocol.APIResp
-         * @static
-         * @param {protocol.IAPIResp} message APIResp message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        APIResp.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.code != null && Object.hasOwnProperty.call(message, "code"))
-                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.code);
-            if (message.msg != null && Object.hasOwnProperty.call(message, "msg"))
-                writer.uint32(/* id 2, wireType 2 =*/18).string(message.msg);
-            if (message.data != null && Object.hasOwnProperty.call(message, "data"))
-                writer.uint32(/* id 3, wireType 2 =*/26).bytes(message.data);
-            return writer;
-        };
-
-        /**
-         * Encodes the specified APIResp message, length delimited. Does not implicitly {@link protocol.APIResp.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof protocol.APIResp
-         * @static
-         * @param {protocol.IAPIResp} message APIResp message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        APIResp.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a APIResp message from the specified reader or buffer.
-         * @function decode
-         * @memberof protocol.APIResp
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {protocol.APIResp} APIResp
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        APIResp.decode = function decode(reader, length, error) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.APIResp();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                if (tag === error)
-                    break;
-                switch (tag >>> 3) {
-                case 1: {
-                        message.code = reader.int32();
-                        break;
-                    }
-                case 2: {
-                        message.msg = reader.string();
-                        break;
-                    }
-                case 3: {
-                        message.data = reader.bytes();
-                        break;
-                    }
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a APIResp message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof protocol.APIResp
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {protocol.APIResp} APIResp
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        APIResp.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a APIResp message.
-         * @function verify
-         * @memberof protocol.APIResp
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        APIResp.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.code != null && message.hasOwnProperty("code"))
-                if (!$util.isInteger(message.code))
-                    return "code: integer expected";
-            if (message.msg != null && message.hasOwnProperty("msg"))
-                if (!$util.isString(message.msg))
-                    return "msg: string expected";
-            if (message.data != null && message.hasOwnProperty("data"))
-                if (!(message.data && typeof message.data.length === "number" || $util.isString(message.data)))
-                    return "data: buffer expected";
-            return null;
-        };
-
-        /**
-         * Creates a APIResp message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof protocol.APIResp
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {protocol.APIResp} APIResp
-         */
-        APIResp.fromObject = function fromObject(object) {
-            if (object instanceof $root.protocol.APIResp)
-                return object;
-            var message = new $root.protocol.APIResp();
-            if (object.code != null)
-                message.code = object.code | 0;
-            if (object.msg != null)
-                message.msg = String(object.msg);
-            if (object.data != null)
-                if (typeof object.data === "string")
-                    $util.base64.decode(object.data, message.data = $util.newBuffer($util.base64.length(object.data)), 0);
-                else if (object.data.length >= 0)
-                    message.data = object.data;
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a APIResp message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof protocol.APIResp
-         * @static
-         * @param {protocol.APIResp} message APIResp
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        APIResp.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            var object = {};
-            if (options.defaults) {
-                object.code = 0;
-                object.msg = "";
-                if (options.bytes === String)
-                    object.data = "";
-                else {
-                    object.data = [];
-                    if (options.bytes !== Array)
-                        object.data = $util.newBuffer(object.data);
-                }
-            }
-            if (message.code != null && message.hasOwnProperty("code"))
-                object.code = message.code;
-            if (message.msg != null && message.hasOwnProperty("msg"))
-                object.msg = message.msg;
-            if (message.data != null && message.hasOwnProperty("data"))
-                object.data = options.bytes === String ? $util.base64.encode(message.data, 0, message.data.length) : options.bytes === Array ? Array.prototype.slice.call(message.data) : message.data;
-            return object;
-        };
-
-        /**
-         * Converts this APIResp to JSON.
-         * @function toJSON
-         * @memberof protocol.APIResp
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        APIResp.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        /**
-         * Gets the default type url for APIResp
-         * @function getTypeUrl
-         * @memberof protocol.APIResp
-         * @static
-         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns {string} The default type url
-         */
-        APIResp.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-            if (typeUrlPrefix === undefined) {
-                typeUrlPrefix = "type.googleapis.com";
-            }
-            return typeUrlPrefix + "/protocol.APIResp";
-        };
-
-        return APIResp;
     })();
 
     protocol.Notification = (function() {
@@ -15990,6 +15729,267 @@ $root.protocol = (function() {
         return IMMessageList;
     })();
 
+    protocol.APIResp = (function() {
+
+        /**
+         * Properties of a APIResp.
+         * @memberof protocol
+         * @interface IAPIResp
+         * @property {number|null} [code] APIResp code
+         * @property {string|null} [msg] APIResp msg
+         * @property {Uint8Array|null} [data] APIResp data
+         */
+
+        /**
+         * Constructs a new APIResp.
+         * @memberof protocol
+         * @classdesc Represents a APIResp.
+         * @implements IAPIResp
+         * @constructor
+         * @param {protocol.IAPIResp=} [properties] Properties to set
+         */
+        function APIResp(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * APIResp code.
+         * @member {number} code
+         * @memberof protocol.APIResp
+         * @instance
+         */
+        APIResp.prototype.code = 0;
+
+        /**
+         * APIResp msg.
+         * @member {string} msg
+         * @memberof protocol.APIResp
+         * @instance
+         */
+        APIResp.prototype.msg = "";
+
+        /**
+         * APIResp data.
+         * @member {Uint8Array} data
+         * @memberof protocol.APIResp
+         * @instance
+         */
+        APIResp.prototype.data = $util.newBuffer([]);
+
+        /**
+         * Creates a new APIResp instance using the specified properties.
+         * @function create
+         * @memberof protocol.APIResp
+         * @static
+         * @param {protocol.IAPIResp=} [properties] Properties to set
+         * @returns {protocol.APIResp} APIResp instance
+         */
+        APIResp.create = function create(properties) {
+            return new APIResp(properties);
+        };
+
+        /**
+         * Encodes the specified APIResp message. Does not implicitly {@link protocol.APIResp.verify|verify} messages.
+         * @function encode
+         * @memberof protocol.APIResp
+         * @static
+         * @param {protocol.IAPIResp} message APIResp message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        APIResp.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.code != null && Object.hasOwnProperty.call(message, "code"))
+                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.code);
+            if (message.msg != null && Object.hasOwnProperty.call(message, "msg"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.msg);
+            if (message.data != null && Object.hasOwnProperty.call(message, "data"))
+                writer.uint32(/* id 3, wireType 2 =*/26).bytes(message.data);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified APIResp message, length delimited. Does not implicitly {@link protocol.APIResp.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof protocol.APIResp
+         * @static
+         * @param {protocol.IAPIResp} message APIResp message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        APIResp.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a APIResp message from the specified reader or buffer.
+         * @function decode
+         * @memberof protocol.APIResp
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {protocol.APIResp} APIResp
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        APIResp.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.APIResp();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.code = reader.int32();
+                        break;
+                    }
+                case 2: {
+                        message.msg = reader.string();
+                        break;
+                    }
+                case 3: {
+                        message.data = reader.bytes();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a APIResp message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof protocol.APIResp
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {protocol.APIResp} APIResp
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        APIResp.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a APIResp message.
+         * @function verify
+         * @memberof protocol.APIResp
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        APIResp.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.code != null && message.hasOwnProperty("code"))
+                if (!$util.isInteger(message.code))
+                    return "code: integer expected";
+            if (message.msg != null && message.hasOwnProperty("msg"))
+                if (!$util.isString(message.msg))
+                    return "msg: string expected";
+            if (message.data != null && message.hasOwnProperty("data"))
+                if (!(message.data && typeof message.data.length === "number" || $util.isString(message.data)))
+                    return "data: buffer expected";
+            return null;
+        };
+
+        /**
+         * Creates a APIResp message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof protocol.APIResp
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {protocol.APIResp} APIResp
+         */
+        APIResp.fromObject = function fromObject(object) {
+            if (object instanceof $root.protocol.APIResp)
+                return object;
+            var message = new $root.protocol.APIResp();
+            if (object.code != null)
+                message.code = object.code | 0;
+            if (object.msg != null)
+                message.msg = String(object.msg);
+            if (object.data != null)
+                if (typeof object.data === "string")
+                    $util.base64.decode(object.data, message.data = $util.newBuffer($util.base64.length(object.data)), 0);
+                else if (object.data.length >= 0)
+                    message.data = object.data;
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a APIResp message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof protocol.APIResp
+         * @static
+         * @param {protocol.APIResp} message APIResp
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        APIResp.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                object.code = 0;
+                object.msg = "";
+                if (options.bytes === String)
+                    object.data = "";
+                else {
+                    object.data = [];
+                    if (options.bytes !== Array)
+                        object.data = $util.newBuffer(object.data);
+                }
+            }
+            if (message.code != null && message.hasOwnProperty("code"))
+                object.code = message.code;
+            if (message.msg != null && message.hasOwnProperty("msg"))
+                object.msg = message.msg;
+            if (message.data != null && message.hasOwnProperty("data"))
+                object.data = options.bytes === String ? $util.base64.encode(message.data, 0, message.data.length) : options.bytes === Array ? Array.prototype.slice.call(message.data) : message.data;
+            return object;
+        };
+
+        /**
+         * Converts this APIResp to JSON.
+         * @function toJSON
+         * @memberof protocol.APIResp
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        APIResp.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for APIResp
+         * @function getTypeUrl
+         * @memberof protocol.APIResp
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        APIResp.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/protocol.APIResp";
+        };
+
+        return APIResp;
+    })();
+
     protocol.GetRecentPrivateMessagesReq = (function() {
 
         /**
@@ -16499,304 +16499,6 @@ $root.protocol = (function() {
         return GetRecentGroupMessagesReq;
     })();
 
-    protocol.UserInfoResp = (function() {
-
-        /**
-         * Properties of a UserInfoResp.
-         * @memberof protocol
-         * @interface IUserInfoResp
-         * @property {string|null} [uid] UserInfoResp uid
-         * @property {string|null} [username] UserInfoResp username
-         * @property {string|null} [email] UserInfoResp email
-         * @property {number|null} [code] UserInfoResp code
-         * @property {string|null} [msg] UserInfoResp msg
-         */
-
-        /**
-         * Constructs a new UserInfoResp.
-         * @memberof protocol
-         * @classdesc Represents a UserInfoResp.
-         * @implements IUserInfoResp
-         * @constructor
-         * @param {protocol.IUserInfoResp=} [properties] Properties to set
-         */
-        function UserInfoResp(properties) {
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * UserInfoResp uid.
-         * @member {string} uid
-         * @memberof protocol.UserInfoResp
-         * @instance
-         */
-        UserInfoResp.prototype.uid = "";
-
-        /**
-         * UserInfoResp username.
-         * @member {string} username
-         * @memberof protocol.UserInfoResp
-         * @instance
-         */
-        UserInfoResp.prototype.username = "";
-
-        /**
-         * UserInfoResp email.
-         * @member {string} email
-         * @memberof protocol.UserInfoResp
-         * @instance
-         */
-        UserInfoResp.prototype.email = "";
-
-        /**
-         * UserInfoResp code.
-         * @member {number} code
-         * @memberof protocol.UserInfoResp
-         * @instance
-         */
-        UserInfoResp.prototype.code = 0;
-
-        /**
-         * UserInfoResp msg.
-         * @member {string} msg
-         * @memberof protocol.UserInfoResp
-         * @instance
-         */
-        UserInfoResp.prototype.msg = "";
-
-        /**
-         * Creates a new UserInfoResp instance using the specified properties.
-         * @function create
-         * @memberof protocol.UserInfoResp
-         * @static
-         * @param {protocol.IUserInfoResp=} [properties] Properties to set
-         * @returns {protocol.UserInfoResp} UserInfoResp instance
-         */
-        UserInfoResp.create = function create(properties) {
-            return new UserInfoResp(properties);
-        };
-
-        /**
-         * Encodes the specified UserInfoResp message. Does not implicitly {@link protocol.UserInfoResp.verify|verify} messages.
-         * @function encode
-         * @memberof protocol.UserInfoResp
-         * @static
-         * @param {protocol.IUserInfoResp} message UserInfoResp message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        UserInfoResp.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.uid != null && Object.hasOwnProperty.call(message, "uid"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.uid);
-            if (message.username != null && Object.hasOwnProperty.call(message, "username"))
-                writer.uint32(/* id 2, wireType 2 =*/18).string(message.username);
-            if (message.email != null && Object.hasOwnProperty.call(message, "email"))
-                writer.uint32(/* id 3, wireType 2 =*/26).string(message.email);
-            if (message.code != null && Object.hasOwnProperty.call(message, "code"))
-                writer.uint32(/* id 4, wireType 0 =*/32).int32(message.code);
-            if (message.msg != null && Object.hasOwnProperty.call(message, "msg"))
-                writer.uint32(/* id 5, wireType 2 =*/42).string(message.msg);
-            return writer;
-        };
-
-        /**
-         * Encodes the specified UserInfoResp message, length delimited. Does not implicitly {@link protocol.UserInfoResp.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof protocol.UserInfoResp
-         * @static
-         * @param {protocol.IUserInfoResp} message UserInfoResp message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        UserInfoResp.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a UserInfoResp message from the specified reader or buffer.
-         * @function decode
-         * @memberof protocol.UserInfoResp
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {protocol.UserInfoResp} UserInfoResp
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        UserInfoResp.decode = function decode(reader, length, error) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.UserInfoResp();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                if (tag === error)
-                    break;
-                switch (tag >>> 3) {
-                case 1: {
-                        message.uid = reader.string();
-                        break;
-                    }
-                case 2: {
-                        message.username = reader.string();
-                        break;
-                    }
-                case 3: {
-                        message.email = reader.string();
-                        break;
-                    }
-                case 4: {
-                        message.code = reader.int32();
-                        break;
-                    }
-                case 5: {
-                        message.msg = reader.string();
-                        break;
-                    }
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a UserInfoResp message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof protocol.UserInfoResp
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {protocol.UserInfoResp} UserInfoResp
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        UserInfoResp.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a UserInfoResp message.
-         * @function verify
-         * @memberof protocol.UserInfoResp
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        UserInfoResp.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.uid != null && message.hasOwnProperty("uid"))
-                if (!$util.isString(message.uid))
-                    return "uid: string expected";
-            if (message.username != null && message.hasOwnProperty("username"))
-                if (!$util.isString(message.username))
-                    return "username: string expected";
-            if (message.email != null && message.hasOwnProperty("email"))
-                if (!$util.isString(message.email))
-                    return "email: string expected";
-            if (message.code != null && message.hasOwnProperty("code"))
-                if (!$util.isInteger(message.code))
-                    return "code: integer expected";
-            if (message.msg != null && message.hasOwnProperty("msg"))
-                if (!$util.isString(message.msg))
-                    return "msg: string expected";
-            return null;
-        };
-
-        /**
-         * Creates a UserInfoResp message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof protocol.UserInfoResp
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {protocol.UserInfoResp} UserInfoResp
-         */
-        UserInfoResp.fromObject = function fromObject(object) {
-            if (object instanceof $root.protocol.UserInfoResp)
-                return object;
-            var message = new $root.protocol.UserInfoResp();
-            if (object.uid != null)
-                message.uid = String(object.uid);
-            if (object.username != null)
-                message.username = String(object.username);
-            if (object.email != null)
-                message.email = String(object.email);
-            if (object.code != null)
-                message.code = object.code | 0;
-            if (object.msg != null)
-                message.msg = String(object.msg);
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a UserInfoResp message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof protocol.UserInfoResp
-         * @static
-         * @param {protocol.UserInfoResp} message UserInfoResp
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        UserInfoResp.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            var object = {};
-            if (options.defaults) {
-                object.uid = "";
-                object.username = "";
-                object.email = "";
-                object.code = 0;
-                object.msg = "";
-            }
-            if (message.uid != null && message.hasOwnProperty("uid"))
-                object.uid = message.uid;
-            if (message.username != null && message.hasOwnProperty("username"))
-                object.username = message.username;
-            if (message.email != null && message.hasOwnProperty("email"))
-                object.email = message.email;
-            if (message.code != null && message.hasOwnProperty("code"))
-                object.code = message.code;
-            if (message.msg != null && message.hasOwnProperty("msg"))
-                object.msg = message.msg;
-            return object;
-        };
-
-        /**
-         * Converts this UserInfoResp to JSON.
-         * @function toJSON
-         * @memberof protocol.UserInfoResp
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        UserInfoResp.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        /**
-         * Gets the default type url for UserInfoResp
-         * @function getTypeUrl
-         * @memberof protocol.UserInfoResp
-         * @static
-         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns {string} The default type url
-         */
-        UserInfoResp.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-            if (typeUrlPrefix === undefined) {
-                typeUrlPrefix = "type.googleapis.com";
-            }
-            return typeUrlPrefix + "/protocol.UserInfoResp";
-        };
-
-        return UserInfoResp;
-    })();
-
     protocol.RegisterReq = (function() {
 
         /**
@@ -17278,26 +16980,24 @@ $root.protocol = (function() {
         return LoginReq;
     })();
 
-    protocol.ResetPwdReq = (function() {
+    protocol.LogoutReq = (function() {
 
         /**
-         * Properties of a ResetPwdReq.
+         * Properties of a LogoutReq.
          * @memberof protocol
-         * @interface IResetPwdReq
-         * @property {string|null} [email] ResetPwdReq email
-         * @property {string|null} [newPwd] ResetPwdReq newPwd
-         * @property {string|null} [code] ResetPwdReq code
+         * @interface ILogoutReq
+         * @property {string|null} [token] LogoutReq token
          */
 
         /**
-         * Constructs a new ResetPwdReq.
+         * Constructs a new LogoutReq.
          * @memberof protocol
-         * @classdesc Represents a ResetPwdReq.
-         * @implements IResetPwdReq
+         * @classdesc Represents a LogoutReq.
+         * @implements ILogoutReq
          * @constructor
-         * @param {protocol.IResetPwdReq=} [properties] Properties to set
+         * @param {protocol.ILogoutReq=} [properties] Properties to set
          */
-        function ResetPwdReq(properties) {
+        function LogoutReq(properties) {
             if (properties)
                 for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -17305,105 +17005,77 @@ $root.protocol = (function() {
         }
 
         /**
-         * ResetPwdReq email.
-         * @member {string} email
-         * @memberof protocol.ResetPwdReq
+         * LogoutReq token.
+         * @member {string} token
+         * @memberof protocol.LogoutReq
          * @instance
          */
-        ResetPwdReq.prototype.email = "";
+        LogoutReq.prototype.token = "";
 
         /**
-         * ResetPwdReq newPwd.
-         * @member {string} newPwd
-         * @memberof protocol.ResetPwdReq
-         * @instance
-         */
-        ResetPwdReq.prototype.newPwd = "";
-
-        /**
-         * ResetPwdReq code.
-         * @member {string} code
-         * @memberof protocol.ResetPwdReq
-         * @instance
-         */
-        ResetPwdReq.prototype.code = "";
-
-        /**
-         * Creates a new ResetPwdReq instance using the specified properties.
+         * Creates a new LogoutReq instance using the specified properties.
          * @function create
-         * @memberof protocol.ResetPwdReq
+         * @memberof protocol.LogoutReq
          * @static
-         * @param {protocol.IResetPwdReq=} [properties] Properties to set
-         * @returns {protocol.ResetPwdReq} ResetPwdReq instance
+         * @param {protocol.ILogoutReq=} [properties] Properties to set
+         * @returns {protocol.LogoutReq} LogoutReq instance
          */
-        ResetPwdReq.create = function create(properties) {
-            return new ResetPwdReq(properties);
+        LogoutReq.create = function create(properties) {
+            return new LogoutReq(properties);
         };
 
         /**
-         * Encodes the specified ResetPwdReq message. Does not implicitly {@link protocol.ResetPwdReq.verify|verify} messages.
+         * Encodes the specified LogoutReq message. Does not implicitly {@link protocol.LogoutReq.verify|verify} messages.
          * @function encode
-         * @memberof protocol.ResetPwdReq
+         * @memberof protocol.LogoutReq
          * @static
-         * @param {protocol.IResetPwdReq} message ResetPwdReq message or plain object to encode
+         * @param {protocol.ILogoutReq} message LogoutReq message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        ResetPwdReq.encode = function encode(message, writer) {
+        LogoutReq.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.email != null && Object.hasOwnProperty.call(message, "email"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.email);
-            if (message.newPwd != null && Object.hasOwnProperty.call(message, "newPwd"))
-                writer.uint32(/* id 2, wireType 2 =*/18).string(message.newPwd);
-            if (message.code != null && Object.hasOwnProperty.call(message, "code"))
-                writer.uint32(/* id 3, wireType 2 =*/26).string(message.code);
+            if (message.token != null && Object.hasOwnProperty.call(message, "token"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.token);
             return writer;
         };
 
         /**
-         * Encodes the specified ResetPwdReq message, length delimited. Does not implicitly {@link protocol.ResetPwdReq.verify|verify} messages.
+         * Encodes the specified LogoutReq message, length delimited. Does not implicitly {@link protocol.LogoutReq.verify|verify} messages.
          * @function encodeDelimited
-         * @memberof protocol.ResetPwdReq
+         * @memberof protocol.LogoutReq
          * @static
-         * @param {protocol.IResetPwdReq} message ResetPwdReq message or plain object to encode
+         * @param {protocol.ILogoutReq} message LogoutReq message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        ResetPwdReq.encodeDelimited = function encodeDelimited(message, writer) {
+        LogoutReq.encodeDelimited = function encodeDelimited(message, writer) {
             return this.encode(message, writer).ldelim();
         };
 
         /**
-         * Decodes a ResetPwdReq message from the specified reader or buffer.
+         * Decodes a LogoutReq message from the specified reader or buffer.
          * @function decode
-         * @memberof protocol.ResetPwdReq
+         * @memberof protocol.LogoutReq
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
          * @param {number} [length] Message length if known beforehand
-         * @returns {protocol.ResetPwdReq} ResetPwdReq
+         * @returns {protocol.LogoutReq} LogoutReq
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        ResetPwdReq.decode = function decode(reader, length, error) {
+        LogoutReq.decode = function decode(reader, length, error) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.ResetPwdReq();
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.LogoutReq();
             while (reader.pos < end) {
                 var tag = reader.uint32();
                 if (tag === error)
                     break;
                 switch (tag >>> 3) {
                 case 1: {
-                        message.email = reader.string();
-                        break;
-                    }
-                case 2: {
-                        message.newPwd = reader.string();
-                        break;
-                    }
-                case 3: {
-                        message.code = reader.string();
+                        message.token = reader.string();
                         break;
                     }
                 default:
@@ -17415,119 +17087,605 @@ $root.protocol = (function() {
         };
 
         /**
-         * Decodes a ResetPwdReq message from the specified reader or buffer, length delimited.
+         * Decodes a LogoutReq message from the specified reader or buffer, length delimited.
          * @function decodeDelimited
-         * @memberof protocol.ResetPwdReq
+         * @memberof protocol.LogoutReq
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {protocol.ResetPwdReq} ResetPwdReq
+         * @returns {protocol.LogoutReq} LogoutReq
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        ResetPwdReq.decodeDelimited = function decodeDelimited(reader) {
+        LogoutReq.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
         };
 
         /**
-         * Verifies a ResetPwdReq message.
+         * Verifies a LogoutReq message.
          * @function verify
-         * @memberof protocol.ResetPwdReq
+         * @memberof protocol.LogoutReq
          * @static
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        ResetPwdReq.verify = function verify(message) {
+        LogoutReq.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (message.email != null && message.hasOwnProperty("email"))
-                if (!$util.isString(message.email))
-                    return "email: string expected";
-            if (message.newPwd != null && message.hasOwnProperty("newPwd"))
-                if (!$util.isString(message.newPwd))
-                    return "newPwd: string expected";
-            if (message.code != null && message.hasOwnProperty("code"))
-                if (!$util.isString(message.code))
-                    return "code: string expected";
+            if (message.token != null && message.hasOwnProperty("token"))
+                if (!$util.isString(message.token))
+                    return "token: string expected";
             return null;
         };
 
         /**
-         * Creates a ResetPwdReq message from a plain object. Also converts values to their respective internal types.
+         * Creates a LogoutReq message from a plain object. Also converts values to their respective internal types.
          * @function fromObject
-         * @memberof protocol.ResetPwdReq
+         * @memberof protocol.LogoutReq
          * @static
          * @param {Object.<string,*>} object Plain object
-         * @returns {protocol.ResetPwdReq} ResetPwdReq
+         * @returns {protocol.LogoutReq} LogoutReq
          */
-        ResetPwdReq.fromObject = function fromObject(object) {
-            if (object instanceof $root.protocol.ResetPwdReq)
+        LogoutReq.fromObject = function fromObject(object) {
+            if (object instanceof $root.protocol.LogoutReq)
                 return object;
-            var message = new $root.protocol.ResetPwdReq();
-            if (object.email != null)
-                message.email = String(object.email);
-            if (object.newPwd != null)
-                message.newPwd = String(object.newPwd);
-            if (object.code != null)
-                message.code = String(object.code);
+            var message = new $root.protocol.LogoutReq();
+            if (object.token != null)
+                message.token = String(object.token);
             return message;
         };
 
         /**
-         * Creates a plain object from a ResetPwdReq message. Also converts values to other types if specified.
+         * Creates a plain object from a LogoutReq message. Also converts values to other types if specified.
          * @function toObject
-         * @memberof protocol.ResetPwdReq
+         * @memberof protocol.LogoutReq
          * @static
-         * @param {protocol.ResetPwdReq} message ResetPwdReq
+         * @param {protocol.LogoutReq} message LogoutReq
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        ResetPwdReq.toObject = function toObject(message, options) {
+        LogoutReq.toObject = function toObject(message, options) {
             if (!options)
                 options = {};
             var object = {};
-            if (options.defaults) {
-                object.email = "";
-                object.newPwd = "";
-                object.code = "";
-            }
-            if (message.email != null && message.hasOwnProperty("email"))
-                object.email = message.email;
-            if (message.newPwd != null && message.hasOwnProperty("newPwd"))
-                object.newPwd = message.newPwd;
-            if (message.code != null && message.hasOwnProperty("code"))
-                object.code = message.code;
+            if (options.defaults)
+                object.token = "";
+            if (message.token != null && message.hasOwnProperty("token"))
+                object.token = message.token;
             return object;
         };
 
         /**
-         * Converts this ResetPwdReq to JSON.
+         * Converts this LogoutReq to JSON.
          * @function toJSON
-         * @memberof protocol.ResetPwdReq
+         * @memberof protocol.LogoutReq
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        ResetPwdReq.prototype.toJSON = function toJSON() {
+        LogoutReq.prototype.toJSON = function toJSON() {
             return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
         };
 
         /**
-         * Gets the default type url for ResetPwdReq
+         * Gets the default type url for LogoutReq
          * @function getTypeUrl
-         * @memberof protocol.ResetPwdReq
+         * @memberof protocol.LogoutReq
          * @static
          * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
          * @returns {string} The default type url
          */
-        ResetPwdReq.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+        LogoutReq.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
             if (typeUrlPrefix === undefined) {
                 typeUrlPrefix = "type.googleapis.com";
             }
-            return typeUrlPrefix + "/protocol.ResetPwdReq";
+            return typeUrlPrefix + "/protocol.LogoutReq";
         };
 
-        return ResetPwdReq;
+        return LogoutReq;
+    })();
+
+    protocol.UserInfoReq = (function() {
+
+        /**
+         * Properties of a UserInfoReq.
+         * @memberof protocol
+         * @interface IUserInfoReq
+         * @property {string|null} [token] UserInfoReq token
+         */
+
+        /**
+         * Constructs a new UserInfoReq.
+         * @memberof protocol
+         * @classdesc Represents a UserInfoReq.
+         * @implements IUserInfoReq
+         * @constructor
+         * @param {protocol.IUserInfoReq=} [properties] Properties to set
+         */
+        function UserInfoReq(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * UserInfoReq token.
+         * @member {string} token
+         * @memberof protocol.UserInfoReq
+         * @instance
+         */
+        UserInfoReq.prototype.token = "";
+
+        /**
+         * Creates a new UserInfoReq instance using the specified properties.
+         * @function create
+         * @memberof protocol.UserInfoReq
+         * @static
+         * @param {protocol.IUserInfoReq=} [properties] Properties to set
+         * @returns {protocol.UserInfoReq} UserInfoReq instance
+         */
+        UserInfoReq.create = function create(properties) {
+            return new UserInfoReq(properties);
+        };
+
+        /**
+         * Encodes the specified UserInfoReq message. Does not implicitly {@link protocol.UserInfoReq.verify|verify} messages.
+         * @function encode
+         * @memberof protocol.UserInfoReq
+         * @static
+         * @param {protocol.IUserInfoReq} message UserInfoReq message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        UserInfoReq.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.token != null && Object.hasOwnProperty.call(message, "token"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.token);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified UserInfoReq message, length delimited. Does not implicitly {@link protocol.UserInfoReq.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof protocol.UserInfoReq
+         * @static
+         * @param {protocol.IUserInfoReq} message UserInfoReq message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        UserInfoReq.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a UserInfoReq message from the specified reader or buffer.
+         * @function decode
+         * @memberof protocol.UserInfoReq
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {protocol.UserInfoReq} UserInfoReq
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        UserInfoReq.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.UserInfoReq();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.token = reader.string();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a UserInfoReq message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof protocol.UserInfoReq
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {protocol.UserInfoReq} UserInfoReq
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        UserInfoReq.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a UserInfoReq message.
+         * @function verify
+         * @memberof protocol.UserInfoReq
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        UserInfoReq.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.token != null && message.hasOwnProperty("token"))
+                if (!$util.isString(message.token))
+                    return "token: string expected";
+            return null;
+        };
+
+        /**
+         * Creates a UserInfoReq message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof protocol.UserInfoReq
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {protocol.UserInfoReq} UserInfoReq
+         */
+        UserInfoReq.fromObject = function fromObject(object) {
+            if (object instanceof $root.protocol.UserInfoReq)
+                return object;
+            var message = new $root.protocol.UserInfoReq();
+            if (object.token != null)
+                message.token = String(object.token);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a UserInfoReq message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof protocol.UserInfoReq
+         * @static
+         * @param {protocol.UserInfoReq} message UserInfoReq
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        UserInfoReq.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults)
+                object.token = "";
+            if (message.token != null && message.hasOwnProperty("token"))
+                object.token = message.token;
+            return object;
+        };
+
+        /**
+         * Converts this UserInfoReq to JSON.
+         * @function toJSON
+         * @memberof protocol.UserInfoReq
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        UserInfoReq.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for UserInfoReq
+         * @function getTypeUrl
+         * @memberof protocol.UserInfoReq
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        UserInfoReq.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/protocol.UserInfoReq";
+        };
+
+        return UserInfoReq;
+    })();
+
+    protocol.UserInfoResp = (function() {
+
+        /**
+         * Properties of a UserInfoResp.
+         * @memberof protocol
+         * @interface IUserInfoResp
+         * @property {string|null} [uid] UserInfoResp uid
+         * @property {string|null} [username] UserInfoResp username
+         * @property {string|null} [email] UserInfoResp email
+         * @property {number|null} [code] UserInfoResp code
+         * @property {string|null} [msg] UserInfoResp msg
+         */
+
+        /**
+         * Constructs a new UserInfoResp.
+         * @memberof protocol
+         * @classdesc Represents a UserInfoResp.
+         * @implements IUserInfoResp
+         * @constructor
+         * @param {protocol.IUserInfoResp=} [properties] Properties to set
+         */
+        function UserInfoResp(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * UserInfoResp uid.
+         * @member {string} uid
+         * @memberof protocol.UserInfoResp
+         * @instance
+         */
+        UserInfoResp.prototype.uid = "";
+
+        /**
+         * UserInfoResp username.
+         * @member {string} username
+         * @memberof protocol.UserInfoResp
+         * @instance
+         */
+        UserInfoResp.prototype.username = "";
+
+        /**
+         * UserInfoResp email.
+         * @member {string} email
+         * @memberof protocol.UserInfoResp
+         * @instance
+         */
+        UserInfoResp.prototype.email = "";
+
+        /**
+         * UserInfoResp code.
+         * @member {number} code
+         * @memberof protocol.UserInfoResp
+         * @instance
+         */
+        UserInfoResp.prototype.code = 0;
+
+        /**
+         * UserInfoResp msg.
+         * @member {string} msg
+         * @memberof protocol.UserInfoResp
+         * @instance
+         */
+        UserInfoResp.prototype.msg = "";
+
+        /**
+         * Creates a new UserInfoResp instance using the specified properties.
+         * @function create
+         * @memberof protocol.UserInfoResp
+         * @static
+         * @param {protocol.IUserInfoResp=} [properties] Properties to set
+         * @returns {protocol.UserInfoResp} UserInfoResp instance
+         */
+        UserInfoResp.create = function create(properties) {
+            return new UserInfoResp(properties);
+        };
+
+        /**
+         * Encodes the specified UserInfoResp message. Does not implicitly {@link protocol.UserInfoResp.verify|verify} messages.
+         * @function encode
+         * @memberof protocol.UserInfoResp
+         * @static
+         * @param {protocol.IUserInfoResp} message UserInfoResp message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        UserInfoResp.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.uid != null && Object.hasOwnProperty.call(message, "uid"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.uid);
+            if (message.username != null && Object.hasOwnProperty.call(message, "username"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.username);
+            if (message.email != null && Object.hasOwnProperty.call(message, "email"))
+                writer.uint32(/* id 3, wireType 2 =*/26).string(message.email);
+            if (message.code != null && Object.hasOwnProperty.call(message, "code"))
+                writer.uint32(/* id 4, wireType 0 =*/32).int32(message.code);
+            if (message.msg != null && Object.hasOwnProperty.call(message, "msg"))
+                writer.uint32(/* id 5, wireType 2 =*/42).string(message.msg);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified UserInfoResp message, length delimited. Does not implicitly {@link protocol.UserInfoResp.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof protocol.UserInfoResp
+         * @static
+         * @param {protocol.IUserInfoResp} message UserInfoResp message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        UserInfoResp.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a UserInfoResp message from the specified reader or buffer.
+         * @function decode
+         * @memberof protocol.UserInfoResp
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {protocol.UserInfoResp} UserInfoResp
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        UserInfoResp.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.UserInfoResp();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.uid = reader.string();
+                        break;
+                    }
+                case 2: {
+                        message.username = reader.string();
+                        break;
+                    }
+                case 3: {
+                        message.email = reader.string();
+                        break;
+                    }
+                case 4: {
+                        message.code = reader.int32();
+                        break;
+                    }
+                case 5: {
+                        message.msg = reader.string();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a UserInfoResp message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof protocol.UserInfoResp
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {protocol.UserInfoResp} UserInfoResp
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        UserInfoResp.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a UserInfoResp message.
+         * @function verify
+         * @memberof protocol.UserInfoResp
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        UserInfoResp.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.uid != null && message.hasOwnProperty("uid"))
+                if (!$util.isString(message.uid))
+                    return "uid: string expected";
+            if (message.username != null && message.hasOwnProperty("username"))
+                if (!$util.isString(message.username))
+                    return "username: string expected";
+            if (message.email != null && message.hasOwnProperty("email"))
+                if (!$util.isString(message.email))
+                    return "email: string expected";
+            if (message.code != null && message.hasOwnProperty("code"))
+                if (!$util.isInteger(message.code))
+                    return "code: integer expected";
+            if (message.msg != null && message.hasOwnProperty("msg"))
+                if (!$util.isString(message.msg))
+                    return "msg: string expected";
+            return null;
+        };
+
+        /**
+         * Creates a UserInfoResp message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof protocol.UserInfoResp
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {protocol.UserInfoResp} UserInfoResp
+         */
+        UserInfoResp.fromObject = function fromObject(object) {
+            if (object instanceof $root.protocol.UserInfoResp)
+                return object;
+            var message = new $root.protocol.UserInfoResp();
+            if (object.uid != null)
+                message.uid = String(object.uid);
+            if (object.username != null)
+                message.username = String(object.username);
+            if (object.email != null)
+                message.email = String(object.email);
+            if (object.code != null)
+                message.code = object.code | 0;
+            if (object.msg != null)
+                message.msg = String(object.msg);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a UserInfoResp message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof protocol.UserInfoResp
+         * @static
+         * @param {protocol.UserInfoResp} message UserInfoResp
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        UserInfoResp.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                object.uid = "";
+                object.username = "";
+                object.email = "";
+                object.code = 0;
+                object.msg = "";
+            }
+            if (message.uid != null && message.hasOwnProperty("uid"))
+                object.uid = message.uid;
+            if (message.username != null && message.hasOwnProperty("username"))
+                object.username = message.username;
+            if (message.email != null && message.hasOwnProperty("email"))
+                object.email = message.email;
+            if (message.code != null && message.hasOwnProperty("code"))
+                object.code = message.code;
+            if (message.msg != null && message.hasOwnProperty("msg"))
+                object.msg = message.msg;
+            return object;
+        };
+
+        /**
+         * Converts this UserInfoResp to JSON.
+         * @function toJSON
+         * @memberof protocol.UserInfoResp
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        UserInfoResp.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for UserInfoResp
+         * @function getTypeUrl
+         * @memberof protocol.UserInfoResp
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        UserInfoResp.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/protocol.UserInfoResp";
+        };
+
+        return UserInfoResp;
     })();
 
     protocol.UpdateUsernameReq = (function() {
@@ -18011,211 +18169,6 @@ $root.protocol = (function() {
         return UpdatePwdReq;
     })();
 
-    protocol.TokenCheckReq = (function() {
-
-        /**
-         * Properties of a TokenCheckReq.
-         * @memberof protocol
-         * @interface ITokenCheckReq
-         * @property {string|null} [token] TokenCheckReq token
-         */
-
-        /**
-         * Constructs a new TokenCheckReq.
-         * @memberof protocol
-         * @classdesc Represents a TokenCheckReq.
-         * @implements ITokenCheckReq
-         * @constructor
-         * @param {protocol.ITokenCheckReq=} [properties] Properties to set
-         */
-        function TokenCheckReq(properties) {
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * TokenCheckReq token.
-         * @member {string} token
-         * @memberof protocol.TokenCheckReq
-         * @instance
-         */
-        TokenCheckReq.prototype.token = "";
-
-        /**
-         * Creates a new TokenCheckReq instance using the specified properties.
-         * @function create
-         * @memberof protocol.TokenCheckReq
-         * @static
-         * @param {protocol.ITokenCheckReq=} [properties] Properties to set
-         * @returns {protocol.TokenCheckReq} TokenCheckReq instance
-         */
-        TokenCheckReq.create = function create(properties) {
-            return new TokenCheckReq(properties);
-        };
-
-        /**
-         * Encodes the specified TokenCheckReq message. Does not implicitly {@link protocol.TokenCheckReq.verify|verify} messages.
-         * @function encode
-         * @memberof protocol.TokenCheckReq
-         * @static
-         * @param {protocol.ITokenCheckReq} message TokenCheckReq message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        TokenCheckReq.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.token != null && Object.hasOwnProperty.call(message, "token"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.token);
-            return writer;
-        };
-
-        /**
-         * Encodes the specified TokenCheckReq message, length delimited. Does not implicitly {@link protocol.TokenCheckReq.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof protocol.TokenCheckReq
-         * @static
-         * @param {protocol.ITokenCheckReq} message TokenCheckReq message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        TokenCheckReq.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a TokenCheckReq message from the specified reader or buffer.
-         * @function decode
-         * @memberof protocol.TokenCheckReq
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {protocol.TokenCheckReq} TokenCheckReq
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        TokenCheckReq.decode = function decode(reader, length, error) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.TokenCheckReq();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                if (tag === error)
-                    break;
-                switch (tag >>> 3) {
-                case 1: {
-                        message.token = reader.string();
-                        break;
-                    }
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a TokenCheckReq message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof protocol.TokenCheckReq
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {protocol.TokenCheckReq} TokenCheckReq
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        TokenCheckReq.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a TokenCheckReq message.
-         * @function verify
-         * @memberof protocol.TokenCheckReq
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        TokenCheckReq.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.token != null && message.hasOwnProperty("token"))
-                if (!$util.isString(message.token))
-                    return "token: string expected";
-            return null;
-        };
-
-        /**
-         * Creates a TokenCheckReq message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof protocol.TokenCheckReq
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {protocol.TokenCheckReq} TokenCheckReq
-         */
-        TokenCheckReq.fromObject = function fromObject(object) {
-            if (object instanceof $root.protocol.TokenCheckReq)
-                return object;
-            var message = new $root.protocol.TokenCheckReq();
-            if (object.token != null)
-                message.token = String(object.token);
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a TokenCheckReq message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof protocol.TokenCheckReq
-         * @static
-         * @param {protocol.TokenCheckReq} message TokenCheckReq
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        TokenCheckReq.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            var object = {};
-            if (options.defaults)
-                object.token = "";
-            if (message.token != null && message.hasOwnProperty("token"))
-                object.token = message.token;
-            return object;
-        };
-
-        /**
-         * Converts this TokenCheckReq to JSON.
-         * @function toJSON
-         * @memberof protocol.TokenCheckReq
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        TokenCheckReq.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        /**
-         * Gets the default type url for TokenCheckReq
-         * @function getTypeUrl
-         * @memberof protocol.TokenCheckReq
-         * @static
-         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns {string} The default type url
-         */
-        TokenCheckReq.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-            if (typeUrlPrefix === undefined) {
-                typeUrlPrefix = "type.googleapis.com";
-            }
-            return typeUrlPrefix + "/protocol.TokenCheckReq";
-        };
-
-        return TokenCheckReq;
-    })();
-
     protocol.DeleteAccountReq = (function() {
 
         /**
@@ -18421,24 +18374,24 @@ $root.protocol = (function() {
         return DeleteAccountReq;
     })();
 
-    protocol.UserInfoReq = (function() {
+    protocol.TokenCheckReq = (function() {
 
         /**
-         * Properties of a UserInfoReq.
+         * Properties of a TokenCheckReq.
          * @memberof protocol
-         * @interface IUserInfoReq
-         * @property {string|null} [token] UserInfoReq token
+         * @interface ITokenCheckReq
+         * @property {string|null} [token] TokenCheckReq token
          */
 
         /**
-         * Constructs a new UserInfoReq.
+         * Constructs a new TokenCheckReq.
          * @memberof protocol
-         * @classdesc Represents a UserInfoReq.
-         * @implements IUserInfoReq
+         * @classdesc Represents a TokenCheckReq.
+         * @implements ITokenCheckReq
          * @constructor
-         * @param {protocol.IUserInfoReq=} [properties] Properties to set
+         * @param {protocol.ITokenCheckReq=} [properties] Properties to set
          */
-        function UserInfoReq(properties) {
+        function TokenCheckReq(properties) {
             if (properties)
                 for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -18446,35 +18399,35 @@ $root.protocol = (function() {
         }
 
         /**
-         * UserInfoReq token.
+         * TokenCheckReq token.
          * @member {string} token
-         * @memberof protocol.UserInfoReq
+         * @memberof protocol.TokenCheckReq
          * @instance
          */
-        UserInfoReq.prototype.token = "";
+        TokenCheckReq.prototype.token = "";
 
         /**
-         * Creates a new UserInfoReq instance using the specified properties.
+         * Creates a new TokenCheckReq instance using the specified properties.
          * @function create
-         * @memberof protocol.UserInfoReq
+         * @memberof protocol.TokenCheckReq
          * @static
-         * @param {protocol.IUserInfoReq=} [properties] Properties to set
-         * @returns {protocol.UserInfoReq} UserInfoReq instance
+         * @param {protocol.ITokenCheckReq=} [properties] Properties to set
+         * @returns {protocol.TokenCheckReq} TokenCheckReq instance
          */
-        UserInfoReq.create = function create(properties) {
-            return new UserInfoReq(properties);
+        TokenCheckReq.create = function create(properties) {
+            return new TokenCheckReq(properties);
         };
 
         /**
-         * Encodes the specified UserInfoReq message. Does not implicitly {@link protocol.UserInfoReq.verify|verify} messages.
+         * Encodes the specified TokenCheckReq message. Does not implicitly {@link protocol.TokenCheckReq.verify|verify} messages.
          * @function encode
-         * @memberof protocol.UserInfoReq
+         * @memberof protocol.TokenCheckReq
          * @static
-         * @param {protocol.IUserInfoReq} message UserInfoReq message or plain object to encode
+         * @param {protocol.ITokenCheckReq} message TokenCheckReq message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        UserInfoReq.encode = function encode(message, writer) {
+        TokenCheckReq.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
             if (message.token != null && Object.hasOwnProperty.call(message, "token"))
@@ -18483,33 +18436,33 @@ $root.protocol = (function() {
         };
 
         /**
-         * Encodes the specified UserInfoReq message, length delimited. Does not implicitly {@link protocol.UserInfoReq.verify|verify} messages.
+         * Encodes the specified TokenCheckReq message, length delimited. Does not implicitly {@link protocol.TokenCheckReq.verify|verify} messages.
          * @function encodeDelimited
-         * @memberof protocol.UserInfoReq
+         * @memberof protocol.TokenCheckReq
          * @static
-         * @param {protocol.IUserInfoReq} message UserInfoReq message or plain object to encode
+         * @param {protocol.ITokenCheckReq} message TokenCheckReq message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        UserInfoReq.encodeDelimited = function encodeDelimited(message, writer) {
+        TokenCheckReq.encodeDelimited = function encodeDelimited(message, writer) {
             return this.encode(message, writer).ldelim();
         };
 
         /**
-         * Decodes a UserInfoReq message from the specified reader or buffer.
+         * Decodes a TokenCheckReq message from the specified reader or buffer.
          * @function decode
-         * @memberof protocol.UserInfoReq
+         * @memberof protocol.TokenCheckReq
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
          * @param {number} [length] Message length if known beforehand
-         * @returns {protocol.UserInfoReq} UserInfoReq
+         * @returns {protocol.TokenCheckReq} TokenCheckReq
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        UserInfoReq.decode = function decode(reader, length, error) {
+        TokenCheckReq.decode = function decode(reader, length, error) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.UserInfoReq();
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.TokenCheckReq();
             while (reader.pos < end) {
                 var tag = reader.uint32();
                 if (tag === error)
@@ -18528,30 +18481,30 @@ $root.protocol = (function() {
         };
 
         /**
-         * Decodes a UserInfoReq message from the specified reader or buffer, length delimited.
+         * Decodes a TokenCheckReq message from the specified reader or buffer, length delimited.
          * @function decodeDelimited
-         * @memberof protocol.UserInfoReq
+         * @memberof protocol.TokenCheckReq
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {protocol.UserInfoReq} UserInfoReq
+         * @returns {protocol.TokenCheckReq} TokenCheckReq
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        UserInfoReq.decodeDelimited = function decodeDelimited(reader) {
+        TokenCheckReq.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
         };
 
         /**
-         * Verifies a UserInfoReq message.
+         * Verifies a TokenCheckReq message.
          * @function verify
-         * @memberof protocol.UserInfoReq
+         * @memberof protocol.TokenCheckReq
          * @static
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        UserInfoReq.verify = function verify(message) {
+        TokenCheckReq.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
             if (message.token != null && message.hasOwnProperty("token"))
@@ -18561,32 +18514,32 @@ $root.protocol = (function() {
         };
 
         /**
-         * Creates a UserInfoReq message from a plain object. Also converts values to their respective internal types.
+         * Creates a TokenCheckReq message from a plain object. Also converts values to their respective internal types.
          * @function fromObject
-         * @memberof protocol.UserInfoReq
+         * @memberof protocol.TokenCheckReq
          * @static
          * @param {Object.<string,*>} object Plain object
-         * @returns {protocol.UserInfoReq} UserInfoReq
+         * @returns {protocol.TokenCheckReq} TokenCheckReq
          */
-        UserInfoReq.fromObject = function fromObject(object) {
-            if (object instanceof $root.protocol.UserInfoReq)
+        TokenCheckReq.fromObject = function fromObject(object) {
+            if (object instanceof $root.protocol.TokenCheckReq)
                 return object;
-            var message = new $root.protocol.UserInfoReq();
+            var message = new $root.protocol.TokenCheckReq();
             if (object.token != null)
                 message.token = String(object.token);
             return message;
         };
 
         /**
-         * Creates a plain object from a UserInfoReq message. Also converts values to other types if specified.
+         * Creates a plain object from a TokenCheckReq message. Also converts values to other types if specified.
          * @function toObject
-         * @memberof protocol.UserInfoReq
+         * @memberof protocol.TokenCheckReq
          * @static
-         * @param {protocol.UserInfoReq} message UserInfoReq
+         * @param {protocol.TokenCheckReq} message TokenCheckReq
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        UserInfoReq.toObject = function toObject(message, options) {
+        TokenCheckReq.toObject = function toObject(message, options) {
             if (!options)
                 options = {};
             var object = {};
@@ -18598,237 +18551,32 @@ $root.protocol = (function() {
         };
 
         /**
-         * Converts this UserInfoReq to JSON.
+         * Converts this TokenCheckReq to JSON.
          * @function toJSON
-         * @memberof protocol.UserInfoReq
+         * @memberof protocol.TokenCheckReq
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        UserInfoReq.prototype.toJSON = function toJSON() {
+        TokenCheckReq.prototype.toJSON = function toJSON() {
             return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
         };
 
         /**
-         * Gets the default type url for UserInfoReq
+         * Gets the default type url for TokenCheckReq
          * @function getTypeUrl
-         * @memberof protocol.UserInfoReq
+         * @memberof protocol.TokenCheckReq
          * @static
          * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
          * @returns {string} The default type url
          */
-        UserInfoReq.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+        TokenCheckReq.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
             if (typeUrlPrefix === undefined) {
                 typeUrlPrefix = "type.googleapis.com";
             }
-            return typeUrlPrefix + "/protocol.UserInfoReq";
+            return typeUrlPrefix + "/protocol.TokenCheckReq";
         };
 
-        return UserInfoReq;
-    })();
-
-    protocol.LogoutReq = (function() {
-
-        /**
-         * Properties of a LogoutReq.
-         * @memberof protocol
-         * @interface ILogoutReq
-         * @property {string|null} [token] LogoutReq token
-         */
-
-        /**
-         * Constructs a new LogoutReq.
-         * @memberof protocol
-         * @classdesc Represents a LogoutReq.
-         * @implements ILogoutReq
-         * @constructor
-         * @param {protocol.ILogoutReq=} [properties] Properties to set
-         */
-        function LogoutReq(properties) {
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * LogoutReq token.
-         * @member {string} token
-         * @memberof protocol.LogoutReq
-         * @instance
-         */
-        LogoutReq.prototype.token = "";
-
-        /**
-         * Creates a new LogoutReq instance using the specified properties.
-         * @function create
-         * @memberof protocol.LogoutReq
-         * @static
-         * @param {protocol.ILogoutReq=} [properties] Properties to set
-         * @returns {protocol.LogoutReq} LogoutReq instance
-         */
-        LogoutReq.create = function create(properties) {
-            return new LogoutReq(properties);
-        };
-
-        /**
-         * Encodes the specified LogoutReq message. Does not implicitly {@link protocol.LogoutReq.verify|verify} messages.
-         * @function encode
-         * @memberof protocol.LogoutReq
-         * @static
-         * @param {protocol.ILogoutReq} message LogoutReq message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        LogoutReq.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.token != null && Object.hasOwnProperty.call(message, "token"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.token);
-            return writer;
-        };
-
-        /**
-         * Encodes the specified LogoutReq message, length delimited. Does not implicitly {@link protocol.LogoutReq.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof protocol.LogoutReq
-         * @static
-         * @param {protocol.ILogoutReq} message LogoutReq message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        LogoutReq.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a LogoutReq message from the specified reader or buffer.
-         * @function decode
-         * @memberof protocol.LogoutReq
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {protocol.LogoutReq} LogoutReq
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        LogoutReq.decode = function decode(reader, length, error) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.LogoutReq();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                if (tag === error)
-                    break;
-                switch (tag >>> 3) {
-                case 1: {
-                        message.token = reader.string();
-                        break;
-                    }
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a LogoutReq message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof protocol.LogoutReq
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {protocol.LogoutReq} LogoutReq
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        LogoutReq.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a LogoutReq message.
-         * @function verify
-         * @memberof protocol.LogoutReq
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        LogoutReq.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.token != null && message.hasOwnProperty("token"))
-                if (!$util.isString(message.token))
-                    return "token: string expected";
-            return null;
-        };
-
-        /**
-         * Creates a LogoutReq message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof protocol.LogoutReq
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {protocol.LogoutReq} LogoutReq
-         */
-        LogoutReq.fromObject = function fromObject(object) {
-            if (object instanceof $root.protocol.LogoutReq)
-                return object;
-            var message = new $root.protocol.LogoutReq();
-            if (object.token != null)
-                message.token = String(object.token);
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a LogoutReq message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof protocol.LogoutReq
-         * @static
-         * @param {protocol.LogoutReq} message LogoutReq
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        LogoutReq.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            var object = {};
-            if (options.defaults)
-                object.token = "";
-            if (message.token != null && message.hasOwnProperty("token"))
-                object.token = message.token;
-            return object;
-        };
-
-        /**
-         * Converts this LogoutReq to JSON.
-         * @function toJSON
-         * @memberof protocol.LogoutReq
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        LogoutReq.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        /**
-         * Gets the default type url for LogoutReq
-         * @function getTypeUrl
-         * @memberof protocol.LogoutReq
-         * @static
-         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns {string} The default type url
-         */
-        LogoutReq.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-            if (typeUrlPrefix === undefined) {
-                typeUrlPrefix = "type.googleapis.com";
-            }
-            return typeUrlPrefix + "/protocol.LogoutReq";
-        };
-
-        return LogoutReq;
+        return TokenCheckReq;
     })();
 
     protocol.SendEmailCodeReq = (function() {

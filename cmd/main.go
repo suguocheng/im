@@ -63,47 +63,54 @@ func main() {
 				return
 			}
 
+			// 心跳包支持
+			if msg.Type == "ping" {
+				conn.WriteMessage(websocket.TextMessage, []byte("pong"))
+				return
+			}
+
 			isChatMessage := msg.Type == "chat" || msg.Type == "secret_chat" || msg.Type == "emoji" || msg.Type == "image" || msg.Type == "file"
 			// --- 处理私聊消息 ---
 			if isChatMessage && msg.To != "" {
 				msg.FromUsername = senderUsername(storageManager, msg.From)
 				b, _ := proto.Marshal(&msg)
-				if msg.Type == "secret_chat" {
-					// 秘密聊天：只转发，不存储
-					err := protocol.SendToUser(msg.To, b)
-					if err != nil {
-						errMsg := &pb.IMMessage{Type: "error", Content: "对方不在线"}
-						b, _ := proto.Marshal(errMsg)
-						conn.WriteMessage(websocket.BinaryMessage, b)
-					}
-					return
-				}
 				err := protocol.SendToUser(msg.To, b) // 始终推送消息
 				if err != nil {
 					errMsg := &pb.IMMessage{Type: "error", Content: "对方不在线"}
 					b, _ := proto.Marshal(errMsg)
 					conn.WriteMessage(websocket.BinaryMessage, b)
+					return
 				}
-				// 聊天通知+免打扰
+
+				// 给发送者回显消息
+				conn.WriteMessage(websocket.BinaryMessage, b)
+
+				// 秘密聊天：只转发，不存储
+				if msg.Type == "secret_chat" {
+					return
+				}
+
+				// --- Redis缓存与推送 ---
+				msgBytes, _ := proto.Marshal(&msg)
+				sessionKey := getSessionKey(msg.From, msg.To)
+				_ = storageManager.CacheMessage(sessionKey, string(msgBytes), 24*time.Hour)
+				_ = storageManager.Publish("channel:"+msg.To, string(msgBytes))
+
+				// 聊天通知
 				if !protocol.StorageFriendStoreGetDND(msg.To, msg.From) {
 					notif := &pb.Notification{
 						Type:         "private_chat_message",
 						From:         msg.From,
-						FromUsername: senderUsername(storageManager, msg.From),
+						FromUsername: msg.FromUsername,
 						To:           msg.To,
 						Content:      msg.Content,
 						Timestamp:    msg.Timestamp,
 					}
 					_ = protocol.SendNotificationToUser(msg.To, notif)
 				}
-				// --- Redis缓存与推送 ---
-				msgBytes, _ := proto.Marshal(&msg)
-				sessionKey := getSessionKey(msg.From, msg.To)
-				_ = storageManager.CacheMessage(sessionKey, string(msgBytes), 24*time.Hour)
-				_ = storageManager.Publish("channel:"+msg.To, string(msgBytes))
 			}
 
-			// --- 新增：处理群聊消息 ---
+			// --- 处理群聊消息 ---
 			if isChatMessage && msg.GroupId != "" {
 				msg.FromUsername = senderUsername(storageManager, msg.From)
 				// 新增禁言校验
@@ -119,7 +126,7 @@ func main() {
 					return
 				}
 
-				// 1. 发送实时消息到群聊
+				// 发送实时消息到群聊
 				err := protocol.SendGroupMessageToMembers(&msg)
 				if err != nil {
 					errMsg := &pb.IMMessage{Type: "error", Content: "群消息发送失败: " + err.Error()}
@@ -128,7 +135,21 @@ func main() {
 					return // 发送失败则不发通知
 				}
 
-				// 2. 发送通知给群成员 (模仿私聊逻辑)
+				// 给发送者回显消息
+				b, _ := proto.Marshal(&msg)
+				conn.WriteMessage(websocket.BinaryMessage, b)
+
+				// 秘密聊天：只转发，不存储
+				if msg.Type == "secret_chat" {
+					return
+				}
+
+				// 只存一次群消息到Redis
+				msgBytes, _ := proto.Marshal(&msg)
+				groupSessionKey := "group:" + msg.GroupId
+				_ = storageManager.CacheMessage(groupSessionKey, string(msgBytes), 24*time.Hour)
+
+				// 发送通知给群成员 (模仿私聊逻辑)
 				group, err := storageManager.GetGroup(msg.GroupId)
 				if err != nil {
 					return
@@ -136,7 +157,7 @@ func main() {
 				notif := &pb.Notification{
 					Type:         "group_chat_message",
 					From:         msg.From,
-					FromUsername: senderUsername(storageManager, msg.From),
+					FromUsername: msg.FromUsername,
 					GroupId:      group.GroupId,
 					GroupName:    group.Name,
 					Content:      msg.Content,
@@ -153,10 +174,6 @@ func main() {
 						continue // 跳过免打扰成员
 					}
 					_ = protocol.SendNotificationToUser(memberUID, notif)
-					// --- Redis缓存与推送 ---
-					msgBytes, _ := proto.Marshal(&msg)
-					groupSessionKey := "group:" + group.GroupId
-					_ = storageManager.CacheMessage(groupSessionKey, string(msgBytes), 24*time.Hour)
 					_ = storageManager.Publish("group_channel:"+group.GroupId, string(msgBytes))
 				}
 			}

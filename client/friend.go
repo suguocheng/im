@@ -158,7 +158,7 @@ func getFriendInfo(uid, friendUid, token string) *pb.FriendInfoResp {
 }
 
 func setFriendRemark(uid, friendUid, remark, token string) {
-	req := &pb.UpdateRemarkReq{Uid: uid, FriendUid: friendUid, Remark: remark, Token: token}
+	req := &pb.UpdateFriendRemarkReq{Uid: uid, FriendUid: friendUid, Remark: remark, Token: token}
 	resp, err := sendRequest("/update_remark", req)
 	if err != nil {
 		fmt.Println("设置备注失败:", err)
@@ -172,7 +172,7 @@ func setFriendRemark(uid, friendUid, remark, token string) {
 }
 
 func setDND(uid, friendUid string, dnd bool, token string) {
-	req := &pb.SetDNDReq{Uid: uid, FriendUid: friendUid, Dnd: dnd, Token: token}
+	req := &pb.SetFriendDNDReq{Uid: uid, FriendUid: friendUid, Dnd: dnd, Token: token}
 	resp, err := sendRequest("/set_dnd", req)
 	if err != nil {
 		fmt.Println("设置免打扰失败:", err)

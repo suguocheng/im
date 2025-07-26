@@ -1,8 +1,8 @@
 // ======= 统一API/WS地址配置 =======
-const API_BASE = 'https://salmon-languages-ecology-wrong.trycloudflare.com';
-const WS_BASE = 'wss://salmon-languages-ecology-wrong.trycloudflare.com/ws';
-// const API_BASE = 'http://127.0.0.1:8081';
-// const WS_BASE = 'ws://127.0.0.1:8081/ws';
+// const API_BASE = 'https://thousands-review-punch-kg.trycloudflare.com';
+// const WS_BASE = 'wss://thousands-review-punch-kg.trycloudflare.com/ws';
+const API_BASE = 'http://127.0.0.1:8081';
+const WS_BASE = 'ws://127.0.0.1:8081/ws';
 
 // ========== 通用居中弹窗 ==========
 function showModal({ title = '', content = '', inputs = [], okText = '确定', cancelText = '取消', onOk }) {
@@ -119,6 +119,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentFriend = null;
     let currentGroup = null;
     let ws = null;
+    let heartbeatInterval = null;
     let myUid = null;
     let myUsername = null;
     let token = null;
@@ -376,7 +377,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 onOk: async ([remark]) => {
                   const UpdateRemarkReq = root.lookupType('protocol.UpdateRemarkReq');
                   const reqBuf = UpdateRemarkReq.encode(UpdateRemarkReq.create({ uid: myUid, friendUid: uid, remark, token })).finish();
-                  const resp = await fetch(`${API_BASE}/update_remark`, {
+                  const resp = await fetch(`${API_BASE}/update_friend_remark`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-protobuf' },
                     body: reqBuf
@@ -396,7 +397,7 @@ document.addEventListener('DOMContentLoaded', function() {
             dndBtn.onclick = async function() {
               const SetDNDReq = root.lookupType('protocol.SetDNDReq');
               const reqBuf = SetDNDReq.encode(SetDNDReq.create({ uid: myUid, friendUid: uid, dnd: !info.dnd, token })).finish();
-              const resp = await fetch(`${API_BASE}/set_dnd`, {
+              const resp = await fetch(`${API_BASE}/set_friend_dnd`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-protobuf' },
                 body: reqBuf
@@ -432,9 +433,9 @@ document.addEventListener('DOMContentLoaded', function() {
           }
         };
         // 未读红点
-        if (unreadMap[uid] > 0) {
+        if (unreadMap['user:' + uid] > 0) {
           const badge = document.createElement('span');
-          badge.textContent = unreadMap[uid] > 99 ? '99+' : unreadMap[uid];
+          badge.textContent = unreadMap['user:' + uid] > 99 ? '99+' : unreadMap['user:' + uid];
           badge.style.background = '#e74c3c';
           badge.style.color = '#fff';
           badge.style.fontSize = '0.85em';
@@ -459,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function selectFriend(uid, name, remark) {
       currentFriend = { uid, name, remark };
       currentGroup = null; // 选择好友时清空群组
-      unreadMap[uid] = 0; // 清除未读
+      unreadMap['user:' + uid] = 0; // 清除未读
       // 修复：用缓存的好友列表数据刷新
       if (friendListCache) {
         renderFriendList(friendListCache);
@@ -566,16 +567,20 @@ document.addEventListener('DOMContentLoaded', function() {
             const roleReqBuf = GroupMemberRoleReq.encode(GroupMemberRoleReq.create({ groupId, uid: myUid })).finish();
             let role = 'member';
             try {
-              const roleResp = await fetch(`${API_BASE}/group_member_role`, {
+              // 替换为 group_member_info
+              const infoReq = root.lookupType('protocol.GroupMemberInfoReq');
+              const infoResp = root.lookupType('protocol.GroupMemberInfoResp');
+              const infoReqBuf = infoReq.encode(infoReq.create({ groupId, uid: myUid })).finish();
+              const resp = await fetch(`${API_BASE}/group_member_info`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-protobuf' },
-                body: roleReqBuf
+                body: infoReqBuf
               });
-              const roleBuf = await roleResp.arrayBuffer();
-              const roleApiMsg = APIResp.decode(new Uint8Array(roleBuf));
-              if (roleApiMsg.code === 0) {
-                const roleData = GroupMemberRoleResp.decode(roleApiMsg.data);
-                role = roleData.role;
+              const buf = await resp.arrayBuffer();
+              const apiMsg = APIResp.decode(new Uint8Array(buf));
+              if (apiMsg.code === 0) {
+                const info = infoResp.decode(apiMsg.data);
+                role = info.role;
               }
             } catch {}
             // 获取备注、免打扰
@@ -851,44 +856,6 @@ document.addEventListener('DOMContentLoaded', function() {
               };
               actionsDiv.insertBefore(adminBtn, actionsDiv.firstChild);
             }
-            // 查看成员信息按钮
-            const memberInfoBtn = document.createElement('button');
-            memberInfoBtn.textContent = '查看成员信息';
-            memberInfoBtn.style.marginRight = '8px';
-            memberInfoBtn.onclick = function() {
-              showModal({
-                title: '查看成员信息',
-                inputs: [{ label: '成员UID', placeholder: '输入成员UID' }],
-                okText: '查询',
-                onOk: async ([targetUid]) => {
-                  if (!targetUid) return;
-                  const GroupMemberInfoReq = root.lookupType('protocol.GroupMemberInfoReq');
-                  const APIResp = root.lookupType('protocol.APIResp');
-                  const GroupMemberInfoResp = root.lookupType('protocol.GroupMemberInfoResp');
-                  const reqBuf = GroupMemberInfoReq.encode(GroupMemberInfoReq.create({ groupId, uid: targetUid })).finish();
-                  try {
-                    const resp = await fetch(`${API_BASE}/group_member_info`, {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/x-protobuf' },
-                      body: reqBuf
-                    });
-                    const buf = await resp.arrayBuffer();
-                    const apiMsg = APIResp.decode(new Uint8Array(buf));
-                    if (apiMsg.code !== 0) throw new Error(apiMsg.msg);
-                    const info = GroupMemberInfoResp.decode(apiMsg.data);
-                    let html = `<div style='margin-bottom:8px;'><b>UID:</b> ${info.uid}</div>`;
-                    html += `<div style='margin-bottom:8px;'><b>用户名:</b> ${info.username}</div>`;
-                    html += `<div style='margin-bottom:8px;'><b>昵称:</b> ${info.nickname}</div>`;
-                    html += `<div style='margin-bottom:8px;'><b>角色:</b> ${info.role}</div>`;
-                    html += `<div style='margin-bottom:8px;'><b>加入时间:</b> ${info.joinTime ? new Date(info.joinTime * 1000).toLocaleString() : ''}</div>`;
-                    showModal({ title: '成员信息', content: html, okText: '关闭' });
-                  } catch (e) {
-                    alert('查询失败: ' + (e.message || e));
-                  }
-                }
-              });
-            };
-            actionsDiv.insertBefore(memberInfoBtn, actionsDiv.firstChild);
             // 成员列表按钮
             const memberListBtn = document.createElement('button');
             memberListBtn.textContent = '成员列表';
@@ -932,9 +899,9 @@ document.addEventListener('DOMContentLoaded', function() {
           }
         };
         // 未读红点
-        if (unreadMap[groupId] > 0) {
+        if (unreadMap['group:' + groupId] > 0) {
           const badge = document.createElement('span');
-          badge.textContent = unreadMap[groupId] > 99 ? '99+' : unreadMap[groupId];
+          badge.textContent = unreadMap['group:' + groupId] > 99 ? '99+' : unreadMap['group:' + groupId];
           badge.style.background = '#e74c3c';
           badge.style.color = '#fff';
           badge.style.fontSize = '0.85em';
@@ -959,7 +926,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function selectGroup(groupId, name) {
       currentGroup = { groupId, name };
       currentFriend = null; // 选择群组时清空好友
-      unreadMap[groupId] = 0; // 清除未读
+      unreadMap['group:' + groupId] = 0; // 清除未读
       // 用缓存的群组列表数据刷新
       if (groupListCache) {
         renderGroupList(groupListCache);
@@ -1000,6 +967,36 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     }
 
+    // ========== 消息类型验证 ==========
+    function isValidNotificationType(type) {
+      const validTypes = [
+        'friend_request', 'private_chat_message', 'group_chat_message',
+        'group_application_pending', 'group_invite', 'group_invite_approved',
+        'group_kicked', 'group_admin_change', 'dismissed'
+      ];
+      return validTypes.includes(type);
+    }
+    
+    function isValidMessageType(type) {
+      const validTypes = [
+        'chat', 'secret_chat', 'image', 'file', 'login', 'error'
+      ];
+      return validTypes.includes(type);
+    }
+    
+    // 解析扩展字段
+    function parseExtra(extra) {
+      if (!extra) return {};
+      const result = {};
+      extra.split(',').forEach(item => {
+        const [key, value] = item.split(':');
+        if (key && value) {
+          result[key.trim()] = value.trim();
+        }
+      });
+      return result;
+    }
+    
     // ========== 表情映射 ==========
     const emojiMap = {
       ':smile:': '😊', ':laugh:': '😄', ':cry:': '😢', ':angry:': '😠', ':heart:': '❤️', ':thumbsup:': '👍', ':thumbsdown:': '👎', ':ok:': '👌', ':clap:': '👏', ':wave:': '👋', ':pray:': '🙏', ':fire:': '🔥', ':star:': '⭐', ':moon:': '🌙', ':sun:': '☀️', ':rainbow:': '🌈', ':coffee:': '☕', ':beer:': '🍺', ':pizza:': '🍕', ':cake:': '🎂'
@@ -1097,8 +1094,8 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       const msgBuf = IMMessage.encode(IMMessage.create(msgObj)).finish();
       ws.send(msgBuf);
-      // 本地回显
-      appendMessage({ from: myUid, content: msgObj.content, self: true, timestamp: msgObj.timestamp, type, extra: msgObj.extra });
+      // 本地回显 - 移除，让服务器确认后再显示
+      // appendMessage({ from: myUid, content: msgObj.content, self: true, timestamp: msgObj.timestamp, type, extra: msgObj.extra });
     }
 
     // ========== 消息发送 ==========
@@ -1134,8 +1131,8 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       const msgBuf = IMMessage.encode(IMMessage.create(msgObj)).finish();
       ws.send(msgBuf);
-      // 本地回显
-      appendMessage({ from: myUid, content: displayContent, self: true, timestamp: Date.now(), type: msgObj.type });
+      // 本地回显 - 移除，让服务器确认后再显示
+      // appendMessage({ from: myUid, content: displayContent, self: true, timestamp: Date.now(), type: msgObj.type });
       chatInput.value = '';
     }
 
@@ -1196,97 +1193,134 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function connectWebSocket() {
+      // 只有在有token的情况下才连接WebSocket
+      if (!token) {
+        return;
+      }
+      
       if (ws) ws.close();
       ws = new WebSocket(WS_BASE);
       ws.binaryType = 'arraybuffer';
       ws.onopen = () => {
         // 登录认证
-        if (token) {
-          const loginMsg = IMMessage.encode(IMMessage.create({ type: 'login', token })).finish();
-          ws.send(loginMsg);
-        }
+        const loginMsg = IMMessage.encode(IMMessage.create({ type: 'login', token })).finish();
+        ws.send(loginMsg);
+        
+        // 启动心跳
+        if (heartbeatInterval) clearInterval(heartbeatInterval);
+        heartbeatInterval = setInterval(() => {
+          // 发送心跳包 - 使用 Protobuf 格式
+          try {
+            const pingMsg = IMMessage.encode(IMMessage.create({ type: 'ping' })).finish();
+            ws.send(pingMsg);
+          } catch (e) {}
+        }, 30000); // 30秒
       };
       ws.onclose = () => {
+        if (heartbeatInterval) clearInterval(heartbeatInterval);
+        if (token) {
+          setTimeout(connectWebSocket, 2000);
+        }
       };
-      ws.onerror = (e) => {
+      ws.onerror = () => {
+        ws.close();
       };
       ws.onmessage = (event) => {
         console.log('onmessage start');
         try {
           const buf = new Uint8Array(event.data);
+          
+          // 忽略心跳回复
+          if (typeof event.data === 'string' && event.data === 'pong') return;
+          
+          // 首先尝试解码为 Notification（通知消息）
           let notif = null;
-          console.log('decode尝试');
           try {
             notif = Notification.decode(buf);
-          } catch {}
-          if (notif && notif.type) {
-            // 判断是否为当前聊天对象的消息，若是则不弹窗
-            if (
-              (notif.type === 'private_chat_message' && currentFriend && notif.from === currentFriend.uid) ||
-              (notif.type === 'group_chat_message' && currentGroup && notif.groupId === currentGroup.groupId)
-            ) {
-              // 不弹窗
+            // 验证是否为有效的通知消息
+            if (notif && notif.type && isValidNotificationType(notif.type)) {
+              console.log('收到通知消息:', notif.type);
+              
+              // 判断是否为当前聊天对象的消息，若是则不弹窗
+              if (
+                (notif.type === 'private_chat_message' && currentFriend && notif.from === currentFriend.uid) ||
+                (notif.type === 'group_chat_message' && currentGroup && notif.groupId === currentGroup.groupId)
+              ) {
+                // 不弹窗
+                return;
+              }
+              
+              let display;
+              switch (notif.type) {
+                case 'friend_request':
+                  display = `[好友请求] ${notif.fromUsername}(${notif.from}) 请求加你为好友`;
+                  break;
+                case 'private_chat_message':
+                  display = `[私聊] ${notif.fromUsername}: ${notif.content}`;
+                  break;
+                case 'group_chat_message':
+                  display = `[群聊][${notif.groupName || ''}] ${notif.fromUsername}: ${notif.content}`;
+                  break;
+                case 'group_application_pending':
+                  display = `[群申请] ${notif.fromUsername}(${notif.from}) 申请加入群聊 [${notif.groupName || ''}]`;
+                  break;
+                case 'group_invite': {
+                  const extra = parseExtra(notif.extra || '');
+                  display = `[群审批] ${notif.fromUsername} 邀请 ${extra.invitee_username || ''} 加入群聊 [${notif.groupName || ''}]，请审批`;
+                  break;
+                }
+                case 'group_invite_approved':
+                  display = `[群通知] 你已成功加入群聊 [${notif.groupName || ''}]`;
+                  break;
+                case 'group_kicked':
+                  display = `[群通知] 你已被 ${notif.fromUsername} 移出群聊 [${notif.groupName || ''}]`;
+                  break;
+                case 'group_admin_change': {
+                  const extra = parseExtra(notif.extra || '');
+                  display = extra.set_admin === 'true'
+                    ? `[群通知] 你在群聊 [${notif.groupName || ''}] 被设为管理员`
+                    : `[群通知] 你在群聊 [${notif.groupName || ''}] 被取消管理员`;
+                  break;
+                }
+                case 'dismissed':
+                  display = `[群系统][${notif.groupName || ''}] 群已被解散 by ${notif.fromUsername}`;
+                  break;
+                default:
+                  return;
+              }
+              notifyList.unshift(display);
+              if (notifyList.length > 30) notifyList.length = 30;
+              renderNotifyPopup();
+              setTimeout(() => {
+                notifyPopup.style.display = 'block';
+                alert(display);
+              }, 10);
               return;
             }
-            console.log('notif分支');
-            console.log('notif对象:', notif);
-            console.log('notif.type:', notif.type, typeof notif.type);
-            console.log('notif所有属性', Object.keys(notif));
-            console.log('notif.type原始:', notif.type, '长度:', notif.type.length, '编码:', Array.from(notif.type).map(c => c.charCodeAt(0)));
-            let display;
-            switch (notif.type) {
-              case 'friend_request':
-                display = `[好友请求] ${notif.fromUsername}(${notif.from}) 请求加你为好友`;
-                break;
-              case 'private_chat_message':
-                display = `[私聊] ${notif.fromUsername}: ${notif.content}`;
-                break;
-              case 'group_chat_message':
-                display = `[群聊][${notif.groupName || ''}] ${notif.fromUsername}: ${notif.content}`;
-                break;
-              case 'group_application_pending':
-                display = `[群申请] ${notif.fromUsername}(${notif.from}) 申请加入群聊 [${notif.groupName || ''}]`;
-                break;
-              case 'group_invite': {
-                const extra = parseExtra(notif.extra || '');
-                display = `[群审批] ${notif.fromUsername} 邀请 ${extra.invitee_username || ''} 加入群聊 [${notif.groupName || ''}]，请审批`;
-                break;
-              }
-              case 'group_invite_approved':
-                display = `[群通知] 你已成功加入群聊 [${notif.groupName || ''}]`;
-                break;
-              case 'group_kicked':
-                display = `[群通知] 你已被 ${notif.fromUsername} 移出群聊 [${notif.groupName || ''}]`;
-                break;
-              case 'group_admin_change': {
-                const extra = parseExtra(notif.extra || '');
-                display = extra.set_admin === 'true'
-                  ? `[群通知] 你在群聊 [${notif.groupName || ''}] 被设为管理员`
-                  : `[群通知] 你在群聊 [${notif.groupName || ''}] 被取消管理员`;
-                break;
-              }
-              case 'dismissed':
-                display = `[群系统][${notif.groupName || ''}] 群已被解散 by ${notif.fromUsername}`;
-                break;
-              default:
-                return;
-            }
-            notifyList.unshift(display);
-            if (notifyList.length > 30) notifyList.length = 30;
-            renderNotifyPopup();
-            setTimeout(() => {
-              notifyPopup.style.display = 'block';
-              alert(display);
-            }, 10);
-            return;
+          } catch (e) {
+            // Notification 解码失败，继续尝试 IMMessage
+            console.log('Notification 解码失败，尝试 IMMessage');
           }
-          // 再decode IMMessage
+          
+          // 尝试解码为 IMMessage（聊天消息）
           let msg = null;
           try {
             msg = IMMessage.decode(buf);
-          } catch {}
+            // 验证是否为有效的聊天消息
+            if (msg && msg.type && isValidMessageType(msg.type)) {
+              console.log('收到聊天消息:', msg.type);
+            } else {
+              console.log('无效的聊天消息类型:', msg?.type);
+              return;
+            }
+          } catch (e) {
+            console.log('IMMessage 解码失败:', e);
+            return;
+          }
+          
           if (!msg) return;
           // 私聊消息
+          console.log('收到消息', msg);
           if ((msg.type === 'chat' || msg.type === 'secret_chat') && currentFriend && msg.from === currentFriend.uid && msg.to === myUid) {
             appendMessage({ from: msg.from, content: replaceEmojis(msg.content), self: false, timestamp: msg.timestamp, type: msg.type });
           } else if (msg.type === 'image' && currentFriend && msg.from === currentFriend.uid && msg.to === myUid) {
@@ -1296,14 +1330,14 @@ document.addEventListener('DOMContentLoaded', function() {
           }
           // 私聊未读
           else if ((msg.type === 'chat' || msg.type === 'image' || msg.type === 'file') && msg.to === myUid && (!currentFriend || msg.from !== currentFriend.uid)) {
-            unreadMap[msg.from] = (unreadMap[msg.from] || 0) + 1;
+            unreadMap['user:' + msg.from] = (unreadMap['user:' + msg.from] || 0) + 1;
             if (friendListCache) {
               renderFriendList(friendListCache);
             }
           }
           // 群聊消息
-          else if (msg.type === 'chat' && currentGroup && msg.groupId === currentGroup.groupId) {
-            appendMessage({ from: msg.from, content: replaceEmojis(msg.content), self: msg.from === myUid, timestamp: msg.timestamp, type: 'chat', extra: msg.extra, username: msg.fromUsername });
+          else if ((msg.type === 'chat' || msg.type === 'secret_chat') && currentGroup && msg.groupId === currentGroup.groupId) {
+            appendMessage({ from: msg.from, content: replaceEmojis(msg.content), self: msg.from === myUid, timestamp: msg.timestamp, type: msg.type, extra: msg.extra, username: msg.fromUsername });
           } else if (msg.type === 'image' && currentGroup && msg.groupId === currentGroup.groupId) {
             appendMessage({ from: msg.from, content: msg.content, self: msg.from === myUid, timestamp: msg.timestamp, type: 'image', extra: msg.extra });
           } else if (msg.type === 'file' && currentGroup && msg.groupId === currentGroup.groupId) {
@@ -1311,11 +1345,39 @@ document.addEventListener('DOMContentLoaded', function() {
           }
           // 群聊未读
           else if ((msg.type === 'chat' || msg.type === 'image' || msg.type === 'file') && msg.groupId && (!currentGroup || msg.groupId !== currentGroup.groupId)) {
-            unreadMap[msg.groupId] = (unreadMap[msg.groupId] || 0) + 1;
+            unreadMap['group:' + msg.groupId] = (unreadMap['group:' + msg.groupId] || 0) + 1;
             renderGroupList([]);
           }
           else if (msg.type === 'error') {
-            alert('消息错误: ' + msg.content);
+            if (msg.content && (msg.content.indexOf('请先登录') !== -1 || msg.content.indexOf('未登录') !== -1)) {
+              // 未登录相关错误静默处理
+              return;
+            }
+            console.log('收到error消息', msg);
+            if (msg.content && msg.content.indexOf('禁言') !== -1) {
+              alert('你已被群主或管理员禁言，无法发送消息');
+            } else {
+              alert('消息错误: ' + msg.content);
+            }
+          }
+          // 处理自己发送的消息回显（包括私聊和群聊）
+          else if ((msg.type === 'chat' || msg.type === 'secret_chat' || msg.type === 'image' || msg.type === 'file') && msg.from === myUid) {
+            // 检查是否在正确的聊天界面
+            const isInCorrectChat = 
+              (currentFriend && msg.to === currentFriend.uid) || 
+              (currentGroup && msg.groupId === currentGroup.groupId);
+            
+            if (isInCorrectChat) {
+              appendMessage({ 
+                from: myUid, 
+                content: msg.type === 'chat' || msg.type === 'secret_chat' ? replaceEmojis(msg.content) : msg.content, 
+                self: true, 
+                timestamp: msg.timestamp, 
+                type: msg.type,
+                extra: msg.extra,
+                username: msg.fromUsername
+              });
+            }
           }
         } catch (e) {}
       };
@@ -1594,7 +1656,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const fromUid = btn.getAttribute('data-uid');
                     const HandleFriendReq = root.lookupType('protocol.HandleFriendReq');
                     const reqBuf = HandleFriendReq.encode(HandleFriendReq.create({ fromUid, toUid: myUid, accept: true, token })).finish();
-                    const resp = await fetch(`${API_BASE}/handle_friend`, {
+                    const resp = await fetch(`${API_BASE}/handle_friend_request`, {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/x-protobuf' },
                       body: reqBuf
@@ -1609,7 +1671,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const fromUid = btn.getAttribute('data-uid');
                     const HandleFriendReq = root.lookupType('protocol.HandleFriendReq');
                     const reqBuf = HandleFriendReq.encode(HandleFriendReq.create({ fromUid, toUid: myUid, accept: false, token })).finish();
-                    const resp = await fetch(`${API_BASE}/handle_friend`, {
+                    const resp = await fetch(`${API_BASE}/handle_friend_request`, {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/x-protobuf' },
                       body: reqBuf
@@ -1707,7 +1769,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const GroupInviteListResp = root.lookupType('protocol.GroupInviteListResp');
             const reqBuf = GroupInviteListReq.encode(GroupInviteListReq.create({ uid: myUid, token })).finish();
             try {
-              const resp = await fetch(`${API_BASE}/group_invite_requests`, {
+              const resp = await fetch(`${API_BASE}/group_request_list`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-protobuf' },
                 body: reqBuf
@@ -1746,7 +1808,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const inviteeUid = btn.getAttribute('data-invitee');
                     const HandleGroupInviteReq = root.lookupType('protocol.HandleGroupInviteReq');
                     const reqBuf = HandleGroupInviteReq.encode(HandleGroupInviteReq.create({ id, groupId, inviteeUid, approve: true, token })).finish();
-                    const resp = await fetch(`${API_BASE}/handle_group_invite`, {
+                    const resp = await fetch(`${API_BASE}/handle_group_request`, {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/x-protobuf' },
                       body: reqBuf
@@ -1763,7 +1825,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const inviteeUid = btn.getAttribute('data-invitee');
                     const HandleGroupInviteReq = root.lookupType('protocol.HandleGroupInviteReq');
                     const reqBuf = HandleGroupInviteReq.encode(HandleGroupInviteReq.create({ id, groupId, inviteeUid, approve: false, token })).finish();
-                    const resp = await fetch(`${API_BASE}/handle_group_invite`, {
+                    const resp = await fetch(`${API_BASE}/handle_group_request`, {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/x-protobuf' },
                       body: reqBuf

@@ -108,21 +108,23 @@ func (m *MySQLGroupStorage) CreateGroup(name, ownerUID string) (string, error) {
 	defer tx.Rollback()
 
 	now := time.Now().Unix()
-	// 先插入一条记录，让id自增
-	res, err := tx.Exec("INSERT INTO `groups` (name, description, owner_uid, created_at, updated_at) VALUES (?, '', ?, ?, ?)",
-		name, ownerUID, now, now)
+
+	// 获取当前最大群组ID
+	var maxGroupID int64
+	err = tx.QueryRow("SELECT COALESCE(MAX(CAST(group_id AS UNSIGNED)), 0) FROM `groups` WHERE group_id REGEXP '^[0-9]+$'").Scan(&maxGroupID)
+	if err != nil {
+		return "", fmt.Errorf("获取最大群组ID失败: %v", err)
+	}
+
+	// 生成新的群组ID
+	newGroupID := maxGroupID + 1
+	groupID := fmt.Sprintf("%d", newGroupID)
+
+	// 插入群组记录
+	_, err = tx.Exec("INSERT INTO `groups` (group_id, name, description, owner_uid, created_at, updated_at) VALUES (?, ?, '', ?, ?, ?)",
+		groupID, name, ownerUID, now, now)
 	if err != nil {
 		return "", fmt.Errorf("创建群组失败: %v", err)
-	}
-	id, err := res.LastInsertId()
-	if err != nil {
-		return "", fmt.Errorf("获取群组ID失败: %v", err)
-	}
-	groupID := fmt.Sprintf("%d", id)
-	// 更新group_id字段
-	_, err = tx.Exec("UPDATE `groups` SET group_id = ? WHERE id = ?", groupID, id)
-	if err != nil {
-		return "", fmt.Errorf("更新group_id失败: %v", err)
 	}
 	// 添加群主为成员
 	_, err = tx.Exec(`

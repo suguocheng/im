@@ -87,7 +87,7 @@ func handleFriend(fromUid, toUid string, accept bool, token string) {
 		fmt.Println("UID不能为空")
 		return
 	}
-	req := &pb.HandleFriendReq{FromUid: fromUid, ToUid: toUid, Accept: accept, Token: token}
+	req := &pb.HandleFriendRequestReq{FromUid: fromUid, ToUid: toUid, Accept: accept, Token: token}
 	resp, err := sendRequest("/handle_friend", req)
 	if err != nil {
 		fmt.Println("处理好友请求失败:", err)
@@ -140,8 +140,8 @@ func handleGroupRequests() {
 	}
 }
 
-func getGroupInviteRequests(uid, token string) []*pb.GroupInviteItem {
-	req := &pb.GroupInviteListReq{Uid: uid, Token: token}
+func getGroupInviteRequests(uid, token string) []*pb.GroupRequestItem {
+	req := &pb.GroupRequestListReq{Uid: uid, Token: token}
 	resp, err := sendRequest("/group_invite_requests", req)
 	if err != nil {
 		fmt.Println("获取群组邀请列表失败:", err)
@@ -151,7 +151,7 @@ func getGroupInviteRequests(uid, token string) []*pb.GroupInviteItem {
 		fmt.Printf("获取群组邀请列表失败: %s\n", resp.Msg)
 		return nil
 	}
-	var list pb.GroupInviteListResp
+	var list pb.GroupRequestListResp
 	if err := proto.Unmarshal(resp.Data, &list); err != nil {
 		fmt.Println("群组邀请列表解析失败:", err)
 		return nil
@@ -160,7 +160,7 @@ func getGroupInviteRequests(uid, token string) []*pb.GroupInviteItem {
 }
 
 func handleGroupInvite(id string, approve bool, groupId string, invitee string) error {
-	req := &pb.HandleGroupInviteReq{
+	req := &pb.HandleGroupRequestReq{
 		Id:         id,
 		Approve:    approve,
 		Token:      savedToken,

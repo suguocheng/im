@@ -161,66 +161,6 @@ func (x *IMMessage) GetGroupId() string {
 	return ""
 }
 
-type APIResp struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
-	Msg           string                 `protobuf:"bytes,2,opt,name=msg,proto3" json:"msg,omitempty"`
-	Data          []byte                 `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *APIResp) Reset() {
-	*x = APIResp{}
-	mi := &file_message_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *APIResp) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*APIResp) ProtoMessage() {}
-
-func (x *APIResp) ProtoReflect() protoreflect.Message {
-	mi := &file_message_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use APIResp.ProtoReflect.Descriptor instead.
-func (*APIResp) Descriptor() ([]byte, []int) {
-	return file_message_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *APIResp) GetCode() int32 {
-	if x != nil {
-		return x.Code
-	}
-	return 0
-}
-
-func (x *APIResp) GetMsg() string {
-	if x != nil {
-		return x.Msg
-	}
-	return ""
-}
-
-func (x *APIResp) GetData() []byte {
-	if x != nil {
-		return x.Data
-	}
-	return nil
-}
-
 // 通用通知消息（兼容好友、群组、系统等所有场景）
 type Notification struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -239,7 +179,7 @@ type Notification struct {
 
 func (x *Notification) Reset() {
 	*x = Notification{}
-	mi := &file_message_proto_msgTypes[2]
+	mi := &file_message_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -251,7 +191,7 @@ func (x *Notification) String() string {
 func (*Notification) ProtoMessage() {}
 
 func (x *Notification) ProtoReflect() protoreflect.Message {
-	mi := &file_message_proto_msgTypes[2]
+	mi := &file_message_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -264,7 +204,7 @@ func (x *Notification) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Notification.ProtoReflect.Descriptor instead.
 func (*Notification) Descriptor() ([]byte, []int) {
-	return file_message_proto_rawDescGZIP(), []int{2}
+	return file_message_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *Notification) GetType() string {
@@ -344,7 +284,7 @@ type FileInfo struct {
 
 func (x *FileInfo) Reset() {
 	*x = FileInfo{}
-	mi := &file_message_proto_msgTypes[3]
+	mi := &file_message_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -356,7 +296,7 @@ func (x *FileInfo) String() string {
 func (*FileInfo) ProtoMessage() {}
 
 func (x *FileInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_message_proto_msgTypes[3]
+	mi := &file_message_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -369,7 +309,7 @@ func (x *FileInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FileInfo.ProtoReflect.Descriptor instead.
 func (*FileInfo) Descriptor() ([]byte, []int) {
-	return file_message_proto_rawDescGZIP(), []int{3}
+	return file_message_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *FileInfo) GetFilename() string {
@@ -416,7 +356,7 @@ type IMMessageList struct {
 
 func (x *IMMessageList) Reset() {
 	*x = IMMessageList{}
-	mi := &file_message_proto_msgTypes[4]
+	mi := &file_message_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -428,7 +368,7 @@ func (x *IMMessageList) String() string {
 func (*IMMessageList) ProtoMessage() {}
 
 func (x *IMMessageList) ProtoReflect() protoreflect.Message {
-	mi := &file_message_proto_msgTypes[4]
+	mi := &file_message_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -441,7 +381,7 @@ func (x *IMMessageList) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use IMMessageList.ProtoReflect.Descriptor instead.
 func (*IMMessageList) Descriptor() ([]byte, []int) {
-	return file_message_proto_rawDescGZIP(), []int{4}
+	return file_message_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *IMMessageList) GetMessages() []*IMMessage {
@@ -451,6 +391,67 @@ func (x *IMMessageList) GetMessages() []*IMMessage {
 	return nil
 }
 
+type APIResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Msg           string                 `protobuf:"bytes,2,opt,name=msg,proto3" json:"msg,omitempty"`
+	Data          []byte                 `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *APIResp) Reset() {
+	*x = APIResp{}
+	mi := &file_message_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *APIResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*APIResp) ProtoMessage() {}
+
+func (x *APIResp) ProtoReflect() protoreflect.Message {
+	mi := &file_message_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use APIResp.ProtoReflect.Descriptor instead.
+func (*APIResp) Descriptor() ([]byte, []int) {
+	return file_message_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *APIResp) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *APIResp) GetMsg() string {
+	if x != nil {
+		return x.Msg
+	}
+	return ""
+}
+
+func (x *APIResp) GetData() []byte {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// 获取最近私聊消息
 type GetRecentPrivateMessagesReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	From          string                 `protobuf:"bytes,1,opt,name=from,proto3" json:"from,omitempty"`
@@ -511,6 +512,7 @@ func (x *GetRecentPrivateMessagesReq) GetCount() int64 {
 	return 0
 }
 
+// 获取最近群聊消息
 type GetRecentGroupMessagesReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	GroupId       string                 `protobuf:"bytes,1,opt,name=group_id,json=groupId,proto3" json:"group_id,omitempty"`
@@ -582,11 +584,7 @@ const file_message_proto_rawDesc = "" +
 	" \x01(\tR\bfilename\x12\x1a\n" +
 	"\bfilesize\x18\v \x01(\x03R\bfilesize\x12\x1b\n" +
 	"\tmime_type\x18\f \x01(\tR\bmimeType\x12\x19\n" +
-	"\bgroup_id\x18\r \x01(\tR\agroupId\"C\n" +
-	"\aAPIResp\x12\x12\n" +
-	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x10\n" +
-	"\x03msg\x18\x02 \x01(\tR\x03msg\x12\x12\n" +
-	"\x04data\x18\x03 \x01(\fR\x04data\"\xf3\x01\n" +
+	"\bgroup_id\x18\r \x01(\tR\agroupId\"\xf3\x01\n" +
 	"\fNotification\x12\x12\n" +
 	"\x04type\x18\x01 \x01(\tR\x04type\x12\x12\n" +
 	"\x04from\x18\x02 \x01(\tR\x04from\x12#\n" +
@@ -605,7 +603,11 @@ const file_message_proto_rawDesc = "" +
 	"\x04type\x18\x04 \x01(\tR\x04type\x12\x10\n" +
 	"\x03url\x18\x05 \x01(\tR\x03url\"@\n" +
 	"\rIMMessageList\x12/\n" +
-	"\bmessages\x18\x01 \x03(\v2\x13.protocol.IMMessageR\bmessages\"W\n" +
+	"\bmessages\x18\x01 \x03(\v2\x13.protocol.IMMessageR\bmessages\"C\n" +
+	"\aAPIResp\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x10\n" +
+	"\x03msg\x18\x02 \x01(\tR\x03msg\x12\x12\n" +
+	"\x04data\x18\x03 \x01(\fR\x04data\"W\n" +
 	"\x1bGetRecentPrivateMessagesReq\x12\x12\n" +
 	"\x04from\x18\x01 \x01(\tR\x04from\x12\x0e\n" +
 	"\x02to\x18\x02 \x01(\tR\x02to\x12\x14\n" +
@@ -629,10 +631,10 @@ func file_message_proto_rawDescGZIP() []byte {
 var file_message_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_message_proto_goTypes = []any{
 	(*IMMessage)(nil),                   // 0: protocol.IMMessage
-	(*APIResp)(nil),                     // 1: protocol.APIResp
-	(*Notification)(nil),                // 2: protocol.Notification
-	(*FileInfo)(nil),                    // 3: protocol.FileInfo
-	(*IMMessageList)(nil),               // 4: protocol.IMMessageList
+	(*Notification)(nil),                // 1: protocol.Notification
+	(*FileInfo)(nil),                    // 2: protocol.FileInfo
+	(*IMMessageList)(nil),               // 3: protocol.IMMessageList
+	(*APIResp)(nil),                     // 4: protocol.APIResp
 	(*GetRecentPrivateMessagesReq)(nil), // 5: protocol.GetRecentPrivateMessagesReq
 	(*GetRecentGroupMessagesReq)(nil),   // 6: protocol.GetRecentGroupMessagesReq
 }

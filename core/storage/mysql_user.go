@@ -49,7 +49,7 @@ func (m *MySQLUserStorage) InitTables() error {
 		return fmt.Errorf("创建用户表失败: %v", err)
 	}
 
-	// 新增：自动修正uid字段为NULL，避免注册时插入报错
+	// 确保uid字段可以为NULL（兼容旧数据）
 	_, err = m.db.Exec("ALTER TABLE users MODIFY COLUMN uid VARCHAR(64) NULL;")
 	if err != nil {
 		fmt.Println("尝试修正users.uid为NULL失败：", err)
@@ -65,22 +65,37 @@ func (m *MySQLUserStorage) CreateUser(username, password, email string) (string,
 	if err != nil {
 		return "", fmt.Errorf("密码加密失败: %v", err)
 	}
-	// 先插入一条记录，让id自增
-	query := `INSERT INTO users (username, password, email) VALUES (?, ?, ?)`
-	res, err := m.db.Exec(query, username, string(hash), email)
+
+	// 使用事务确保原子性
+	tx, err := m.db.Begin()
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("开启事务失败: %v", err)
 	}
-	id, err := res.LastInsertId()
+	defer tx.Rollback() // 如果提交失败，回滚事务
+
+	// 获取当前最大UID
+	var maxUID int64
+	err = tx.QueryRow("SELECT COALESCE(MAX(CAST(uid AS UNSIGNED)), 0) FROM users WHERE uid REGEXP '^[0-9]+$'").Scan(&maxUID)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("获取最大UID失败: %v", err)
 	}
-	uid := fmt.Sprintf("%d", id)
-	// 更新uid字段
-	_, err = m.db.Exec(`UPDATE users SET uid = ? WHERE id = ?`, uid, id)
+
+	// 生成新的UID
+	newUID := maxUID + 1
+	uid := fmt.Sprintf("%d", newUID)
+
+	// 插入用户记录
+	query := `INSERT INTO users (uid, username, password, email) VALUES (?, ?, ?, ?)`
+	_, err = tx.Exec(query, uid, username, string(hash), email)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("插入用户失败: %v", err)
 	}
+
+	// 提交事务
+	if err := tx.Commit(); err != nil {
+		return "", fmt.Errorf("提交事务失败: %v", err)
+	}
+
 	return uid, nil
 }
 

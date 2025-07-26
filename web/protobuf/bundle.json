@@ -37,38 +37,6 @@
             }
           }
         },
-        "HandleFriendReq": {
-          "fields": {
-            "fromUid": {
-              "type": "string",
-              "id": 1
-            },
-            "toUid": {
-              "type": "string",
-              "id": 2
-            },
-            "accept": {
-              "type": "bool",
-              "id": 3
-            },
-            "token": {
-              "type": "string",
-              "id": 4
-            }
-          }
-        },
-        "HandleFriendResp": {
-          "fields": {
-            "code": {
-              "type": "int32",
-              "id": 1
-            },
-            "msg": {
-              "type": "string",
-              "id": 2
-            }
-          }
-        },
         "FriendListReq": {
           "fields": {
             "uid": {
@@ -105,6 +73,118 @@
               "rule": "repeated",
               "type": "string",
               "id": 5
+            }
+          }
+        },
+        "FriendInfoReq": {
+          "fields": {
+            "uid": {
+              "type": "string",
+              "id": 1
+            },
+            "friendUid": {
+              "type": "string",
+              "id": 2
+            },
+            "token": {
+              "type": "string",
+              "id": 3
+            }
+          }
+        },
+        "FriendInfoResp": {
+          "fields": {
+            "uid": {
+              "type": "string",
+              "id": 1
+            },
+            "username": {
+              "type": "string",
+              "id": 2
+            },
+            "email": {
+              "type": "string",
+              "id": 3
+            },
+            "remark": {
+              "type": "string",
+              "id": 4
+            },
+            "dnd": {
+              "type": "bool",
+              "id": 5
+            },
+            "code": {
+              "type": "int32",
+              "id": 6
+            },
+            "msg": {
+              "type": "string",
+              "id": 7
+            }
+          }
+        },
+        "UpdateFriendRemarkReq": {
+          "fields": {
+            "uid": {
+              "type": "string",
+              "id": 1
+            },
+            "friendUid": {
+              "type": "string",
+              "id": 2
+            },
+            "remark": {
+              "type": "string",
+              "id": 3
+            },
+            "token": {
+              "type": "string",
+              "id": 4
+            }
+          }
+        },
+        "UpdateFriendRemarkResp": {
+          "fields": {
+            "code": {
+              "type": "int32",
+              "id": 1
+            },
+            "msg": {
+              "type": "string",
+              "id": 2
+            }
+          }
+        },
+        "SetFriendDNDReq": {
+          "fields": {
+            "uid": {
+              "type": "string",
+              "id": 1
+            },
+            "friendUid": {
+              "type": "string",
+              "id": 2
+            },
+            "dnd": {
+              "type": "bool",
+              "id": 3
+            },
+            "token": {
+              "type": "string",
+              "id": 4
+            }
+          }
+        },
+        "SetFriendDNDResp": {
+          "fields": {
+            "code": {
+              "type": "int32",
+              "id": 1
+            },
+            "msg": {
+              "type": "string",
+              "id": 2
             }
           }
         },
@@ -163,97 +243,17 @@
             }
           }
         },
-        "UpdateRemarkReq": {
+        "HandleFriendRequestReq": {
           "fields": {
-            "uid": {
+            "fromUid": {
               "type": "string",
               "id": 1
             },
-            "friendUid": {
+            "toUid": {
               "type": "string",
               "id": 2
             },
-            "remark": {
-              "type": "string",
-              "id": 3
-            },
-            "token": {
-              "type": "string",
-              "id": 4
-            }
-          }
-        },
-        "UpdateRemarkResp": {
-          "fields": {
-            "code": {
-              "type": "int32",
-              "id": 1
-            },
-            "msg": {
-              "type": "string",
-              "id": 2
-            }
-          }
-        },
-        "FriendInfoReq": {
-          "fields": {
-            "uid": {
-              "type": "string",
-              "id": 1
-            },
-            "friendUid": {
-              "type": "string",
-              "id": 2
-            },
-            "token": {
-              "type": "string",
-              "id": 3
-            }
-          }
-        },
-        "FriendInfoResp": {
-          "fields": {
-            "uid": {
-              "type": "string",
-              "id": 1
-            },
-            "username": {
-              "type": "string",
-              "id": 2
-            },
-            "email": {
-              "type": "string",
-              "id": 3
-            },
-            "remark": {
-              "type": "string",
-              "id": 4
-            },
-            "dnd": {
-              "type": "bool",
-              "id": 5
-            },
-            "code": {
-              "type": "int32",
-              "id": 6
-            },
-            "msg": {
-              "type": "string",
-              "id": 7
-            }
-          }
-        },
-        "SetDNDReq": {
-          "fields": {
-            "uid": {
-              "type": "string",
-              "id": 1
-            },
-            "friendUid": {
-              "type": "string",
-              "id": 2
-            },
-            "dnd": {
+            "accept": {
               "type": "bool",
               "id": 3
             },
@@ -263,7 +263,7 @@
             }
           }
         },
-        "SetDNDResp": {
+        "HandleFriendRequestResp": {
           "fields": {
             "code": {
               "type": "int32",
@@ -336,6 +336,46 @@
             }
           }
         },
+        "GroupRequestItem": {
+          "fields": {
+            "id": {
+              "type": "string",
+              "id": 1
+            },
+            "groupId": {
+              "type": "string",
+              "id": 2
+            },
+            "groupName": {
+              "type": "string",
+              "id": 3
+            },
+            "inviterUid": {
+              "type": "string",
+              "id": 4
+            },
+            "inviteeUid": {
+              "type": "string",
+              "id": 5
+            },
+            "status": {
+              "type": "string",
+              "id": 6
+            },
+            "createdAt": {
+              "type": "string",
+              "id": 7
+            },
+            "inviterUsername": {
+              "type": "string",
+              "id": 8
+            },
+            "inviteeUsername": {
+              "type": "string",
+              "id": 9
+            }
+          }
+        },
         "CreateGroupReq": {
           "fields": {
             "name": {
@@ -397,30 +437,6 @@
             }
           }
         },
-        "LeaveGroupReq": {
-          "fields": {
-            "groupId": {
-              "type": "string",
-              "id": 1
-            },
-            "uid": {
-              "type": "string",
-              "id": 2
-            }
-          }
-        },
-        "LeaveGroupResp": {
-          "fields": {
-            "code": {
-              "type": "int32",
-              "id": 1
-            },
-            "msg": {
-              "type": "string",
-              "id": 2
-            }
-          }
-        },
         "GroupListReq": {
           "fields": {
             "uid": {
@@ -441,6 +457,30 @@
             },
             "groups": {
               "rule": "repeated",
+              "type": "Group",
+              "id": 3
+            }
+          }
+        },
+        "GroupInfoReq": {
+          "fields": {
+            "groupId": {
+              "type": "string",
+              "id": 1
+            }
+          }
+        },
+        "GroupInfoResp": {
+          "fields": {
+            "code": {
+              "type": "int32",
+              "id": 1
+            },
+            "msg": {
+              "type": "string",
+              "id": 2
+            },
+            "group": {
               "type": "Group",
               "id": 3
             }
@@ -471,15 +511,43 @@
             }
           }
         },
-        "GroupInfoReq": {
+        "LeaveGroupReq": {
           "fields": {
             "groupId": {
               "type": "string",
               "id": 1
+            },
+            "uid": {
+              "type": "string",
+              "id": 2
             }
           }
         },
-        "GroupInfoResp": {
+        "LeaveGroupResp": {
+          "fields": {
+            "code": {
+              "type": "int32",
+              "id": 1
+            },
+            "msg": {
+              "type": "string",
+              "id": 2
+            }
+          }
+        },
+        "GroupMemberRoleReq": {
+          "fields": {
+            "groupId": {
+              "type": "string",
+              "id": 1
+            },
+            "uid": {
+              "type": "string",
+              "id": 2
+            }
+          }
+        },
+        "GroupMemberRoleResp": {
           "fields": {
             "code": {
               "type": "int32",
@@ -489,9 +557,53 @@
               "type": "string",
               "id": 2
             },
-            "group": {
-              "type": "Group",
+            "role": {
+              "type": "string",
               "id": 3
+            }
+          }
+        },
+        "GroupMemberInfoReq": {
+          "fields": {
+            "groupId": {
+              "type": "string",
+              "id": 1
+            },
+            "uid": {
+              "type": "string",
+              "id": 2
+            }
+          }
+        },
+        "GroupMemberInfoResp": {
+          "fields": {
+            "code": {
+              "type": "int32",
+              "id": 1
+            },
+            "msg": {
+              "type": "string",
+              "id": 2
+            },
+            "uid": {
+              "type": "string",
+              "id": 3
+            },
+            "username": {
+              "type": "string",
+              "id": 4
+            },
+            "nickname": {
+              "type": "string",
+              "id": 5
+            },
+            "role": {
+              "type": "string",
+              "id": 6
+            },
+            "joinTime": {
+              "type": "int64",
+              "id": 7
             }
           }
         },
@@ -524,34 +636,6 @@
             }
           }
         },
-        "KickFromGroupReq": {
-          "fields": {
-            "groupId": {
-              "type": "string",
-              "id": 1
-            },
-            "operatorUid": {
-              "type": "string",
-              "id": 2
-            },
-            "targetUid": {
-              "type": "string",
-              "id": 3
-            }
-          }
-        },
-        "KickFromGroupResp": {
-          "fields": {
-            "code": {
-              "type": "int32",
-              "id": 1
-            },
-            "msg": {
-              "type": "string",
-              "id": 2
-            }
-          }
-        },
         "SetGroupNicknameReq": {
           "fields": {
             "groupId": {
@@ -569,34 +653,6 @@
           }
         },
         "SetGroupNicknameResp": {
-          "fields": {
-            "code": {
-              "type": "int32",
-              "id": 1
-            },
-            "msg": {
-              "type": "string",
-              "id": 2
-            }
-          }
-        },
-        "UpdateGroupNameReq": {
-          "fields": {
-            "groupId": {
-              "type": "string",
-              "id": 1
-            },
-            "operatorUid": {
-              "type": "string",
-              "id": 2
-            },
-            "newName": {
-              "type": "string",
-              "id": 3
-            }
-          }
-        },
-        "UpdateGroupNameResp": {
           "fields": {
             "code": {
               "type": "int32",
@@ -696,6 +752,62 @@
             }
           }
         },
+        "KickFromGroupReq": {
+          "fields": {
+            "groupId": {
+              "type": "string",
+              "id": 1
+            },
+            "operatorUid": {
+              "type": "string",
+              "id": 2
+            },
+            "targetUid": {
+              "type": "string",
+              "id": 3
+            }
+          }
+        },
+        "KickFromGroupResp": {
+          "fields": {
+            "code": {
+              "type": "int32",
+              "id": 1
+            },
+            "msg": {
+              "type": "string",
+              "id": 2
+            }
+          }
+        },
+        "UpdateGroupNameReq": {
+          "fields": {
+            "groupId": {
+              "type": "string",
+              "id": 1
+            },
+            "operatorUid": {
+              "type": "string",
+              "id": 2
+            },
+            "newName": {
+              "type": "string",
+              "id": 3
+            }
+          }
+        },
+        "UpdateGroupNameResp": {
+          "fields": {
+            "code": {
+              "type": "int32",
+              "id": 1
+            },
+            "msg": {
+              "type": "string",
+              "id": 2
+            }
+          }
+        },
         "SetGroupAdminReq": {
           "fields": {
             "groupId": {
@@ -752,119 +864,7 @@
             }
           }
         },
-        "GroupMemberRoleReq": {
-          "fields": {
-            "groupId": {
-              "type": "string",
-              "id": 1
-            },
-            "uid": {
-              "type": "string",
-              "id": 2
-            }
-          }
-        },
-        "GroupMemberRoleResp": {
-          "fields": {
-            "code": {
-              "type": "int32",
-              "id": 1
-            },
-            "msg": {
-              "type": "string",
-              "id": 2
-            },
-            "role": {
-              "type": "string",
-              "id": 3
-            }
-          }
-        },
-        "GroupMemberInfoReq": {
-          "fields": {
-            "groupId": {
-              "type": "string",
-              "id": 1
-            },
-            "uid": {
-              "type": "string",
-              "id": 2
-            }
-          }
-        },
-        "GroupMemberInfoResp": {
-          "fields": {
-            "code": {
-              "type": "int32",
-              "id": 1
-            },
-            "msg": {
-              "type": "string",
-              "id": 2
-            },
-            "uid": {
-              "type": "string",
-              "id": 3
-            },
-            "username": {
-              "type": "string",
-              "id": 4
-            },
-            "nickname": {
-              "type": "string",
-              "id": 5
-            },
-            "role": {
-              "type": "string",
-              "id": 6
-            },
-            "joinTime": {
-              "type": "int64",
-              "id": 7
-            }
-          }
-        },
-        "GroupInviteItem": {
-          "fields": {
-            "id": {
-              "type": "string",
-              "id": 1
-            },
-            "groupId": {
-              "type": "string",
-              "id": 2
-            },
-            "groupName": {
-              "type": "string",
-              "id": 3
-            },
-            "inviterUid": {
-              "type": "string",
-              "id": 4
-            },
-            "inviteeUid": {
-              "type": "string",
-              "id": 5
-            },
-            "status": {
-              "type": "string",
-              "id": 6
-            },
-            "createdAt": {
-              "type": "string",
-              "id": 7
-            },
-            "inviterUsername": {
-              "type": "string",
-              "id": 8
-            },
-            "inviteeUsername": {
-              "type": "string",
-              "id": 9
-            }
-          }
-        },
-        "GroupInviteListReq": {
+        "GroupRequestListReq": {
           "fields": {
             "uid": {
               "type": "string",
@@ -876,7 +876,7 @@
             }
           }
         },
-        "GroupInviteListResp": {
+        "GroupRequestListResp": {
           "fields": {
             "code": {
               "type": "int32",
@@ -888,12 +888,12 @@
             },
             "items": {
               "rule": "repeated",
-              "type": "GroupInviteItem",
+              "type": "GroupRequestItem",
               "id": 3
             }
           }
         },
-        "HandleGroupInviteReq": {
+        "HandleGroupRequestReq": {
           "fields": {
             "id": {
               "type": "string",
@@ -973,22 +973,6 @@
             }
           }
         },
-        "APIResp": {
-          "fields": {
-            "code": {
-              "type": "int32",
-              "id": 1
-            },
-            "msg": {
-              "type": "string",
-              "id": 2
-            },
-            "data": {
-              "type": "bytes",
-              "id": 3
-            }
-          }
-        },
         "Notification": {
           "fields": {
             "type": {
@@ -1062,6 +1046,22 @@
             }
           }
         },
+        "APIResp": {
+          "fields": {
+            "code": {
+              "type": "int32",
+              "id": 1
+            },
+            "msg": {
+              "type": "string",
+              "id": 2
+            },
+            "data": {
+              "type": "bytes",
+              "id": 3
+            }
+          }
+        },
         "GetRecentPrivateMessagesReq": {
           "fields": {
             "from": {
@@ -1087,30 +1087,6 @@
             "count": {
               "type": "int64",
               "id": 2
-            }
-          }
-        },
-        "UserInfoResp": {
-          "fields": {
-            "uid": {
-              "type": "string",
-              "id": 1
-            },
-            "username": {
-              "type": "string",
-              "id": 2
-            },
-            "email": {
-              "type": "string",
-              "id": 3
-            },
-            "code": {
-              "type": "int32",
-              "id": 4
-            },
-            "msg": {
-              "type": "string",
-              "id": 5
             }
           }
         },
@@ -1142,19 +1118,43 @@
             }
           }
         },
-        "ResetPwdReq": {
+        "LogoutReq": {
           "fields": {
-            "email": {
+            "token": {
+              "type": "string",
+              "id": 1
+            }
+          }
+        },
+        "UserInfoReq": {
+          "fields": {
+            "token": {
+              "type": "string",
+              "id": 1
+            }
+          }
+        },
+        "UserInfoResp": {
+          "fields": {
+            "uid": {
               "type": "string",
               "id": 1
             },
-            "newPwd": {
+            "username": {
               "type": "string",
               "id": 2
             },
-            "code": {
+            "email": {
               "type": "string",
               "id": 3
+            },
+            "code": {
+              "type": "int32",
+              "id": 4
+            },
+            "msg": {
+              "type": "string",
+              "id": 5
             }
           }
         },
@@ -1186,14 +1186,6 @@
             }
           }
         },
-        "TokenCheckReq": {
-          "fields": {
-            "token": {
-              "type": "string",
-              "id": 1
-            }
-          }
-        },
         "DeleteAccountReq": {
           "fields": {
             "uid": {
@@ -1202,15 +1194,7 @@
             }
           }
         },
-        "UserInfoReq": {
-          "fields": {
-            "token": {
-              "type": "string",
-              "id": 1
-            }
-          }
-        },
-        "LogoutReq": {
+        "TokenCheckReq": {
           "fields": {
             "token": {
               "type": "string",

@@ -4,7 +4,28 @@ package protocol;
 
 option go_package = "im/core/protocol/pb;pb";
 
-// 用户信息响应
+// 注册
+message RegisterReq {
+  string username = 1;
+  string password = 2;
+  string email = 3;
+}
+
+// 登录
+message LoginReq {
+  string uid = 1;
+  string password = 2;
+}
+
+// 登出
+message LogoutReq {
+  string token = 1;
+}
+
+// 用户信息
+message UserInfoReq {
+  string token = 1;
+}
 message UserInfoResp {
   string uid = 1;
   string username = 2;
@@ -13,48 +34,26 @@ message UserInfoResp {
   string msg = 5;
 }
 
-// 用户相关请求/响应
-message RegisterReq {
-  string username = 1;
-  string password = 2;
-  string email = 3;
-}
-
-message LoginReq {
-  string uid = 1;
-  string password = 2;
-}
-
-message ResetPwdReq {
-  string email = 1;
-  string new_pwd = 2;
-  string code = 3;
-}
-
+// 更新用户名
 message UpdateUsernameReq {
   string uid = 1;
   string new_username = 2;
 }
 
+// 更新密码
 message UpdatePwdReq {
   string uid = 1;
   string old_pwd = 2;
   string new_pwd = 3;
 }
 
-message TokenCheckReq {
-  string token = 1;
-}
-
+// 删除账户
 message DeleteAccountReq {
   string uid = 1;
 }
 
-message UserInfoReq {
-  string token = 1;
-}
-
-message LogoutReq {
+// Token检验
+message TokenCheckReq {
   string token = 1;
 }
 
