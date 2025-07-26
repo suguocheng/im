@@ -9,6 +9,7 @@ message RegisterReq {
   string username = 1;
   string password = 2;
   string email = 3;
+  string email_code = 4; // 邮箱验证码
 }
 
 // 登录
@@ -57,6 +58,15 @@ message TokenCheckReq {
   string token = 1;
 }
 
+// 发送邮箱验证码
 message SendEmailCodeReq {
   string email = 1;
+  string purpose = 2; // "register" 或 "reset_password"
+}
+
+// 重置密码
+message ResetPasswordReq {
+  string email = 1;
+  string email_code = 2;
+  string new_password = 3;
 } 

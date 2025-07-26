@@ -1103,6 +1103,10 @@
             "email": {
               "type": "string",
               "id": 3
+            },
+            "emailCode": {
+              "type": "string",
+              "id": 4
             }
           }
         },
@@ -1207,6 +1211,26 @@
             "email": {
               "type": "string",
               "id": 1
+            },
+            "purpose": {
+              "type": "string",
+              "id": 2
+            }
+          }
+        },
+        "ResetPasswordReq": {
+          "fields": {
+            "email": {
+              "type": "string",
+              "id": 1
+            },
+            "emailCode": {
+              "type": "string",
+              "id": 2
+            },
+            "newPassword": {
+              "type": "string",
+              "id": 3
             }
           }
         }

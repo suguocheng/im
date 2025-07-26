@@ -16508,6 +16508,7 @@ $root.protocol = (function() {
          * @property {string|null} [username] RegisterReq username
          * @property {string|null} [password] RegisterReq password
          * @property {string|null} [email] RegisterReq email
+         * @property {string|null} [emailCode] RegisterReq emailCode
          */
 
         /**
@@ -16550,6 +16551,14 @@ $root.protocol = (function() {
         RegisterReq.prototype.email = "";
 
         /**
+         * RegisterReq emailCode.
+         * @member {string} emailCode
+         * @memberof protocol.RegisterReq
+         * @instance
+         */
+        RegisterReq.prototype.emailCode = "";
+
+        /**
          * Creates a new RegisterReq instance using the specified properties.
          * @function create
          * @memberof protocol.RegisterReq
@@ -16579,6 +16588,8 @@ $root.protocol = (function() {
                 writer.uint32(/* id 2, wireType 2 =*/18).string(message.password);
             if (message.email != null && Object.hasOwnProperty.call(message, "email"))
                 writer.uint32(/* id 3, wireType 2 =*/26).string(message.email);
+            if (message.emailCode != null && Object.hasOwnProperty.call(message, "emailCode"))
+                writer.uint32(/* id 4, wireType 2 =*/34).string(message.emailCode);
             return writer;
         };
 
@@ -16627,6 +16638,10 @@ $root.protocol = (function() {
                         message.email = reader.string();
                         break;
                     }
+                case 4: {
+                        message.emailCode = reader.string();
+                        break;
+                    }
                 default:
                     reader.skipType(tag & 7);
                     break;
@@ -16671,6 +16686,9 @@ $root.protocol = (function() {
             if (message.email != null && message.hasOwnProperty("email"))
                 if (!$util.isString(message.email))
                     return "email: string expected";
+            if (message.emailCode != null && message.hasOwnProperty("emailCode"))
+                if (!$util.isString(message.emailCode))
+                    return "emailCode: string expected";
             return null;
         };
 
@@ -16692,6 +16710,8 @@ $root.protocol = (function() {
                 message.password = String(object.password);
             if (object.email != null)
                 message.email = String(object.email);
+            if (object.emailCode != null)
+                message.emailCode = String(object.emailCode);
             return message;
         };
 
@@ -16712,6 +16732,7 @@ $root.protocol = (function() {
                 object.username = "";
                 object.password = "";
                 object.email = "";
+                object.emailCode = "";
             }
             if (message.username != null && message.hasOwnProperty("username"))
                 object.username = message.username;
@@ -16719,6 +16740,8 @@ $root.protocol = (function() {
                 object.password = message.password;
             if (message.email != null && message.hasOwnProperty("email"))
                 object.email = message.email;
+            if (message.emailCode != null && message.hasOwnProperty("emailCode"))
+                object.emailCode = message.emailCode;
             return object;
         };
 
@@ -18586,6 +18609,7 @@ $root.protocol = (function() {
          * @memberof protocol
          * @interface ISendEmailCodeReq
          * @property {string|null} [email] SendEmailCodeReq email
+         * @property {string|null} [purpose] SendEmailCodeReq purpose
          */
 
         /**
@@ -18610,6 +18634,14 @@ $root.protocol = (function() {
          * @instance
          */
         SendEmailCodeReq.prototype.email = "";
+
+        /**
+         * SendEmailCodeReq purpose.
+         * @member {string} purpose
+         * @memberof protocol.SendEmailCodeReq
+         * @instance
+         */
+        SendEmailCodeReq.prototype.purpose = "";
 
         /**
          * Creates a new SendEmailCodeReq instance using the specified properties.
@@ -18637,6 +18669,8 @@ $root.protocol = (function() {
                 writer = $Writer.create();
             if (message.email != null && Object.hasOwnProperty.call(message, "email"))
                 writer.uint32(/* id 1, wireType 2 =*/10).string(message.email);
+            if (message.purpose != null && Object.hasOwnProperty.call(message, "purpose"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.purpose);
             return writer;
         };
 
@@ -18677,6 +18711,10 @@ $root.protocol = (function() {
                         message.email = reader.string();
                         break;
                     }
+                case 2: {
+                        message.purpose = reader.string();
+                        break;
+                    }
                 default:
                     reader.skipType(tag & 7);
                     break;
@@ -18715,6 +18753,9 @@ $root.protocol = (function() {
             if (message.email != null && message.hasOwnProperty("email"))
                 if (!$util.isString(message.email))
                     return "email: string expected";
+            if (message.purpose != null && message.hasOwnProperty("purpose"))
+                if (!$util.isString(message.purpose))
+                    return "purpose: string expected";
             return null;
         };
 
@@ -18732,6 +18773,8 @@ $root.protocol = (function() {
             var message = new $root.protocol.SendEmailCodeReq();
             if (object.email != null)
                 message.email = String(object.email);
+            if (object.purpose != null)
+                message.purpose = String(object.purpose);
             return message;
         };
 
@@ -18748,10 +18791,14 @@ $root.protocol = (function() {
             if (!options)
                 options = {};
             var object = {};
-            if (options.defaults)
+            if (options.defaults) {
                 object.email = "";
+                object.purpose = "";
+            }
             if (message.email != null && message.hasOwnProperty("email"))
                 object.email = message.email;
+            if (message.purpose != null && message.hasOwnProperty("purpose"))
+                object.purpose = message.purpose;
             return object;
         };
 
@@ -18782,6 +18829,258 @@ $root.protocol = (function() {
         };
 
         return SendEmailCodeReq;
+    })();
+
+    protocol.ResetPasswordReq = (function() {
+
+        /**
+         * Properties of a ResetPasswordReq.
+         * @memberof protocol
+         * @interface IResetPasswordReq
+         * @property {string|null} [email] ResetPasswordReq email
+         * @property {string|null} [emailCode] ResetPasswordReq emailCode
+         * @property {string|null} [newPassword] ResetPasswordReq newPassword
+         */
+
+        /**
+         * Constructs a new ResetPasswordReq.
+         * @memberof protocol
+         * @classdesc Represents a ResetPasswordReq.
+         * @implements IResetPasswordReq
+         * @constructor
+         * @param {protocol.IResetPasswordReq=} [properties] Properties to set
+         */
+        function ResetPasswordReq(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * ResetPasswordReq email.
+         * @member {string} email
+         * @memberof protocol.ResetPasswordReq
+         * @instance
+         */
+        ResetPasswordReq.prototype.email = "";
+
+        /**
+         * ResetPasswordReq emailCode.
+         * @member {string} emailCode
+         * @memberof protocol.ResetPasswordReq
+         * @instance
+         */
+        ResetPasswordReq.prototype.emailCode = "";
+
+        /**
+         * ResetPasswordReq newPassword.
+         * @member {string} newPassword
+         * @memberof protocol.ResetPasswordReq
+         * @instance
+         */
+        ResetPasswordReq.prototype.newPassword = "";
+
+        /**
+         * Creates a new ResetPasswordReq instance using the specified properties.
+         * @function create
+         * @memberof protocol.ResetPasswordReq
+         * @static
+         * @param {protocol.IResetPasswordReq=} [properties] Properties to set
+         * @returns {protocol.ResetPasswordReq} ResetPasswordReq instance
+         */
+        ResetPasswordReq.create = function create(properties) {
+            return new ResetPasswordReq(properties);
+        };
+
+        /**
+         * Encodes the specified ResetPasswordReq message. Does not implicitly {@link protocol.ResetPasswordReq.verify|verify} messages.
+         * @function encode
+         * @memberof protocol.ResetPasswordReq
+         * @static
+         * @param {protocol.IResetPasswordReq} message ResetPasswordReq message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        ResetPasswordReq.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.email != null && Object.hasOwnProperty.call(message, "email"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.email);
+            if (message.emailCode != null && Object.hasOwnProperty.call(message, "emailCode"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.emailCode);
+            if (message.newPassword != null && Object.hasOwnProperty.call(message, "newPassword"))
+                writer.uint32(/* id 3, wireType 2 =*/26).string(message.newPassword);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified ResetPasswordReq message, length delimited. Does not implicitly {@link protocol.ResetPasswordReq.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof protocol.ResetPasswordReq
+         * @static
+         * @param {protocol.IResetPasswordReq} message ResetPasswordReq message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        ResetPasswordReq.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a ResetPasswordReq message from the specified reader or buffer.
+         * @function decode
+         * @memberof protocol.ResetPasswordReq
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {protocol.ResetPasswordReq} ResetPasswordReq
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        ResetPasswordReq.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protocol.ResetPasswordReq();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.email = reader.string();
+                        break;
+                    }
+                case 2: {
+                        message.emailCode = reader.string();
+                        break;
+                    }
+                case 3: {
+                        message.newPassword = reader.string();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a ResetPasswordReq message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof protocol.ResetPasswordReq
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {protocol.ResetPasswordReq} ResetPasswordReq
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        ResetPasswordReq.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a ResetPasswordReq message.
+         * @function verify
+         * @memberof protocol.ResetPasswordReq
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        ResetPasswordReq.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.email != null && message.hasOwnProperty("email"))
+                if (!$util.isString(message.email))
+                    return "email: string expected";
+            if (message.emailCode != null && message.hasOwnProperty("emailCode"))
+                if (!$util.isString(message.emailCode))
+                    return "emailCode: string expected";
+            if (message.newPassword != null && message.hasOwnProperty("newPassword"))
+                if (!$util.isString(message.newPassword))
+                    return "newPassword: string expected";
+            return null;
+        };
+
+        /**
+         * Creates a ResetPasswordReq message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof protocol.ResetPasswordReq
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {protocol.ResetPasswordReq} ResetPasswordReq
+         */
+        ResetPasswordReq.fromObject = function fromObject(object) {
+            if (object instanceof $root.protocol.ResetPasswordReq)
+                return object;
+            var message = new $root.protocol.ResetPasswordReq();
+            if (object.email != null)
+                message.email = String(object.email);
+            if (object.emailCode != null)
+                message.emailCode = String(object.emailCode);
+            if (object.newPassword != null)
+                message.newPassword = String(object.newPassword);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a ResetPasswordReq message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof protocol.ResetPasswordReq
+         * @static
+         * @param {protocol.ResetPasswordReq} message ResetPasswordReq
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        ResetPasswordReq.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                object.email = "";
+                object.emailCode = "";
+                object.newPassword = "";
+            }
+            if (message.email != null && message.hasOwnProperty("email"))
+                object.email = message.email;
+            if (message.emailCode != null && message.hasOwnProperty("emailCode"))
+                object.emailCode = message.emailCode;
+            if (message.newPassword != null && message.hasOwnProperty("newPassword"))
+                object.newPassword = message.newPassword;
+            return object;
+        };
+
+        /**
+         * Converts this ResetPasswordReq to JSON.
+         * @function toJSON
+         * @memberof protocol.ResetPasswordReq
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        ResetPasswordReq.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for ResetPasswordReq
+         * @function getTypeUrl
+         * @memberof protocol.ResetPasswordReq
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        ResetPasswordReq.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/protocol.ResetPasswordReq";
+        };
+
+        return ResetPasswordReq;
     })();
 
     return protocol;

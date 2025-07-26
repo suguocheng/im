@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 
 	"github.com/joho/godotenv"
 )
 
-// 数据库配置
+// MysqlConfig MySQL配置
 type MysqlConfig struct {
 	Host     string
 	Port     int
@@ -18,13 +19,20 @@ type MysqlConfig struct {
 	Charset  string
 }
 
-// Redis配置
-// RedisConfig 结构体
+// RedisConfig Redis配置
 type RedisConfig struct {
 	Host     string
 	Port     int
 	Password string
 	DB       int
+}
+
+// EmailConfig 邮件服务配置
+type EmailConfig struct {
+	Host     string
+	Port     int
+	Username string
+	Password string
 }
 
 // 初始化配置
@@ -42,25 +50,35 @@ func init() {
 	}
 }
 
-// 获取数据库配置
+// GetMysqlConfig 获取MySQL配置
 func GetMysqlConfig() *MysqlConfig {
 	return &MysqlConfig{
-		Host:     getEnv("MYSQL_HOST", "localhost"),
-		Port:     getEnvAsInt("MYSQL_PORT", 3306),
-		Username: getEnv("MYSQL_USERNAME", "root"),
+		Host:     getEnv("MYSQL_HOST", ""),
+		Port:     getEnvAsInt("MYSQL_PORT", 0),
+		Username: getEnv("MYSQL_USERNAME", ""),
 		Password: getEnv("MYSQL_PASSWORD", ""),
-		Database: getEnv("MYSQL_DATABASE", "im_system"),
+		Database: getEnv("MYSQL_DATABASE", ""),
 		Charset:  getEnv("MYSQL_CHARSET", "utf8mb4"),
 	}
 }
 
-// 获取Redis配置
+// GetRedisConfig 获取Redis配置
 func GetRedisConfig() *RedisConfig {
 	return &RedisConfig{
-		Host:     getEnv("REDIS_HOST", "localhost"),
-		Port:     getEnvAsInt("REDIS_PORT", 6379),
+		Host:     getEnv("REDIS_HOST", ""),
+		Port:     getEnvAsInt("REDIS_PORT", 0),
 		Password: getEnv("REDIS_PASSWORD", ""),
 		DB:       getEnvAsInt("REDIS_DB", 0),
+	}
+}
+
+// GetEmailConfig 获取邮件服务配置
+func GetEmailConfig() *EmailConfig {
+	return &EmailConfig{
+		Host:     getEnv("EMAIL_HOST", ""),
+		Port:     getEnvAsInt("EMAIL_PORT", 0),
+		Username: getEnv("EMAIL_USERNAME", ""),
+		Password: getEnv("EMAIL_PASSWORD", ""),
 	}
 }
 
@@ -81,8 +99,8 @@ func getEnv(key, defaultValue string) string {
 // 从环境变量获取整数值
 func getEnvAsInt(key string, defaultValue int) int {
 	if value := os.Getenv(key); value != "" {
-		if intValue, err := fmt.Sscanf(value, "%d", &defaultValue); err == nil && intValue == 1 {
-			return defaultValue
+		if parsedValue, err := strconv.Atoi(value); err == nil {
+			return parsedValue
 		}
 	}
 	return defaultValue

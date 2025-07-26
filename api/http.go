@@ -4,20 +4,29 @@ import (
 	"fmt"
 	"im/core/auth"
 	pb "im/core/protocol/pb"
+	"im/core/service"
 	"io"
 	"net/http"
 
 	"im/core/protocol"
-	"im/core/service"
 	"im/core/storage"
 	"strings"
 	"time"
+
+	"im/config"
 
 	"google.golang.org/protobuf/proto"
 )
 
 var storageManager = storage.GetStorageManager()
 var fileService = service.NewFileService()
+var emailService *service.EmailService
+
+// 初始化邮件服务
+func initEmailService() {
+	config := config.GetEmailConfig()
+	emailService = service.NewEmailService(config.Host, config.Port, config.Username, config.Password)
+}
 
 func writeResp(w http.ResponseWriter, code int, msg string, data []byte) {
 	w.Header().Set("Content-Type", "application/x-protobuf")
@@ -42,12 +51,105 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		writeResp(w, 1002, "密码或邮箱长度不合法", nil)
 		return
 	}
+
+	// 验证邮箱验证码
+	if !emailService.VerifyCode(req.Email, req.EmailCode, "register") {
+		writeResp(w, 1003, "邮箱验证码错误或已过期", nil)
+		return
+	}
+
 	uid, err := storageManager.CreateUser(req.Username, req.Password, req.Email)
 	if err != nil {
 		writeResp(w, 1004, err.Error(), nil)
 		return
 	}
 	writeResp(w, 0, "注册成功", []byte(uid))
+}
+
+// 发送邮箱验证码
+func SendEmailCodeHandler(w http.ResponseWriter, r *http.Request) {
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		writeResp(w, 1, "请求体读取失败", nil)
+		return
+	}
+	var req pb.SendEmailCodeReq
+	if err := proto.Unmarshal(body, &req); err != nil {
+		writeResp(w, 1, "请求格式错误", nil)
+		return
+	}
+	if req.Email == "" {
+		writeResp(w, 1, "邮箱不能为空", nil)
+		return
+	}
+	if req.Purpose != "register" && req.Purpose != "reset_password" {
+		writeResp(w, 1, "无效的验证码用途", nil)
+		return
+	}
+
+	// 检查邮箱是否已存在（注册时）或不存在（重置密码时）
+	if req.Purpose == "register" {
+		_, err := storageManager.GetUserByEmail(req.Email)
+		if err == nil {
+			writeResp(w, 1, "该邮箱已被注册", nil)
+			return
+		}
+	} else if req.Purpose == "reset_password" {
+		_, err := storageManager.GetUserByEmail(req.Email)
+		if err != nil {
+			writeResp(w, 1, "该邮箱未注册", nil)
+			return
+		}
+	}
+
+	// 发送验证码
+	err = emailService.SendVerificationCode(req.Email, req.Purpose)
+	if err != nil {
+		writeResp(w, 1, "验证码发送失败: "+err.Error(), nil)
+		return
+	}
+
+	writeResp(w, 0, "验证码已发送", nil)
+}
+
+// 重置密码
+func ResetPasswordHandler(w http.ResponseWriter, r *http.Request) {
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		writeResp(w, 1, "请求体读取失败", nil)
+		return
+	}
+	var req pb.ResetPasswordReq
+	if err := proto.Unmarshal(body, &req); err != nil {
+		writeResp(w, 1, "请求格式错误", nil)
+		return
+	}
+	if req.Email == "" || req.EmailCode == "" || req.NewPassword == "" {
+		writeResp(w, 1, "邮箱、验证码和新密码不能为空", nil)
+		return
+	}
+
+	// 验证邮箱验证码
+	if !emailService.VerifyCode(req.Email, req.EmailCode, "reset_password") {
+		writeResp(w, 1, "邮箱验证码错误或已过期", nil)
+		return
+	}
+
+	// 获取用户信息
+	user, err := storageManager.GetUserByEmail(req.Email)
+	if err != nil {
+		writeResp(w, 1, "用户不存在", nil)
+		return
+	}
+
+	// 更新密码
+	err = storageManager.UpdatePassword(user.UID, req.NewPassword)
+	if err != nil {
+		writeResp(w, 1, err.Error(), nil)
+		return
+	}
+
+	writeResp(w, 0, "密码重置成功", nil)
 }
 
 // 在线账号管理
@@ -263,26 +365,6 @@ func TokenCheckHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeResp(w, 0, "token有效", []byte(userID))
-}
-
-// 邮箱验证码功能预留接口（实际应集成邮件服务）
-func SendEmailCodeHandler(w http.ResponseWriter, r *http.Request) {
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		writeResp(w, 1, "请求体读取失败", nil)
-		return
-	}
-	var req pb.SendEmailCodeReq
-	if err := proto.Unmarshal(body, &req); err != nil {
-		writeResp(w, 1, "请求格式错误", nil)
-		return
-	}
-	if req.Email == "" {
-		writeResp(w, 1, "邮箱不能为空", nil)
-		return
-	}
-	// 这里应调用实际邮件服务发送验证码
-	writeResp(w, 0, "验证码已发送(模拟)", nil)
 }
 
 // 添加好友请求
@@ -1470,8 +1552,13 @@ func wrapCORS(handler http.HandlerFunc) http.HandlerFunc {
 }
 
 func StartHTTPServer(addr string) {
+	// 初始化邮件服务
+	initEmailService()
+
 	// 用户相关路由
 	http.HandleFunc("/register", wrapCORS(RegisterHandler))
+	http.HandleFunc("/send_email_code", wrapCORS(SendEmailCodeHandler))
+	http.HandleFunc("/reset_password", wrapCORS(ResetPasswordHandler))
 	http.HandleFunc("/login", wrapCORS(LoginHandler))
 	http.HandleFunc("/logout", wrapCORS(LogoutHandler))
 	http.HandleFunc("/user_info", wrapCORS(UserInfoHandler))

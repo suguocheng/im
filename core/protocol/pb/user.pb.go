@@ -27,6 +27,7 @@ type RegisterReq struct {
 	Username      string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
 	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
 	Email         string                 `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
+	EmailCode     string                 `protobuf:"bytes,4,opt,name=email_code,json=emailCode,proto3" json:"email_code,omitempty"` // 邮箱验证码
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -78,6 +79,13 @@ func (x *RegisterReq) GetPassword() string {
 func (x *RegisterReq) GetEmail() string {
 	if x != nil {
 		return x.Email
+	}
+	return ""
+}
+
+func (x *RegisterReq) GetEmailCode() string {
+	if x != nil {
+		return x.EmailCode
 	}
 	return ""
 }
@@ -505,9 +513,11 @@ func (x *TokenCheckReq) GetToken() string {
 	return ""
 }
 
+// 发送邮箱验证码
 type SendEmailCodeReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
+	Purpose       string                 `protobuf:"bytes,2,opt,name=purpose,proto3" json:"purpose,omitempty"` // "register" 或 "reset_password"
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -549,16 +559,86 @@ func (x *SendEmailCodeReq) GetEmail() string {
 	return ""
 }
 
+func (x *SendEmailCodeReq) GetPurpose() string {
+	if x != nil {
+		return x.Purpose
+	}
+	return ""
+}
+
+// 重置密码
+type ResetPasswordReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
+	EmailCode     string                 `protobuf:"bytes,2,opt,name=email_code,json=emailCode,proto3" json:"email_code,omitempty"`
+	NewPassword   string                 `protobuf:"bytes,3,opt,name=new_password,json=newPassword,proto3" json:"new_password,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ResetPasswordReq) Reset() {
+	*x = ResetPasswordReq{}
+	mi := &file_user_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ResetPasswordReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ResetPasswordReq) ProtoMessage() {}
+
+func (x *ResetPasswordReq) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ResetPasswordReq.ProtoReflect.Descriptor instead.
+func (*ResetPasswordReq) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *ResetPasswordReq) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+func (x *ResetPasswordReq) GetEmailCode() string {
+	if x != nil {
+		return x.EmailCode
+	}
+	return ""
+}
+
+func (x *ResetPasswordReq) GetNewPassword() string {
+	if x != nil {
+		return x.NewPassword
+	}
+	return ""
+}
+
 var File_user_proto protoreflect.FileDescriptor
 
 const file_user_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"user.proto\x12\bprotocol\"[\n" +
+	"user.proto\x12\bprotocol\"z\n" +
 	"\vRegisterReq\x12\x1a\n" +
 	"\busername\x18\x01 \x01(\tR\busername\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\x12\x14\n" +
-	"\x05email\x18\x03 \x01(\tR\x05email\"8\n" +
+	"\x05email\x18\x03 \x01(\tR\x05email\x12\x1d\n" +
+	"\n" +
+	"email_code\x18\x04 \x01(\tR\temailCode\"8\n" +
 	"\bLoginReq\x12\x10\n" +
 	"\x03uid\x18\x01 \x01(\tR\x03uid\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\"!\n" +
@@ -582,9 +662,15 @@ const file_user_proto_rawDesc = "" +
 	"\x10DeleteAccountReq\x12\x10\n" +
 	"\x03uid\x18\x01 \x01(\tR\x03uid\"%\n" +
 	"\rTokenCheckReq\x12\x14\n" +
-	"\x05token\x18\x01 \x01(\tR\x05token\"(\n" +
+	"\x05token\x18\x01 \x01(\tR\x05token\"B\n" +
 	"\x10SendEmailCodeReq\x12\x14\n" +
-	"\x05email\x18\x01 \x01(\tR\x05emailB\x18Z\x16im/core/protocol/pb;pbb\x06proto3"
+	"\x05email\x18\x01 \x01(\tR\x05email\x12\x18\n" +
+	"\apurpose\x18\x02 \x01(\tR\apurpose\"j\n" +
+	"\x10ResetPasswordReq\x12\x14\n" +
+	"\x05email\x18\x01 \x01(\tR\x05email\x12\x1d\n" +
+	"\n" +
+	"email_code\x18\x02 \x01(\tR\temailCode\x12!\n" +
+	"\fnew_password\x18\x03 \x01(\tR\vnewPasswordB\x18Z\x16im/core/protocol/pb;pbb\x06proto3"
 
 var (
 	file_user_proto_rawDescOnce sync.Once
@@ -598,7 +684,7 @@ func file_user_proto_rawDescGZIP() []byte {
 	return file_user_proto_rawDescData
 }
 
-var file_user_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_user_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_user_proto_goTypes = []any{
 	(*RegisterReq)(nil),       // 0: protocol.RegisterReq
 	(*LoginReq)(nil),          // 1: protocol.LoginReq
@@ -610,6 +696,7 @@ var file_user_proto_goTypes = []any{
 	(*DeleteAccountReq)(nil),  // 7: protocol.DeleteAccountReq
 	(*TokenCheckReq)(nil),     // 8: protocol.TokenCheckReq
 	(*SendEmailCodeReq)(nil),  // 9: protocol.SendEmailCodeReq
+	(*ResetPasswordReq)(nil),  // 10: protocol.ResetPasswordReq
 }
 var file_user_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
@@ -630,7 +717,7 @@ func file_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_user_proto_rawDesc), len(file_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   10,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

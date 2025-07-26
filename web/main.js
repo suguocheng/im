@@ -232,13 +232,16 @@ document.addEventListener('DOMContentLoaded', function() {
       const username = document.getElementById('reg-username').value.trim();
       const email = document.getElementById('reg-email').value.trim();
       const pwd = document.getElementById('reg-pwd').value;
-      if (!username || !email || !pwd) {
+      const emailCode = document.getElementById('reg-email-code').value.trim();
+      
+      if (!username || !email || !pwd || !emailCode) {
         registerError.textContent = '请填写所有信息';
         return;
       }
+      
       try {
         // protobuf编码请求体
-        const payload = { username, email, password: pwd };
+        const payload = { username, email, password: pwd, emailCode };
         const body = RegisterReq.encode(RegisterReq.create(payload)).finish();
         const resp = await fetch(`${API_BASE}/register`, {
           method: 'POST',
@@ -1935,5 +1938,174 @@ document.addEventListener('DOMContentLoaded', function() {
         if (currentGroup) selectGroup(currentGroup.groupId, currentGroup.name);
       }
     }
+
+
+
+    // 发送验证码功能
+    document.addEventListener('click', function(e) {
+      if (e.target.id === 'send-email-code') {
+        const email = document.getElementById('reg-email').value.trim();
+        if (!email) {
+          alert('请先输入邮箱');
+          return;
+        }
+        
+        const btn = e.target;
+        btn.disabled = true;
+        btn.textContent = '发送中...';
+        
+        // 发送验证码请求
+        const SendEmailCodeReq = root.lookupType('protocol.SendEmailCodeReq');
+        const APIResp = root.lookupType('protocol.APIResp');
+        const reqBuf = SendEmailCodeReq.encode(SendEmailCodeReq.create({ 
+          email: email, 
+          purpose: 'register' 
+        })).finish();
+        
+        fetch(`${API_BASE}/send_email_code`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-protobuf' },
+          body: reqBuf
+        })
+        .then(resp => resp.arrayBuffer())
+        .then(buf => {
+          const apiMsg = APIResp.decode(new Uint8Array(buf));
+          if (apiMsg.code === 0) {
+            alert('验证码已发送到您的邮箱');
+            // 开始倒计时
+            let countdown = 60;
+            const timer = setInterval(() => {
+              btn.textContent = `${countdown}秒后重发`;
+              countdown--;
+              if (countdown < 0) {
+                clearInterval(timer);
+                btn.disabled = false;
+                btn.textContent = '发送验证码';
+              }
+            }, 1000);
+          } else {
+            alert('发送失败: ' + apiMsg.msg);
+            btn.disabled = false;
+            btn.textContent = '发送验证码';
+          }
+        })
+        .catch(e => {
+          alert('发送失败: ' + e.message);
+          btn.disabled = false;
+          btn.textContent = '发送验证码';
+        });
+      }
+      
+      // 忘记密码功能
+      if (e.target.id === 'forgot-password') {
+        e.preventDefault();
+        showModal({
+          title: '重置密码',
+          content: `
+            <div style="margin-bottom:12px;">
+              <input type="email" id="reset-email" placeholder="请输入注册邮箱" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;margin-bottom:8px;">
+              <div style="display:flex;gap:8px;margin-bottom:8px;">
+                <input type="text" id="reset-email-code" placeholder="邮箱验证码" style="flex:1;padding:8px;border:1px solid #ddd;border-radius:4px;">
+                <button type="button" id="send-reset-code" style="padding:8px 12px;background:#409eff;color:#fff;border:none;border-radius:4px;cursor:pointer;">发送验证码</button>
+              </div>
+              <input type="password" id="reset-new-password" placeholder="新密码" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
+            </div>
+          `,
+          okText: '重置密码',
+          onOk: async () => {
+            const email = document.getElementById('reset-email').value.trim();
+            const emailCode = document.getElementById('reset-email-code').value.trim();
+            const newPassword = document.getElementById('reset-new-password').value;
+            
+            if (!email || !emailCode || !newPassword) {
+              alert('请填写所有信息');
+              return;
+            }
+            
+            try {
+              const ResetPasswordReq = root.lookupType('protocol.ResetPasswordReq');
+              const APIResp = root.lookupType('protocol.APIResp');
+              const reqBuf = ResetPasswordReq.encode(ResetPasswordReq.create({ 
+                email: email, 
+                emailCode: emailCode, 
+                newPassword: newPassword 
+              })).finish();
+              
+              const resp = await fetch(`${API_BASE}/reset_password`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-protobuf' },
+                body: reqBuf
+              });
+              
+              const buf = await resp.arrayBuffer();
+              const apiMsg = APIResp.decode(new Uint8Array(buf));
+              if (apiMsg.code === 0) {
+                alert('密码重置成功，请使用新密码登录');
+                return true; // 关闭模态框
+              } else {
+                alert('重置失败: ' + apiMsg.msg);
+                return false;
+              }
+            } catch (e) {
+              alert('重置失败: ' + e.message);
+              return false;
+            }
+          }
+        });
+      }
+      
+      // 发送重置密码验证码
+      if (e.target.id === 'send-reset-code') {
+        const email = document.getElementById('reset-email').value.trim();
+        if (!email) {
+          alert('请先输入邮箱');
+          return;
+        }
+        
+        const btn = e.target;
+        btn.disabled = true;
+        btn.textContent = '发送中...';
+        
+        const SendEmailCodeReq = root.lookupType('protocol.SendEmailCodeReq');
+        const APIResp = root.lookupType('protocol.APIResp');
+        const reqBuf = SendEmailCodeReq.encode(SendEmailCodeReq.create({ 
+          email: email, 
+          purpose: 'reset_password' 
+        })).finish();
+        
+        fetch(`${API_BASE}/send_email_code`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-protobuf' },
+          body: reqBuf
+        })
+        .then(resp => resp.arrayBuffer())
+        .then(buf => {
+          const apiMsg = APIResp.decode(new Uint8Array(buf));
+          if (apiMsg.code === 0) {
+            alert('验证码已发送到您的邮箱');
+            // 开始倒计时
+            let countdown = 60;
+            const timer = setInterval(() => {
+              btn.textContent = `${countdown}秒后重发`;
+              countdown--;
+              if (countdown < 0) {
+                clearInterval(timer);
+                btn.disabled = false;
+                btn.textContent = '发送验证码';
+              }
+            }, 1000);
+          } else {
+            alert('发送失败: ' + apiMsg.msg);
+            btn.disabled = false;
+            btn.textContent = '发送验证码';
+          }
+        })
+        .catch(e => {
+          alert('发送失败: ' + e.message);
+          btn.disabled = false;
+          btn.textContent = '发送验证码';
+        });
+      }
+    });
   });
 }); 

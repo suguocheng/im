@@ -287,3 +287,43 @@ body.dark-mode aside {
   color: #eee;
   border-right: 1px solid #222;
 }
+
+/* 忘记密码链接样式 */
+.forgot-password-link {
+  text-align: right;
+}
+
+.forgot-password-link a {
+  color: #409eff;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+/* 邮箱验证码输入框容器样式 */
+.email-code-container {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.email-code-input {
+  flex: 1;
+}
+
+.send-email-code-btn {
+  padding: 8px 12px;
+  background: #409eff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.send-email-code-btn:hover {
+  background: #1976d2;
+}
+
+.send-email-code-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
