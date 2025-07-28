@@ -16,7 +16,9 @@ type StorageManager struct {
 	userStorage   *MySQLUserStorage
 	friendStorage *MySQLFriendStorage
 	groupStorage  *MySQLGroupStorage
+	mongoStorage  *MongoDBMessageStorage
 	useMySQL      bool
+	useMongoDB    bool
 	mu            sync.RWMutex
 }
 
@@ -592,6 +594,21 @@ func (sm *StorageManager) InitRedis(addr, password string, db int) {
 	redisMsgStore = NewRedisMessageStorage(addr, password, db)
 }
 
+// 初始化MongoDB（可在InitMySQL后调用）
+func (sm *StorageManager) InitMongoDB(uri, databaseName string) error {
+	sm.mu.Lock()
+	defer sm.mu.Unlock()
+
+	mongoStorage, err := NewMongoDBMessageStorage(uri, databaseName)
+	if err != nil {
+		return err
+	}
+
+	sm.mongoStorage = mongoStorage
+	sm.useMongoDB = true
+	return nil
+}
+
 // 缓存消息
 func (sm *StorageManager) CacheMessage(sessionKey, msg string, expire time.Duration) error {
 	if redisMsgStore == nil {
@@ -643,4 +660,50 @@ func (sm *StorageManager) GetOfflineMessageCount(userID string) (int64, error) {
 		return 0, fmt.Errorf("Redis未初始化")
 	}
 	return redisMsgStore.GetOfflineMessageCount(userID)
+}
+
+// ==================== MongoDB消息存储 ====================
+
+// StoreMessageToMongoDB 存储消息到MongoDB
+func (sm *StorageManager) StoreMessageToMongoDB(msg *pb.IMMessage) error {
+	sm.mu.RLock()
+	defer sm.mu.RUnlock()
+
+	if !sm.useMongoDB || sm.mongoStorage == nil {
+		return fmt.Errorf("MongoDB存储未初始化")
+	}
+	return sm.mongoStorage.StoreMessage(msg)
+}
+
+// GetPrivateMessagesFromMongoDB 从MongoDB获取私聊消息
+func (sm *StorageManager) GetPrivateMessagesFromMongoDB(uid1, uid2 string, limit int64) ([]*pb.IMMessage, error) {
+	sm.mu.RLock()
+	defer sm.mu.RUnlock()
+
+	if !sm.useMongoDB || sm.mongoStorage == nil {
+		return nil, fmt.Errorf("MongoDB存储未初始化")
+	}
+	return sm.mongoStorage.GetPrivateMessages(uid1, uid2, limit)
+}
+
+// GetGroupMessagesFromMongoDB 从MongoDB获取群聊消息
+func (sm *StorageManager) GetGroupMessagesFromMongoDB(groupID string, limit int64) ([]*pb.IMMessage, error) {
+	sm.mu.RLock()
+	defer sm.mu.RUnlock()
+
+	if !sm.useMongoDB || sm.mongoStorage == nil {
+		return nil, fmt.Errorf("MongoDB存储未初始化")
+	}
+	return sm.mongoStorage.GetGroupMessages(groupID, limit)
+}
+
+// DeleteOldMessagesFromMongoDB 删除MongoDB中的旧消息
+func (sm *StorageManager) DeleteOldMessagesFromMongoDB(beforeTime int64) error {
+	sm.mu.RLock()
+	defer sm.mu.RUnlock()
+
+	if !sm.useMongoDB || sm.mongoStorage == nil {
+		return fmt.Errorf("MongoDB存储未初始化")
+	}
+	return sm.mongoStorage.DeleteMessages(beforeTime)
 }

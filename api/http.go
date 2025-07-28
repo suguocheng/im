@@ -1434,15 +1434,21 @@ func GetRecentPrivateMessagesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	sessionKey := "chat:" + req.From + ":" + req.To
 	msgs, err := storageManager.GetRecentMessages(sessionKey, req.Count)
-	if err != nil {
-		writeResp(w, 1, "获取消息失败: "+err.Error(), nil)
-		return
-	}
 	var pbMsgs []*pb.IMMessage
-	for _, m := range msgs {
-		var msg pb.IMMessage
-		if err := proto.Unmarshal([]byte(m), &msg); err == nil {
-			pbMsgs = append(pbMsgs, &msg)
+	if err != nil || len(msgs) == 0 {
+		// Redis查不到，查MongoDB
+		mongoMsgs, err2 := storageManager.GetPrivateMessagesFromMongoDB(req.From, req.To, req.Count)
+		if err2 != nil {
+			writeResp(w, 1, "获取消息失败: "+err2.Error(), nil)
+			return
+		}
+		pbMsgs = mongoMsgs
+	} else {
+		for _, m := range msgs {
+			var msg pb.IMMessage
+			if err := proto.Unmarshal([]byte(m), &msg); err == nil {
+				pbMsgs = append(pbMsgs, &msg)
+			}
 		}
 	}
 	data, _ := proto.Marshal(&pb.IMMessageList{Messages: pbMsgs})
@@ -1467,15 +1473,21 @@ func GetRecentGroupMessagesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	sessionKey := "group:" + req.GroupId
 	msgs, err := storageManager.GetRecentMessages(sessionKey, req.Count)
-	if err != nil {
-		writeResp(w, 1, "获取消息失败: "+err.Error(), nil)
-		return
-	}
 	var pbMsgs []*pb.IMMessage
-	for _, m := range msgs {
-		var msg pb.IMMessage
-		if err := proto.Unmarshal([]byte(m), &msg); err == nil {
-			pbMsgs = append(pbMsgs, &msg)
+	if err != nil || len(msgs) == 0 {
+		// Redis查不到，查MongoDB
+		mongoMsgs, err2 := storageManager.GetGroupMessagesFromMongoDB(req.GroupId, req.Count)
+		if err2 != nil {
+			writeResp(w, 1, "获取消息失败: "+err2.Error(), nil)
+			return
+		}
+		pbMsgs = mongoMsgs
+	} else {
+		for _, m := range msgs {
+			var msg pb.IMMessage
+			if err := proto.Unmarshal([]byte(m), &msg); err == nil {
+				pbMsgs = append(pbMsgs, &msg)
+			}
 		}
 	}
 	data, _ := proto.Marshal(&pb.IMMessageList{Messages: pbMsgs})

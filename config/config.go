@@ -35,6 +35,13 @@ type EmailConfig struct {
 	Password string
 }
 
+// MongoDBConfig MongoDB配置
+type MongoDBConfig struct {
+	URI        string
+	Database   string
+	Collection string
+}
+
 // 初始化配置
 func init() {
 	// 尝试加载.env文件
@@ -79,6 +86,15 @@ func GetEmailConfig() *EmailConfig {
 		Port:     getEnvAsInt("EMAIL_PORT", 0),
 		Username: getEnv("EMAIL_USERNAME", ""),
 		Password: getEnv("EMAIL_PASSWORD", ""),
+	}
+}
+
+// GetMongoDBConfig 获取MongoDB配置
+func GetMongoDBConfig() *MongoDBConfig {
+	return &MongoDBConfig{
+		URI:        getEnv("MONGODB_URI", "mongodb://localhost:27017"),
+		Database:   getEnv("MONGODB_DATABASE", "im_system"),
+		Collection: getEnv("MONGODB_COLLECTION", "messages"),
 	}
 }
 

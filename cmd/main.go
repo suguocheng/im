@@ -33,6 +33,14 @@ func main() {
 	storageManager.InitRedis(redisAddr, redisConfig.Password, redisConfig.DB)
 	log.Println("Redis存储初始化成功")
 
+	// 初始化MongoDB存储
+	mongoConfig := config.GetMongoDBConfig()
+	if err := storageManager.InitMongoDB(mongoConfig.URI, mongoConfig.Database); err != nil {
+		log.Printf("MongoDB存储初始化失败: %v", err)
+	} else {
+		log.Println("MongoDB存储初始化成功")
+	}
+
 	// 程序结束时关闭存储
 	defer func() {
 		if err := storageManager.Close(); err != nil {
@@ -97,6 +105,9 @@ func main() {
 				_ = storageManager.CacheMessage(sessionKey, string(msgBytes), 24*time.Hour)
 				_ = storageManager.Publish("channel:"+msg.To, string(msgBytes))
 
+				// --- MongoDB长期存储 ---
+				_ = storageManager.StoreMessageToMongoDB(&msg)
+
 				// 聊天通知（只在对方在线时发送）
 				if err == nil && !protocol.StorageFriendStoreGetDND(msg.To, msg.From) {
 					notif := &pb.Notification{
@@ -154,6 +165,9 @@ func main() {
 				for _, offlineMember := range offlineMembers {
 					_ = storageManager.StoreOfflineMessage(offlineMember, string(msgBytes))
 				}
+
+				// --- MongoDB长期存储 ---
+				_ = storageManager.StoreMessageToMongoDB(&msg)
 
 				// 发送通知给群成员 (模仿私聊逻辑)
 				group, err := storageManager.GetGroup(msg.GroupId)
