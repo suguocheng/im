@@ -74,12 +74,13 @@ func main() {
 			if isChatMessage && msg.To != "" {
 				msg.FromUsername = senderUsername(storageManager, msg.From)
 				b, _ := proto.Marshal(&msg)
-				err := protocol.SendToUser(msg.To, b) // 始终推送消息
+
+				// 尝试发送给接收者，但不因为对方不在线而失败
+				err := protocol.SendToUser(msg.To, b)
 				if err != nil {
-					errMsg := &pb.IMMessage{Type: "error", Content: "对方不在线"}
-					b, _ := proto.Marshal(errMsg)
-					conn.WriteMessage(websocket.BinaryMessage, b)
-					return
+					// 对方不在线，将消息存储为离线消息
+					msgBytes, _ := proto.Marshal(&msg)
+					_ = storageManager.StoreOfflineMessage(msg.To, string(msgBytes))
 				}
 
 				// 给发送者回显消息
@@ -96,8 +97,8 @@ func main() {
 				_ = storageManager.CacheMessage(sessionKey, string(msgBytes), 24*time.Hour)
 				_ = storageManager.Publish("channel:"+msg.To, string(msgBytes))
 
-				// 聊天通知
-				if !protocol.StorageFriendStoreGetDND(msg.To, msg.From) {
+				// 聊天通知（只在对方在线时发送）
+				if err == nil && !protocol.StorageFriendStoreGetDND(msg.To, msg.From) {
 					notif := &pb.Notification{
 						Type:         "private_chat_message",
 						From:         msg.From,
@@ -126,8 +127,8 @@ func main() {
 					return
 				}
 
-				// 发送实时消息到群聊
-				err := protocol.SendGroupMessageToMembers(&msg)
+				// 发送实时消息到群聊，获取不在线的成员列表
+				offlineMembers, err := protocol.SendGroupMessageToMembers(&msg)
 				if err != nil {
 					errMsg := &pb.IMMessage{Type: "error", Content: "群消息发送失败: " + err.Error()}
 					b, _ := proto.Marshal(errMsg)
@@ -148,6 +149,11 @@ func main() {
 				msgBytes, _ := proto.Marshal(&msg)
 				groupSessionKey := "group:" + msg.GroupId
 				_ = storageManager.CacheMessage(groupSessionKey, string(msgBytes), 24*time.Hour)
+
+				// 为不在线的成员存储离线消息
+				for _, offlineMember := range offlineMembers {
+					_ = storageManager.StoreOfflineMessage(offlineMember, string(msgBytes))
+				}
 
 				// 发送通知给群成员 (模仿私聊逻辑)
 				group, err := storageManager.GetGroup(msg.GroupId)

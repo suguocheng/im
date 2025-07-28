@@ -620,3 +620,27 @@ func (sm *StorageManager) Publish(channel, msg string) error {
 func (sm *StorageManager) Subscribe(channel string) *RedisMessageStorage {
 	return redisMsgStore
 }
+
+// 存储离线消息
+func (sm *StorageManager) StoreOfflineMessage(userID, msg string) error {
+	if redisMsgStore == nil {
+		return fmt.Errorf("Redis未初始化")
+	}
+	return redisMsgStore.StoreOfflineMessage(userID, msg)
+}
+
+// 获取并删除用户的所有离线消息
+func (sm *StorageManager) GetAndClearOfflineMessages(userID string) ([]string, error) {
+	if redisMsgStore == nil {
+		return nil, fmt.Errorf("Redis未初始化")
+	}
+	return redisMsgStore.GetAndClearOfflineMessages(userID)
+}
+
+// 获取用户离线消息数量
+func (sm *StorageManager) GetOfflineMessageCount(userID string) (int64, error) {
+	if redisMsgStore == nil {
+		return 0, fmt.Errorf("Redis未初始化")
+	}
+	return redisMsgStore.GetOfflineMessageCount(userID)
+}

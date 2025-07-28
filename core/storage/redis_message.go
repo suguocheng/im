@@ -54,3 +54,30 @@ func (r *RedisMessageStorage) Subscribe(channel string) *redis.PubSub {
 func (r *RedisMessageStorage) DeleteCache(sessionKey string) error {
 	return r.client.Del(ctx, sessionKey).Err()
 }
+
+// 存储离线消息
+func (r *RedisMessageStorage) StoreOfflineMessage(userID string, msg string) error {
+	key := "offline:" + userID
+	return r.client.LPush(ctx, key, msg).Err()
+}
+
+// 获取并删除用户的所有离线消息
+func (r *RedisMessageStorage) GetAndClearOfflineMessages(userID string) ([]string, error) {
+	key := "offline:" + userID
+	// 获取所有离线消息
+	messages, err := r.client.LRange(ctx, key, 0, -1).Result()
+	if err != nil {
+		return nil, err
+	}
+	// 删除离线消息列表
+	if len(messages) > 0 {
+		_ = r.client.Del(ctx, key).Err()
+	}
+	return messages, nil
+}
+
+// 获取用户离线消息数量
+func (r *RedisMessageStorage) GetOfflineMessageCount(userID string) (int64, error) {
+	key := "offline:" + userID
+	return r.client.LLen(ctx, key).Result()
+}

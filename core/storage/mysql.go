@@ -3,7 +3,6 @@ package storage
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"strconv"
 	"strings"
 
@@ -54,11 +53,6 @@ func NewMySQLStorage(dsn string) (*MySQLStorage, error) {
 	}
 
 	storage := &MySQLStorage{db: db}
-
-	// 初始化数据库表
-	if err := storage.initTables(); err != nil {
-		return nil, fmt.Errorf("初始化数据库表失败: %v", err)
-	}
 
 	return storage, nil
 }
@@ -125,12 +119,6 @@ func extractDBConfigFromDSN(dsn string) dbConfig {
 	}
 
 	return config
-}
-
-// 初始化数据库表 - 由各个模块负责初始化自己的表
-func (m *MySQLStorage) initTables() error {
-	log.Println("MySQL数据库表初始化完成")
-	return nil
 }
 
 // 关闭数据库连接

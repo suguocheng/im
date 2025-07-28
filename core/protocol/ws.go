@@ -6,6 +6,7 @@ import (
 	pb "im/core/protocol/pb"
 	"net/http"
 	"sync"
+	"time"
 
 	"im/core/storage"
 
@@ -86,6 +87,10 @@ func (w *WSProtocol) handleConn(conn *websocket.Conn) {
 			}
 			userID = uid
 			wsUserConn.Store(userID, conn)
+
+			// 检查并发送离线消息
+			go sendOfflineMessages(userID, conn)
+
 			// 替换所有 JSON 字符串消息为 IMMessage 结构体 proto.Marshal 后发送
 			loginMsg := &pb.IMMessage{Type: "login", Content: "登录成功"}
 			b, _ := proto.Marshal(loginMsg)
@@ -110,24 +115,25 @@ func SendToUser(userID string, data []byte) error {
 	return conn.WriteMessage(websocket.BinaryMessage, data)
 }
 
-// 发送群聊消息给群组所有在线成员
-func SendGroupMessageToMembers(msg *pb.IMMessage) error {
+// 发送群聊消息给群组所有在线成员，返回不在线的成员列表
+func SendGroupMessageToMembers(msg *pb.IMMessage) ([]string, error) {
 	storageManager := storage.GetStorageManager()
 	group, err := storageManager.GetGroup(msg.GroupId)
 	if err != nil {
-		return fmt.Errorf("获取群组信息失败: %v", err)
+		return nil, fmt.Errorf("获取群组信息失败: %v", err)
 	}
 
 	b, _ := proto.Marshal(msg)
-	var sentCount int
+	var offlineMembers []string
 	for _, memberUID := range group.MemberUids {
 		if memberUID != msg.From { // 不发给自己
-			if err := SendToUser(memberUID, b); err == nil {
-				sentCount++
+			if err := SendToUser(memberUID, b); err != nil {
+				// 记录不在线的成员
+				offlineMembers = append(offlineMembers, memberUID)
 			}
 		}
 	}
-	return nil
+	return offlineMembers, nil
 }
 
 // 发送通知给指定用户
@@ -162,4 +168,64 @@ func StorageFriendStoreGetDND(uid, friendUid string) bool {
 		return false
 	}
 	return dnd
+}
+
+// 发送离线消息给刚登录的用户
+func sendOfflineMessages(userID string, conn *websocket.Conn) {
+	storageManager := storage.GetStorageManager()
+
+	// 获取并清除离线消息
+	offlineMessages, err := storageManager.GetAndClearOfflineMessages(userID)
+	if err != nil {
+		return
+	}
+
+	if len(offlineMessages) == 0 {
+		return
+	}
+
+	// 统计私聊和群聊消息数量
+	var privateCount, groupCount int
+	for _, msgStr := range offlineMessages {
+		var msg pb.IMMessage
+		if err := proto.Unmarshal([]byte(msgStr), &msg); err == nil {
+			if msg.GroupId != "" {
+				groupCount++
+			} else if msg.To != "" {
+				privateCount++
+			}
+		}
+	}
+
+	// 发送离线消息通知
+	var content string
+	if privateCount > 0 && groupCount > 0 {
+		content = fmt.Sprintf("您有 %d 条私聊消息和 %d 条群聊消息", privateCount, groupCount)
+	} else if privateCount > 0 {
+		content = fmt.Sprintf("您有 %d 条私聊消息", privateCount)
+	} else if groupCount > 0 {
+		content = fmt.Sprintf("您有 %d 条群聊消息", groupCount)
+	}
+
+	offlineNotif := &pb.Notification{
+		Type:      "offline_messages",
+		From:      "system",
+		To:        userID,
+		Content:   content,
+		Timestamp: time.Now().Unix(),
+		Extra:     fmt.Sprintf("private:%d,group:%d", privateCount, groupCount),
+	}
+
+	notifBytes, _ := proto.Marshal(offlineNotif)
+	conn.WriteMessage(websocket.BinaryMessage, notifBytes)
+
+	// 逐个发送离线消息
+	for _, msgStr := range offlineMessages {
+		// 尝试解析为IMMessage
+		var msg pb.IMMessage
+		if err := proto.Unmarshal([]byte(msgStr), &msg); err == nil {
+			msgBytes, _ := proto.Marshal(&msg)
+			conn.WriteMessage(websocket.BinaryMessage, msgBytes)
+		}
+	}
 }

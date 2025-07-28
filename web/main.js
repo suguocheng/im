@@ -1,6 +1,6 @@
 // ======= 统一API/WS地址配置 =======
-// const API_BASE = 'https://thousands-review-punch-kg.trycloudflare.com';
-// const WS_BASE = 'wss://thousands-review-punch-kg.trycloudflare.com/ws';
+// const API_BASE = 'https://dealer-assets-theaters-widespread.trycloudflare.com';
+// const WS_BASE = 'wss://dealer-assets-theaters-widespread.trycloudflare.com/ws';
 const API_BASE = 'http://127.0.0.1:8081';
 const WS_BASE = 'ws://127.0.0.1:8081/ws';
 
@@ -378,8 +378,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 inputs: [{ label: '备注', value: info.remark || '', placeholder: '输入备注' }],
                 okText: '保存',
                 onOk: async ([remark]) => {
-                  const UpdateRemarkReq = root.lookupType('protocol.UpdateRemarkReq');
-                  const reqBuf = UpdateRemarkReq.encode(UpdateRemarkReq.create({ uid: myUid, friendUid: uid, remark, token })).finish();
+                  const UpdateFriendRemarkReq = root.lookupType('protocol.UpdateFriendRemarkReq');
+                  const reqBuf = UpdateFriendRemarkReq.encode(UpdateFriendRemarkReq.create({ uid: myUid, friendUid: uid, remark, token })).finish();
                   const resp = await fetch(`${API_BASE}/update_friend_remark`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-protobuf' },
@@ -398,8 +398,8 @@ document.addEventListener('DOMContentLoaded', function() {
             dndBtn.textContent = info.dnd ? '关闭免打扰' : '开启免打扰';
             dndBtn.style.marginRight = '8px';
             dndBtn.onclick = async function() {
-              const SetDNDReq = root.lookupType('protocol.SetDNDReq');
-              const reqBuf = SetDNDReq.encode(SetDNDReq.create({ uid: myUid, friendUid: uid, dnd: !info.dnd, token })).finish();
+              const SetFriendDNDReq = root.lookupType('protocol.SetFriendDNDReq');
+              const reqBuf = SetFriendDNDReq.encode(SetFriendDNDReq.create({ uid: myUid, friendUid: uid, dnd: !info.dnd, token })).finish();
               const resp = await fetch(`${API_BASE}/set_friend_dnd`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-protobuf' },
@@ -975,7 +975,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const validTypes = [
         'friend_request', 'private_chat_message', 'group_chat_message',
         'group_application_pending', 'group_invite', 'group_invite_approved',
-        'group_kicked', 'group_admin_change', 'dismissed'
+        'group_kicked', 'group_admin_change', 'dismissed', 'offline_messages'
       ];
       return validTypes.includes(type);
     }
@@ -1287,6 +1287,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 case 'dismissed':
                   display = `[群系统][${notif.groupName || ''}] 群已被解散 by ${notif.fromUsername}`;
+                  break;
+                case 'offline_messages':
+                  display = `[离线消息] ${notif.content}`;
                   break;
                 default:
                   return;
@@ -1657,8 +1660,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.querySelectorAll('.btn-accept-friend').forEach(btn => {
                   btn.onclick = async function() {
                     const fromUid = btn.getAttribute('data-uid');
-                    const HandleFriendReq = root.lookupType('protocol.HandleFriendReq');
-                    const reqBuf = HandleFriendReq.encode(HandleFriendReq.create({ fromUid, toUid: myUid, accept: true, token })).finish();
+                    const HandleFriendRequestReq = root.lookupType('protocol.HandleFriendRequestReq');
+                    const reqBuf = HandleFriendRequestReq.encode(HandleFriendRequestReq.create({ fromUid, toUid: myUid, accept: true, token })).finish();
                     const resp = await fetch(`${API_BASE}/handle_friend_request`, {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/x-protobuf' },
@@ -1672,8 +1675,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.querySelectorAll('.btn-reject-friend').forEach(btn => {
                   btn.onclick = async function() {
                     const fromUid = btn.getAttribute('data-uid');
-                    const HandleFriendReq = root.lookupType('protocol.HandleFriendReq');
-                    const reqBuf = HandleFriendReq.encode(HandleFriendReq.create({ fromUid, toUid: myUid, accept: false, token })).finish();
+                    const HandleFriendRequestReq = root.lookupType('protocol.HandleFriendRequestReq');
+                    const reqBuf = HandleFriendRequestReq.encode(HandleFriendRequestReq.create({ fromUid, toUid: myUid, accept: false, token })).finish();
                     const resp = await fetch(`${API_BASE}/handle_friend_request`, {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/x-protobuf' },
@@ -1767,10 +1770,10 @@ document.addEventListener('DOMContentLoaded', function() {
           const btnHandle = document.getElementById('btn-handle-group-req');
           if (btnHandle) btnHandle.onclick = async function() {
             // 拉取待审批群组邀请请求
-            const GroupInviteListReq = root.lookupType('protocol.GroupInviteListReq');
+            const GroupRequestListReq = root.lookupType('protocol.GroupRequestListReq');
             const APIResp = root.lookupType('protocol.APIResp');
-            const GroupInviteListResp = root.lookupType('protocol.GroupInviteListResp');
-            const reqBuf = GroupInviteListReq.encode(GroupInviteListReq.create({ uid: myUid, token })).finish();
+            const GroupRequestListResp = root.lookupType('protocol.GroupRequestListResp');
+            const reqBuf = GroupRequestListReq.encode(GroupRequestListReq.create({ uid: myUid, token })).finish();
             try {
               const resp = await fetch(`${API_BASE}/group_request_list`, {
                 method: 'POST',
@@ -1780,7 +1783,7 @@ document.addEventListener('DOMContentLoaded', function() {
               const buf = await resp.arrayBuffer();
               const msg = APIResp.decode(new Uint8Array(buf));
               if (msg.code !== 0) throw new Error(msg.msg);
-              const reqList = GroupInviteListResp.decode(msg.data);
+              const reqList = GroupRequestListResp.decode(msg.data);
               let html = '';
               if (!reqList.items || reqList.items.length === 0) {
                 html = `<div style='color:#888;padding:12px;'>暂无待审批的群组请求</div>`;
@@ -1809,8 +1812,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     const id = btn.getAttribute('data-id');
                     const groupId = btn.getAttribute('data-group');
                     const inviteeUid = btn.getAttribute('data-invitee');
-                    const HandleGroupInviteReq = root.lookupType('protocol.HandleGroupInviteReq');
-                    const reqBuf = HandleGroupInviteReq.encode(HandleGroupInviteReq.create({ id, groupId, inviteeUid, approve: true, token })).finish();
+                    const HandleGroupRequestReq = root.lookupType('protocol.HandleGroupRequestReq');
+                    const reqBuf = HandleGroupRequestReq.encode(HandleGroupRequestReq.create({ id, groupId, inviteeUid, approve: true, token })).finish();
                     const resp = await fetch(`${API_BASE}/handle_group_request`, {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/x-protobuf' },
@@ -1826,8 +1829,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     const id = btn.getAttribute('data-id');
                     const groupId = btn.getAttribute('data-group');
                     const inviteeUid = btn.getAttribute('data-invitee');
-                    const HandleGroupInviteReq = root.lookupType('protocol.HandleGroupInviteReq');
-                    const reqBuf = HandleGroupInviteReq.encode(HandleGroupInviteReq.create({ id, groupId, inviteeUid, approve: false, token })).finish();
+                    const HandleGroupRequestReq = root.lookupType('protocol.HandleGroupRequestReq');
+                    const reqBuf = HandleGroupRequestReq.encode(HandleGroupRequestReq.create({ id, groupId, inviteeUid, approve: false, token })).finish();
                     const resp = await fetch(`${API_BASE}/handle_group_request`, {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/x-protobuf' },
