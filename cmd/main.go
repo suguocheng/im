@@ -125,6 +125,17 @@ func main() {
 			// --- 处理群聊消息 ---
 			if isChatMessage && msg.GroupId != "" {
 				msg.FromUsername = senderUsername(storageManager, msg.From)
+				// 获取发送者的群昵称
+				groupNickname := getGroupNickname(storageManager, msg.GroupId, msg.From)
+				// 将群昵称添加到extra字段中，格式：nickname:xxx
+				if groupNickname != "" {
+					if msg.Extra == "" {
+						msg.Extra = "nickname:" + groupNickname
+					} else {
+						msg.Extra = msg.Extra + ",nickname:" + groupNickname
+					}
+				}
+
 				// 新增禁言校验
 				storageManager := storage.GetStorageManager()
 				isMuted := false
@@ -219,4 +230,13 @@ func getSessionKey(uid1, uid2 string) string {
 		return "chat:" + uid1 + ":" + uid2
 	}
 	return "chat:" + uid2 + ":" + uid1
+}
+
+// getGroupNickname 获取用户在群组中的昵称
+func getGroupNickname(storageManager *storage.StorageManager, groupID, uid string) string {
+	member, err := storageManager.GetGroupMemberInfo(groupID, uid)
+	if err != nil {
+		return ""
+	}
+	return member.Nickname
 }

@@ -329,7 +329,7 @@ document.addEventListener('DOMContentLoaded', function() {
         div.style.justifyContent = 'space-between';
         // 左侧：名称
         const nameSpan = document.createElement('span');
-        nameSpan.textContent = remark ? `${name}（${remark}）` : name;
+        nameSpan.textContent = remark ? `${remark}(${name})` : name;
         nameSpan.style.flex = '1';
         // 右侧：...按钮
         const moreBtn = document.createElement('button');
@@ -471,14 +471,14 @@ document.addEventListener('DOMContentLoaded', function() {
       // 高亮
       const items = friendListDiv.querySelectorAll('.list-item');
       items.forEach(item => {
-        if (item.textContent === (remark ? `${name}（${remark}）` : name)) {
+        if (item.textContent === (remark ? `${remark}(${name})` : name)) {
           item.classList.add('selected');
         } else {
           item.classList.remove('selected');
         }
       });
       // 聊天区标题
-      chatTitleDiv.textContent = `与 ${remark ? `${name}（${remark}）` : name} 聊天`;
+      chatTitleDiv.textContent = `与 ${remark ? `${remark}(${name})` : name} 聊天`;
       renderSecretModeBtn();
       // 拉取并展示历史消息
       chatHistoryDiv.innerHTML = '<div class="empty-tip" style="color:#888;padding:16px;">加载中...</div>';
@@ -538,9 +538,10 @@ document.addEventListener('DOMContentLoaded', function() {
         div.style.display = 'flex';
         div.style.alignItems = 'center';
         div.style.justifyContent = 'space-between';
-        // 左侧：群名
+        // 左侧：群名（优先显示备注）
         const nameSpan = document.createElement('span');
-        nameSpan.textContent = groupName;
+        const remark = group.remark || '';
+        nameSpan.textContent = remark ? `${remark}(${groupName})` : groupName;
         nameSpan.style.flex = '1';
         // 右侧：...按钮
         const moreBtn = document.createElement('button');
@@ -918,7 +919,7 @@ document.addEventListener('DOMContentLoaded', function() {
         div.appendChild(moreBtn);
         div.style.cursor = 'pointer';
         div.onclick = () => {
-          selectGroup(groupId, groupName);
+          selectGroup(groupId, groupName, remark);
         };
         if (currentGroup && currentGroup.groupId === groupId) {
           div.classList.add('selected');
@@ -926,8 +927,8 @@ document.addEventListener('DOMContentLoaded', function() {
         groupListDiv.appendChild(div);
       });
     }
-    function selectGroup(groupId, name) {
-      currentGroup = { groupId, name };
+    function selectGroup(groupId, name, remark) {
+      currentGroup = { groupId, name, remark };
       currentFriend = null; // 选择群组时清空好友
       unreadMap['group:' + groupId] = 0; // 清除未读
       // 用缓存的群组列表数据刷新
@@ -937,14 +938,17 @@ document.addEventListener('DOMContentLoaded', function() {
       // 高亮
       const items = groupListDiv.querySelectorAll('.list-item');
       items.forEach(item => {
-        if (item.textContent === name) {
+        const remark = currentGroup.remark || '';
+        const displayName = remark ? `${remark}(${name})` : name;
+        if (item.textContent === displayName) {
           item.classList.add('selected');
         } else {
           item.classList.remove('selected');
         }
       });
       // 聊天区标题
-      chatTitleDiv.textContent = `群聊：${name || groupId || '未知群组'}`;
+      const displayName = remark ? `${remark}(${name})` : (name || groupId || '未知群组');
+      chatTitleDiv.textContent = `群聊：${displayName}`;
       renderSecretModeBtn();
       // 拉取并展示历史消息
       chatHistoryDiv.innerHTML = '<div class="empty-tip" style="color:#888;padding:16px;">加载中...</div>';
@@ -1150,13 +1154,15 @@ document.addEventListener('DOMContentLoaded', function() {
       // 群聊消息显示昵称
       let nickname = '';
       if (currentGroup && !self) {
-        // extra格式: nickname:xxx, 可扩展
+        // 优先显示群昵称，格式: nickname:xxx
         if (extra && typeof extra === 'string') {
           const match = extra.match(/nickname:([^,]+)/);
           if (match) nickname = match[1];
         }
+        // 如果没有群昵称，则显示用户名
         if (!nickname && username) nickname = username;
-        if (!nickname) nickname = from; // 兜底显示UID
+        // 最后兜底显示UID
+        if (!nickname) nickname = from;
         if (nickname) {
           html += `<div style='font-size:0.98em;color:#409eff;margin-bottom:2px;'>${nickname}</div>`;
         }
@@ -1938,7 +1944,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.classList.remove('dark-mode');
         // 可选：退出秘密模式时刷新历史消息
         if (currentFriend) selectFriend(currentFriend.uid, currentFriend.name, currentFriend.remark);
-        if (currentGroup) selectGroup(currentGroup.groupId, currentGroup.name);
+        if (currentGroup) selectGroup(currentGroup.groupId, currentGroup.name, currentGroup.remark);
       }
     }
 

@@ -942,7 +942,7 @@ func SetGroupNicknameHandler(w http.ResponseWriter, r *http.Request) {
 		writeResp(w, 1, "请求格式错误", nil)
 		return
 	}
-	if req.GroupId == "" || req.Uid == "" || req.Nickname == "" {
+	if req.GroupId == "" || req.Uid == "" {
 		writeResp(w, 1, "缺少参数", nil)
 		return
 	}
@@ -974,16 +974,17 @@ func SetGroupRemarkHandler(w http.ResponseWriter, r *http.Request) {
 		writeResp(w, 1, "请求格式错误", nil)
 		return
 	}
-	if req.GroupId == "" || req.Uid == "" || req.Remark == "" {
+	if req.GroupId == "" || req.Uid == "" {
 		writeResp(w, 1, "缺少参数", nil)
 		return
 	}
-	// 权限校验
-	role, err := storageManager.GetUserRoleInGroup(req.GroupId, req.Uid)
-	if err != nil || role != "owner" {
-		writeResp(w, 1, "只有群主可以设置群备注", nil)
+	// 检查用户是否是群组成员
+	_, err = storageManager.GetUserRoleInGroup(req.GroupId, req.Uid)
+	if err != nil {
+		writeResp(w, 1, "您不是该群组成员", nil)
 		return
 	}
+	// 群备注是每个人对自己看到的群组的备注，所有群组成员都可以设置
 	err = storageManager.SetGroupRemark(req.GroupId, req.Uid, req.Remark)
 	if err != nil {
 		writeResp(w, 1, err.Error(), nil)
