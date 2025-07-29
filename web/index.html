@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IM 客户端</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -69,11 +70,11 @@
       </section>
     </div>
   </div>
-  <div id="modal-mask" style="display:none;position:fixed;z-index:9999;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);"></div>
-  <div id="modal-dialog" style="display:none;position:fixed;z-index:10000;left:50%;top:50%;transform:translate(-50%,-50%);background:#fff;border-radius:8px;box-shadow:0 4px 24px rgba(0,0,0,0.18);min-width:280px;max-width:90vw;padding:0 0 16px 0;">
-    <div id="modal-title" style="font-weight:bold;font-size:1.1em;padding:16px 24px 8px 24px;"></div>
-    <div id="modal-content" style="padding:0 24px 8px 24px;"></div>
-    <div id="modal-actions" style="display:flex;justify-content:flex-end;gap:12px;padding:0 24px 8px 24px;"></div>
+  <div id="modal-mask" class="modal-mask"></div>
+  <div id="modal-dialog" class="modal-dialog">
+    <div id="modal-title" class="modal-title"></div>
+    <div id="modal-content" class="modal-content"></div>
+    <div id="modal-actions" class="modal-actions"></div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/protobufjs/dist/protobuf.min.js"></script>
   <script src="main.js"></script>

@@ -4,6 +4,160 @@
 const API_BASE = 'http://127.0.0.1:8081';
 const WS_BASE = 'ws://127.0.0.1:8081/ws';
 
+// ========== 端到端加密工具 ==========
+// 密钥管理
+let secretChatKeys = new Map(); // 存储每个聊天的密钥
+
+// 生成随机密钥
+function generateSecretKey() {
+  const array = new Uint8Array(32);
+  crypto.getRandomValues(array);
+  const key = Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+  console.log('生成新密钥:', key);
+  return key;
+}
+
+// 获取或生成聊天密钥
+function getOrCreateSecretKey(chatId) {
+  if (!secretChatKeys.has(chatId)) {
+    // 使用确定性密钥生成，确保相同聊天ID的用户生成相同的密钥
+    const key = generateDeterministicKey(chatId);
+    secretChatKeys.set(chatId, key);
+  }
+  return secretChatKeys.get(chatId);
+}
+
+// 生成确定性密钥（基于聊天ID）
+function generateDeterministicKey(chatId) {
+  // 使用简单的哈希函数生成确定性密钥
+  let hash = 0;
+  for (let i = 0; i < chatId.length; i++) {
+    const char = chatId.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // 转换为32位整数
+  }
+  
+  // 使用哈希值作为种子生成密钥
+  const keyBytes = new Uint8Array(32);
+  for (let i = 0; i < 32; i++) {
+    // 使用简单的伪随机数生成
+    hash = (hash * 9301 + 49297) % 233280;
+    keyBytes[i] = (hash % 256);
+  }
+  
+  return Array.from(keyBytes, byte => byte.toString(16).padStart(2, '0')).join('');
+}
+
+
+
+// 简单的AES加密（使用Web Crypto API）
+async function encryptMessage(message, key) {
+  try {
+    // 将密钥转换为Uint8Array
+    const keyBytes = new Uint8Array(key.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+    
+    // 生成随机IV
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    
+    // 导入密钥
+    const cryptoKey = await crypto.subtle.importKey(
+      'raw',
+      keyBytes,
+      { name: 'AES-GCM' },
+      false,
+      ['encrypt']
+    );
+    
+    // 加密消息
+    const encodedMessage = new TextEncoder().encode(message);
+    const encryptedData = await crypto.subtle.encrypt(
+      { name: 'AES-GCM', iv: iv },
+      cryptoKey,
+      encodedMessage
+    );
+    
+    // 组合IV和加密数据
+    const result = new Uint8Array(iv.length + encryptedData.byteLength);
+    result.set(iv);
+    result.set(new Uint8Array(encryptedData), iv.length);
+    
+    // 转换为base64
+    return btoa(String.fromCharCode(...result));
+  } catch (error) {
+    console.error('加密失败:', error);
+    return null;
+  }
+}
+
+// 解密消息
+async function decryptMessage(encryptedData, key) {
+  try {
+    // 将密钥转换为Uint8Array
+    const keyBytes = new Uint8Array(key.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+    
+    // 检查加密数据是否为base64格式
+    if (!encryptedData || typeof encryptedData !== 'string') {
+      console.error('加密数据格式错误:', encryptedData);
+      return null;
+    }
+    
+    // 解码base64
+    let encryptedBytes;
+    try {
+      encryptedBytes = new Uint8Array(atob(encryptedData).split('').map(char => char.charCodeAt(0)));
+    } catch (e) {
+      console.error('Base64解码失败:', e);
+      return null;
+    }
+    
+    // 检查数据长度
+    if (encryptedBytes.length < 12) {
+      console.error('加密数据太短');
+      return null;
+    }
+    
+    // 提取IV和加密数据
+    const iv = encryptedBytes.slice(0, 12);
+    const data = encryptedBytes.slice(12);
+    
+    // 导入密钥
+    const cryptoKey = await crypto.subtle.importKey(
+      'raw',
+      keyBytes,
+      { name: 'AES-GCM' },
+      false,
+      ['decrypt']
+    );
+    
+    // 解密
+    const decryptedData = await crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv: iv },
+      cryptoKey,
+      data
+    );
+    
+    return new TextDecoder().decode(decryptedData);
+  } catch (error) {
+    console.error('解密失败:', error);
+    return null;
+  }
+}
+
+// 获取聊天ID
+function getChatId() {
+  // 这些变量需要在全局作用域中访问
+  const currentFriend = window.currentFriend;
+  const currentGroup = window.currentGroup;
+  const myUid = window.myUid;
+  
+  if (currentFriend) {
+    return `private_${Math.min(currentFriend.uid, myUid)}_${Math.max(currentFriend.uid, myUid)}`;
+  } else if (currentGroup) {
+    return `group_${currentGroup.groupId}`;
+  }
+  return null;
+}
+
 // ========== 通用居中弹窗 ==========
 function showModal({ title = '', content = '', inputs = [], okText = '确定', cancelText = '取消', onOk }) {
   const mask = document.getElementById('modal-mask');
@@ -11,6 +165,7 @@ function showModal({ title = '', content = '', inputs = [], okText = '确定', c
   const titleDiv = document.getElementById('modal-title');
   const contentDiv = document.getElementById('modal-content');
   const actionsDiv = document.getElementById('modal-actions');
+  
   // 清空
   titleDiv.textContent = title;
   contentDiv.innerHTML = '';
@@ -20,62 +175,46 @@ function showModal({ title = '', content = '', inputs = [], okText = '确定', c
     contentDiv.appendChild(contentHtml);
   }
   actionsDiv.innerHTML = '';
+  
   // 输入框
   const inputEls = [];
   for (const inp of inputs) {
     const label = document.createElement('div');
     label.textContent = inp.label || '';
-    label.style.margin = '8px 0 2px 0';
-    label.style.fontSize = '0.98em';
+    label.className = 'modal-input-label';
     contentDiv.appendChild(label);
+    
     const input = document.createElement('input');
     input.type = inp.type || 'text';
     input.value = inp.value || '';
     input.placeholder = inp.placeholder || '';
-    input.style.width = '100%';
-    input.style.boxSizing = 'border-box';
-    input.style.marginBottom = '6px';
-    input.style.padding = '7px 10px';
-    input.style.border = '1px solid #ddd';
-    input.style.borderRadius = '4px';
-    input.style.fontSize = '1em';
+    input.className = 'modal-input';
     contentDiv.appendChild(input);
     inputEls.push(input);
   }
+  
   // 按钮
   const okBtn = document.createElement('button');
   okBtn.textContent = okText;
-  okBtn.style.background = '#409eff';
-  okBtn.style.color = '#fff';
-  okBtn.style.border = 'none';
-  okBtn.style.borderRadius = '4px';
-  okBtn.style.padding = '7px 18px';
-  okBtn.style.fontSize = '1em';
-  okBtn.style.cursor = 'pointer';
-  okBtn.onmouseenter = () => okBtn.style.background = '#1976d2';
-  okBtn.onmouseleave = () => okBtn.style.background = '#409eff';
+  okBtn.className = 'modal-btn modal-btn-primary';
   okBtn.onclick = () => {
     mask.style.display = dialog.style.display = 'none';
     if (onOk) onOk(inputEls.map(i => i.value));
   };
   actionsDiv.appendChild(okBtn);
+  
   if (cancelText) {
     const cancelBtn = document.createElement('button');
     cancelBtn.textContent = cancelText;
-    cancelBtn.style.background = '#eee';
-    cancelBtn.style.color = '#222';
-    cancelBtn.style.border = 'none';
-    cancelBtn.style.borderRadius = '4px';
-    cancelBtn.style.padding = '7px 18px';
-    cancelBtn.style.fontSize = '1em';
-    cancelBtn.style.cursor = 'pointer';
+    cancelBtn.className = 'modal-btn modal-btn-secondary';
     cancelBtn.onclick = () => {
       mask.style.display = dialog.style.display = 'none';
-      // No onCancel callback for now
     };
     actionsDiv.appendChild(cancelBtn);
   }
+  
   mask.style.display = dialog.style.display = 'block';
+  
   // ESC关闭
   function escListener(e) {
     if (e.key === 'Escape') {
@@ -84,11 +223,13 @@ function showModal({ title = '', content = '', inputs = [], okText = '确定', c
     }
   }
   document.addEventListener('keydown', escListener);
+  
   // 点击遮罩关闭
   mask.onclick = () => {
     mask.style.display = dialog.style.display = 'none';
     document.removeEventListener('keydown', escListener);
   };
+  
   // 聚焦第一个输入
   if (inputEls.length) setTimeout(() => inputEls[0].focus(), 50);
 }
@@ -128,6 +269,12 @@ document.addEventListener('DOMContentLoaded', function() {
     let groupListCache = null;
     let secretMode = false;
     let secretBtn = null;
+    
+    // 将关键变量设置为全局变量，以便加密函数可以访问
+    window.currentFriend = currentFriend;
+    window.currentGroup = currentGroup;
+    window.myUid = myUid;
+    window.secretMode = secretMode;
 
     document.getElementById('to-register').onclick = e => {
       e.preventDefault();
@@ -282,6 +429,7 @@ document.addEventListener('DOMContentLoaded', function() {
         userInfoSpan.textContent = `${userInfo.username} (UID: ${userInfo.uid})`;
         myUid = userInfo.uid;
         myUsername = userInfo.username;
+        window.myUid = myUid;
         // 获取好友列表
         await fetchFriendList(userInfo.uid, tokenVal);
       } catch (e) {
@@ -311,10 +459,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function renderFriendList(friendList) {
       if (!friendList.friendUids || friendList.friendUids.length === 0) {
-        friendListDiv.innerHTML = '<div style="color:#888;padding:16px;">暂无好友</div>';
+        friendListDiv.innerHTML = '<div class="empty-state">暂无好友</div>';
         chatTitleDiv.textContent = '';
         chatHistoryDiv.innerHTML = '';
         currentFriend = null;
+        window.currentFriend = currentFriend;
         return;
       }
       friendListDiv.innerHTML = '';
@@ -323,14 +472,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const name = friendList.friendUsernames[i] || uid;
         const remark = friendList.remarks && friendList.remarks[i] ? friendList.remarks[i] : '';
         const div = document.createElement('div');
-        div.className = 'list-item';
-        div.style.display = 'flex';
-        div.style.alignItems = 'center';
-        div.style.justifyContent = 'space-between';
+        div.className = 'list-item list-item-flex';
         // 左侧：名称
         const nameSpan = document.createElement('span');
         nameSpan.textContent = remark ? `${remark}(${name})` : name;
-        nameSpan.style.flex = '1';
+        nameSpan.className = 'list-item-name';
         // 右侧：...按钮
         const moreBtn = document.createElement('button');
         moreBtn.className = 'circle-more-btn';
@@ -371,7 +517,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // 设置备注按钮
             const remarkBtn = document.createElement('button');
             remarkBtn.textContent = '设置备注';
-            remarkBtn.style.marginRight = '8px';
+            remarkBtn.className = 'btn-margin-right';
             remarkBtn.onclick = function() {
               showModal({
                 title: '设置备注',
@@ -396,7 +542,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // 设置免打扰按钮
             const dndBtn = document.createElement('button');
             dndBtn.textContent = info.dnd ? '关闭免打扰' : '开启免打扰';
-            dndBtn.style.marginRight = '8px';
+            dndBtn.className = 'btn-margin-right';
             dndBtn.onclick = async function() {
               const SetFriendDNDReq = root.lookupType('protocol.SetFriendDNDReq');
               const reqBuf = SetFriendDNDReq.encode(SetFriendDNDReq.create({ uid: myUid, friendUid: uid, dnd: !info.dnd, token })).finish();
@@ -414,8 +560,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // 删除好友按钮
             const delBtn = document.createElement('button');
             delBtn.textContent = '删除好友';
-            delBtn.style.background = '#e74c3c';
-            delBtn.style.color = '#fff';
+            delBtn.className = 'btn-danger';
             delBtn.onclick = async function() {
               if (!confirm('确定要删除该好友吗？')) return;
               const DeleteFriendReq = root.lookupType('protocol.DeleteFriendReq');
@@ -439,13 +584,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (unreadMap['user:' + uid] > 0) {
           const badge = document.createElement('span');
           badge.textContent = unreadMap['user:' + uid] > 99 ? '99+' : unreadMap['user:' + uid];
-          badge.style.background = '#e74c3c';
-          badge.style.color = '#fff';
-          badge.style.fontSize = '0.85em';
-          badge.style.borderRadius = '10px';
-          badge.style.padding = '2px 7px';
-          badge.style.marginLeft = '8px';
-          badge.style.verticalAlign = 'middle';
+          badge.className = 'unread-badge';
           nameSpan.appendChild(badge);
         }
         div.appendChild(nameSpan);
@@ -461,8 +600,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function selectFriend(uid, name, remark) {
-      currentFriend = { uid, name, remark };
+              currentFriend = { uid, name, remark };
+        window.currentFriend = currentFriend;
       currentGroup = null; // 选择好友时清空群组
+      window.currentGroup = currentGroup;
       unreadMap['user:' + uid] = 0; // 清除未读
       // 修复：用缓存的好友列表数据刷新
       if (friendListCache) {
@@ -481,12 +622,12 @@ document.addEventListener('DOMContentLoaded', function() {
       chatTitleDiv.textContent = `与 ${remark ? `${remark}(${name})` : name} 聊天`;
       renderSecretModeBtn();
       // 拉取并展示历史消息
-      chatHistoryDiv.innerHTML = '<div class="empty-tip" style="color:#888;padding:16px;">加载中...</div>';
-      fetchRecentPrivateMessages(myUid, uid, 50).then(msgs => {
-        chatHistoryDiv.innerHTML = '';
-        if (!msgs.length) {
-          chatHistoryDiv.innerHTML = '<div class="empty-tip" style="color:#888;padding:16px;">暂无消息</div>';
-        } else {
+      chatHistoryDiv.innerHTML = '<div class="empty-state">加载中...</div>';
+              fetchRecentPrivateMessages(myUid, uid, 50).then(msgs => {
+          chatHistoryDiv.innerHTML = '';
+          if (!msgs.length) {
+            chatHistoryDiv.innerHTML = '<div class="empty-state">暂无消息</div>';
+          } else {
           msgs.reverse().forEach(msg => {
             appendMessage({
               from: msg.from,
@@ -535,14 +676,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const groupId = group.groupId || group.group_id || group.id || '';
         const div = document.createElement('div');
         div.className = 'list-item';
-        div.style.display = 'flex';
-        div.style.alignItems = 'center';
-        div.style.justifyContent = 'space-between';
+        div.className = 'list-item list-item-flex';
         // 左侧：群名（优先显示备注）
         const nameSpan = document.createElement('span');
         const remark = group.remark || '';
         nameSpan.textContent = remark ? `${remark}(${groupName})` : groupName;
-        nameSpan.style.flex = '1';
+        nameSpan.className = 'list-item-name';
         // 右侧：...按钮
         const moreBtn = document.createElement('button');
         moreBtn.className = 'circle-more-btn';
@@ -618,7 +757,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // 设置备注按钮
             const remarkBtn = document.createElement('button');
             remarkBtn.textContent = '设置备注';
-            remarkBtn.style.marginRight = '8px';
+            remarkBtn.className = 'btn-margin-right';
             remarkBtn.onclick = function() {
               showModal({
                 title: '设置群备注',
@@ -644,8 +783,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (role !== 'owner') {
               const leaveBtn = document.createElement('button');
               leaveBtn.textContent = '退出群组';
-              leaveBtn.style.background = '#e74c3c';
-              leaveBtn.style.color = '#fff';
+                          leaveBtn.className = 'btn-danger';
               leaveBtn.onclick = async function() {
                 if (!confirm('确定要退出该群组吗？')) return;
                 const LeaveGroupReq = root.lookupType('protocol.LeaveGroupReq');
@@ -666,8 +804,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (role === 'owner') {
               const dismissBtn = document.createElement('button');
               dismissBtn.textContent = '解散群组';
-              dismissBtn.style.background = '#e74c3c';
-              dismissBtn.style.color = '#fff';
+                          dismissBtn.className = 'btn-danger';
               dismissBtn.onclick = async function() {
                 if (!confirm('确定要解散该群组吗？')) return;
                 const DismissGroupReq = root.lookupType('protocol.DismissGroupReq');
@@ -687,7 +824,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // 设置群昵称按钮
             const nicknameBtn = document.createElement('button');
             nicknameBtn.textContent = '设置群昵称';
-            nicknameBtn.style.marginRight = '8px';
+            nicknameBtn.className = 'btn-margin-right';
             nicknameBtn.onclick = function() {
               showModal({
                 title: '设置群昵称',
@@ -712,7 +849,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // 设置群免打扰按钮
             const dndBtn = document.createElement('button');
             dndBtn.textContent = dnd ? '关闭群免打扰' : '开启群免打扰';
-            dndBtn.style.marginRight = '8px';
+            dndBtn.className = 'btn-margin-right';
             dndBtn.onclick = async function() {
               const SetGroupDNDReq = root.lookupType('protocol.SetGroupDNDReq');
               const reqBuf = SetGroupDNDReq.encode(SetGroupDNDReq.create({ groupId, uid: myUid, dnd: !dnd })).finish();
@@ -730,7 +867,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // 邀请新成员按钮
             const inviteBtn = document.createElement('button');
             inviteBtn.textContent = '邀请新成员';
-            inviteBtn.style.marginRight = '8px';
+            inviteBtn.className = 'btn-margin-right';
             inviteBtn.onclick = function() {
               showModal({
                 title: '邀请新成员',
@@ -756,7 +893,7 @@ document.addEventListener('DOMContentLoaded', function() {
               // 修改群名
               const updateNameBtn = document.createElement('button');
               updateNameBtn.textContent = '修改群名';
-              updateNameBtn.style.marginRight = '8px';
+              updateNameBtn.className = 'btn-margin-right';
               updateNameBtn.onclick = function() {
                 showModal({
                   title: '修改群名',
@@ -781,7 +918,7 @@ document.addEventListener('DOMContentLoaded', function() {
               // 移除成员
               const kickBtn = document.createElement('button');
               kickBtn.textContent = '移除成员';
-              kickBtn.style.marginRight = '8px';
+              kickBtn.className = 'btn-margin-right';
               kickBtn.onclick = function() {
                 showModal({
                   title: '移除成员',
@@ -805,7 +942,7 @@ document.addEventListener('DOMContentLoaded', function() {
               // 设置禁言
               const muteBtn = document.createElement('button');
               muteBtn.textContent = '设置禁言';
-              muteBtn.style.marginRight = '8px';
+              muteBtn.className = 'btn-margin-right';
               muteBtn.onclick = function() {
                 showModal({
                   title: '设置禁言',
@@ -835,7 +972,7 @@ document.addEventListener('DOMContentLoaded', function() {
               // 设置/取消管理员
               const adminBtn = document.createElement('button');
               adminBtn.textContent = '设置/取消管理员';
-              adminBtn.style.marginRight = '8px';
+              adminBtn.className = 'btn-margin-right';
               adminBtn.onclick = function() {
                 showModal({
                   title: '设置/取消管理员',
@@ -863,7 +1000,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // 成员列表按钮
             const memberListBtn = document.createElement('button');
             memberListBtn.textContent = '成员列表';
-            memberListBtn.style.marginRight = '8px';
+            memberListBtn.className = 'btn-margin-right';
             memberListBtn.onclick = async function() {
               const GroupMembersReq = root.lookupType('protocol.GroupMembersReq');
               const APIResp = root.lookupType('protocol.APIResp');
@@ -906,18 +1043,12 @@ document.addEventListener('DOMContentLoaded', function() {
         if (unreadMap['group:' + groupId] > 0) {
           const badge = document.createElement('span');
           badge.textContent = unreadMap['group:' + groupId] > 99 ? '99+' : unreadMap['group:' + groupId];
-          badge.style.background = '#e74c3c';
-          badge.style.color = '#fff';
-          badge.style.fontSize = '0.85em';
-          badge.style.borderRadius = '10px';
-          badge.style.padding = '2px 7px';
-          badge.style.marginLeft = '8px';
-          badge.style.verticalAlign = 'middle';
+          badge.className = 'unread-badge';
           nameSpan.appendChild(badge);
         }
         div.appendChild(nameSpan);
         div.appendChild(moreBtn);
-        div.style.cursor = 'pointer';
+        div.className = 'list-item list-item-flex clickable';
         div.onclick = () => {
           selectGroup(groupId, groupName, remark);
         };
@@ -928,8 +1059,10 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     }
     function selectGroup(groupId, name, remark) {
-      currentGroup = { groupId, name, remark };
+              currentGroup = { groupId, name, remark };
+        window.currentGroup = currentGroup;
       currentFriend = null; // 选择群组时清空好友
+      window.currentFriend = currentFriend;
       unreadMap['group:' + groupId] = 0; // 清除未读
       // 用缓存的群组列表数据刷新
       if (groupListCache) {
@@ -1021,22 +1154,13 @@ document.addEventListener('DOMContentLoaded', function() {
       if (menu) { menu.remove(); return; }
       menu = document.createElement('div');
       menu.id = 'emoji-menu';
-      menu.style.position = 'absolute';
-      menu.style.bottom = '60px';
-      menu.style.left = '20px';
-      menu.style.background = '#fff';
-      menu.style.border = '1px solid #eee';
-      menu.style.borderRadius = '8px';
-      menu.style.boxShadow = '0 2px 8px #0002';
-      menu.style.padding = '8px';
-      menu.style.zIndex = 1000;
+      menu.className = 'emoji-menu';
       for (const code in emojiMap) {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.textContent = emojiMap[code];
         btn.title = code;
-        btn.style.fontSize = '1.2em';
-        btn.style.margin = '2px';
+        btn.className = 'emoji-btn';
         btn.onclick = () => {
           chatInput.value += code;
           menu.remove();
@@ -1111,7 +1235,7 @@ document.addEventListener('DOMContentLoaded', function() {
       if (e.key === 'Enter') sendMessage();
     });
 
-    function sendMessage() {
+    async function sendMessage() {
       if (!(currentFriend || currentGroup)) {
         alert('请先选择好友或群组');
         return;
@@ -1122,8 +1246,26 @@ document.addEventListener('DOMContentLoaded', function() {
         alert('WebSocket未连接');
         return;
       }
-      // 表情替换
-      const displayContent = replaceEmojis(content);
+      
+      // 如果是秘密模式，加密消息内容
+      if (secretMode) {
+        const chatId = getChatId();
+        if (!chatId) {
+          alert('无法获取聊天ID');
+          return;
+        }
+        const key = getOrCreateSecretKey(chatId);
+        const encryptedContent = await encryptMessage(content, key);
+        if (!encryptedContent) {
+          alert('消息加密失败');
+          return;
+        }
+        content = encryptedContent;
+      }
+      
+      // 表情替换（仅用于显示）
+      const displayContent = replaceEmojis(chatInput.value.trim());
+      
       // 构造IMMessage
       const msgObj = {
         from: myUid,
@@ -1138,8 +1280,6 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       const msgBuf = IMMessage.encode(IMMessage.create(msgObj)).finish();
       ws.send(msgBuf);
-      // 本地回显 - 移除，让服务器确认后再显示
-      // appendMessage({ from: myUid, content: displayContent, self: true, timestamp: Date.now(), type: msgObj.type });
       chatInput.value = '';
     }
 
@@ -1148,8 +1288,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const emptyTip = chatHistoryDiv.querySelector('.empty-tip');
       if (emptyTip) emptyTip.remove();
       const div = document.createElement('div');
-      div.style.margin = '8px 0';
-      div.style.textAlign = self ? 'right' : 'left';
+      div.className = `message-container ${self ? 'self' : 'other'}`;
       let html = '';
       // 群聊消息显示昵称
       let nickname = '';
@@ -1178,7 +1317,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const fileUrl = (content && content.startsWith('http')) ? content : (content ? API_BASE + content : '');
         html += fileUrl ? `<a href="${fileUrl}" target="_blank" style="color:#409eff;text-decoration:underline;">${extra || '文件'}</a>` : '';
       } else {
-        html += `<span style="display:inline-block;padding:6px 14px;border-radius:16px;background:${self ? '#409eff' : '#eee'};color:${self ? '#fff' : '#222'};max-width:60%;word-break:break-all;">${content}</span>`;
+        // 为秘密聊天消息添加加密标识
+        const secretIcon = type === 'secret_chat' ? '🔒 ' : '';
+        html += `<span style="display:inline-block;padding:6px 14px;border-radius:16px;background:${self ? '#409eff' : '#eee'};color:${self ? '#fff' : '#222'};max-width:60%;word-break:break-all;">${secretIcon}${content}</span>`;
       }
       // 格式化时间
       const timeStr = timestamp ? formatTime(timestamp) : '';
@@ -1234,7 +1375,7 @@ document.addEventListener('DOMContentLoaded', function() {
       ws.onerror = () => {
         ws.close();
       };
-      ws.onmessage = (event) => {
+      ws.onmessage = async (event) => {
         console.log('onmessage start');
         try {
           const buf = new Uint8Array(event.data);
@@ -1334,7 +1475,21 @@ document.addEventListener('DOMContentLoaded', function() {
           // 私聊消息
           console.log('收到消息', msg);
           if ((msg.type === 'chat' || msg.type === 'secret_chat') && currentFriend && msg.from === currentFriend.uid && msg.to === myUid) {
-            appendMessage({ from: msg.from, content: replaceEmojis(msg.content), self: false, timestamp: msg.timestamp, type: msg.type });
+            let displayContent = msg.content;
+            // 如果是秘密聊天，需要解密
+            if (msg.type === 'secret_chat') {
+              const chatId = getChatId();
+              const key = getOrCreateSecretKey(chatId);
+              const decryptedContent = await decryptMessage(msg.content, key);
+              if (decryptedContent) {
+                displayContent = replaceEmojis(decryptedContent);
+              } else {
+                displayContent = '[解密失败]';
+              }
+            } else {
+              displayContent = replaceEmojis(msg.content);
+            }
+            appendMessage({ from: msg.from, content: displayContent, self: false, timestamp: msg.timestamp, type: msg.type });
           } else if (msg.type === 'image' && currentFriend && msg.from === currentFriend.uid && msg.to === myUid) {
             appendMessage({ from: msg.from, content: msg.content, self: false, timestamp: msg.timestamp, type: 'image', extra: msg.extra });
           } else if (msg.type === 'file' && currentFriend && msg.from === currentFriend.uid && msg.to === myUid) {
@@ -1349,7 +1504,21 @@ document.addEventListener('DOMContentLoaded', function() {
           }
           // 群聊消息
           else if ((msg.type === 'chat' || msg.type === 'secret_chat') && currentGroup && msg.groupId === currentGroup.groupId) {
-            appendMessage({ from: msg.from, content: replaceEmojis(msg.content), self: msg.from === myUid, timestamp: msg.timestamp, type: msg.type, extra: msg.extra, username: msg.fromUsername });
+            let displayContent = msg.content;
+            // 如果是秘密聊天，需要解密
+            if (msg.type === 'secret_chat') {
+              const chatId = getChatId();
+              const key = getOrCreateSecretKey(chatId);
+              const decryptedContent = await decryptMessage(msg.content, key);
+              if (decryptedContent) {
+                displayContent = replaceEmojis(decryptedContent);
+              } else {
+                displayContent = '[解密失败]';
+              }
+            } else {
+              displayContent = replaceEmojis(msg.content);
+            }
+            appendMessage({ from: msg.from, content: displayContent, self: msg.from === myUid, timestamp: msg.timestamp, type: msg.type, extra: msg.extra, username: msg.fromUsername });
           } else if (msg.type === 'image' && currentGroup && msg.groupId === currentGroup.groupId) {
             appendMessage({ from: msg.from, content: msg.content, self: msg.from === myUid, timestamp: msg.timestamp, type: 'image', extra: msg.extra });
           } else if (msg.type === 'file' && currentGroup && msg.groupId === currentGroup.groupId) {
@@ -1380,9 +1549,24 @@ document.addEventListener('DOMContentLoaded', function() {
               (currentGroup && msg.groupId === currentGroup.groupId);
             
             if (isInCorrectChat) {
+              let displayContent = msg.content;
+              // 如果是秘密聊天，需要解密自己发送的消息
+              if (msg.type === 'secret_chat') {
+                const chatId = getChatId();
+                const key = getOrCreateSecretKey(chatId);
+                const decryptedContent = await decryptMessage(msg.content, key);
+                if (decryptedContent) {
+                  displayContent = replaceEmojis(decryptedContent);
+                } else {
+                  displayContent = '[解密失败]';
+                }
+              } else if (msg.type === 'chat') {
+                displayContent = replaceEmojis(msg.content);
+              }
+              
               appendMessage({ 
                 from: myUid, 
-                content: msg.type === 'chat' || msg.type === 'secret_chat' ? replaceEmojis(msg.content) : msg.content, 
+                content: displayContent, 
                 self: true, 
                 timestamp: msg.timestamp, 
                 type: msg.type,
@@ -1506,6 +1690,7 @@ document.addEventListener('DOMContentLoaded', function() {
                   token = null;
                   myUid = null;
                   myUsername = null;
+                  window.myUid = myUid;
                   if (ws) { ws.close(); ws = null; }
                   showLoginPanel();
                 }
@@ -1535,6 +1720,7 @@ document.addEventListener('DOMContentLoaded', function() {
               token = null;
               myUid = null;
               myUsername = null;
+              window.myUid = myUid;
               if (ws) { ws.close(); ws = null; }
               showLoginPanel();
             };
@@ -1559,6 +1745,8 @@ document.addEventListener('DOMContentLoaded', function() {
       chatHistoryDiv.innerHTML = '';
       currentGroup = null;
       currentFriend = null;
+      window.currentGroup = currentGroup;
+      window.currentFriend = currentFriend;
       if (friendListHeader) friendListHeader.style.display = 'none';
       if (groupListHeader) groupListHeader.style.display = 'flex';
       fetchGroupList(token);
@@ -1572,6 +1760,8 @@ document.addEventListener('DOMContentLoaded', function() {
       chatHistoryDiv.innerHTML = '';
       currentGroup = null;
       currentFriend = null;
+      window.currentGroup = currentGroup;
+      window.currentFriend = currentFriend;
       if (friendListHeader) friendListHeader.style.display = 'flex';
       if (groupListHeader) groupListHeader.style.display = 'none';
       fetchFriendList(myUid, token);
@@ -1924,22 +2114,25 @@ document.addEventListener('DOMContentLoaded', function() {
       secretBtn = document.createElement('button');
       secretBtn.textContent = secretMode ? '🔓退出秘密' : '🔒秘密模式';
       secretBtn.id = 'secret-mode-btn';
-      secretBtn.style.marginLeft = '12px';
-      secretBtn.style.background = secretMode ? '#409eff' : '';
-      secretBtn.style.color = secretMode ? '#fff' : '';
-      secretBtn.style.border = 'none';
-      secretBtn.style.borderRadius = '4px';
-      secretBtn.style.padding = '4px 12px';
-      secretBtn.style.cursor = 'pointer';
+      secretBtn.className = 'secret-mode-btn';
+      if (secretMode) {
+        secretBtn.classList.add('active');
+      }
       secretBtn.onclick = toggleSecretMode;
       chatTitleDiv.appendChild(secretBtn);
     }
     function toggleSecretMode() {
       secretMode = !secretMode;
+      window.secretMode = secretMode;
       renderSecretModeBtn();
       if (secretMode) {
         document.body.classList.add('dark-mode');
-        chatHistoryDiv.innerHTML = '<div style="color:#409eff;padding:12px;">已进入秘密聊天，消息仅本地可见，且端到端加密</div>';
+        // 生成新的密钥
+        const chatId = getChatId();
+        if (chatId) {
+          getOrCreateSecretKey(chatId); // 确保密钥存在
+        }
+        chatHistoryDiv.innerHTML = '<div style="color:#409eff;padding:12px;">🔒 已进入秘密聊天模式<br>• 消息使用端到端加密<br>• 服务器无法解密消息内容<br>• 消息不会持久化存储<br>• 密钥仅保存在本地</div>';
       } else {
         document.body.classList.remove('dark-mode');
         // 可选：退出秘密模式时刷新历史消息

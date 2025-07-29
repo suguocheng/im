@@ -1,3 +1,4 @@
+/* ========== 基础样式 ========== */
 body {
   margin: 0;
   padding: 0;
@@ -5,6 +6,8 @@ body {
   background: #f7f7f7;
   color: #222;
 }
+
+/* ========== 登录/注册面板 ========== */
 .center-panel {
   max-width: 320px;
   margin: 10vh auto;
@@ -16,12 +19,14 @@ body {
   flex-direction: column;
   gap: 16px;
 }
+
 .center-panel input {
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 1em;
 }
+
 .center-panel button {
   padding: 10px;
   background: #222;
@@ -32,260 +37,27 @@ body {
   cursor: pointer;
   transition: background 0.2s;
 }
+
 .center-panel button:hover {
   background: #444;
 }
+
 .switch-link {
   font-size: 0.95em;
   color: #888;
   text-align: right;
 }
+
 .switch-link a {
   color: #222;
   text-decoration: underline;
   cursor: pointer;
 }
+
 .error {
   color: #e74c3c;
   font-size: 0.95em;
   min-height: 1.2em;
-}
-#main-panel {
-  max-width: 900px;
-  margin: 5vh auto;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 16px #0001;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  height: 80vh; 
-}
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 18px 32px 12px 32px;
-  border-bottom: 1px solid #eee;
-  font-size: 1.1em;
-}
-.main-content {
-  display: flex;
-  flex: 1;
-  min-height: 0;
-}
-aside {
-  width: 200px;
-  border-right: 1px solid #eee;
-  background: #fafbfc;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
-.tab-bar {
-  display: flex;
-  border-bottom: 1px solid #eee;
-}
-.tab {
-  flex: 1;
-  background: none;
-  border: none;
-  padding: 10px 0;
-  font-size: 1em;
-  cursor: pointer;
-  color: #888;
-  border-bottom: 2px solid transparent;
-  transition: color 0.2s, border-bottom 0.2s;
-}
-.tab.active {
-  color: #222;
-  border-bottom: 2px solid #222;
-}
-.list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 8px 0;
-}
-.list-item {
-  padding: 10px 18px;
-  cursor: pointer;
-  border-radius: 4px;
-  margin: 2px 8px;
-  transition: background 0.15s;
-}
-.list-item:hover, .list-item.selected {
-  background: #f0f0f0;
-}
-.friend-list-title, .group-list-title {
-  font-size: 1em;
-  margin-left: 60px;
-  margin-top: 6px;
-  margin-bottom: 8px;
-}
-#friend-list, #group-list {
-  margin-top: 0;
-  padding-top: 0;
-  flex: 1;
-  overflow-y: auto;
-}
-#chat-section {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-#chat-title {
-  padding: 14px 18px;
-  border-bottom: 1px solid #eee;
-  font-weight: bold;
-  background: #fafbfc;
-}
-#chat-history {
-  flex: 1;
-  overflow-y: auto;
-  padding: 18px;
-  font-size: 1em;
-  background: #fff;
-}
-#chat-input-bar {
-  display: flex;
-  border-top: 1px solid #eee;
-  padding: 10px 18px;
-  background: #fafbfc;
-}
-#chat-input {
-  flex: 1;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1em;
-  margin-right: 8px;
-}
-#send-btn {
-  padding: 8px 18px;
-  background: #222;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  font-size: 1em;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-#send-btn:hover {
-  background: #444;
-}
-.circle-add-btn {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: #409eff;
-  color: #fff;
-  font-size: 1.1em;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s;
-  cursor: pointer;
-  outline: none;
-  padding: 0;
-  margin: 0;
-}
-.circle-add-btn:hover, .circle-add-btn:focus {
-  background: #1976d2;
-}
-.circle-more-btn {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: #e0e0e0;
-  color: #555;
-  font-size: 1.2em;         /* 稍大一点 */
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 22px;         /* 保证内容垂直居中 */
-  transition: background 0.2s;
-  cursor: pointer;
-  outline: none;
-  padding: 0;
-  margin-left: 12px;         /* 让按钮更靠右 */
-  margin-right: 0px;         /* 离右边有点空隙 */
-}
-.circle-more-btn:hover, .circle-more-btn:focus {
-  background: #bdbdbd;
-}
-.circle-user-btn {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: #409eff;
-  color: #fff;
-  font-size: 1.1em;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s;
-  cursor: pointer;
-  outline: none;
-  padding: 0;
-  margin-left: 8px;
-}
-.circle-user-btn:hover, .circle-user-btn:focus {
-  background: #1976d2;
-}
-body.dark-mode {
-  background: #181c20;
-  color: #eee;
-}
-body.dark-mode #main-panel {
-  background: #23272b;
-  color: #eee;
-}
-body.dark-mode #chat-history {
-  background: #23272b;
-  color: #eee;
-}
-body.dark-mode #chat-title {
-  background: #23272b;
-  color: #eee;
-}
-body.dark-mode #chat-input-bar {
-  background: #23272b;
-  border-top: 1px solid #333;
-}
-body.dark-mode #chat-input {
-  background: #181c20;
-  color: #eee;
-  border: 1px solid #444;
-}
-body.dark-mode #send-btn {
-  background: #409eff;
-  color: #fff;
-}
-body.dark-mode #send-btn:hover {
-  background: #1976d2;
-}
-body.dark-mode .list-item.selected, body.dark-mode .list-item:hover {
-  background: #222b36;
-}
-body.dark-mode .list-item {
-  color: #eee;
-}
-body.dark-mode .circle-more-btn, body.dark-mode .circle-add-btn, body.dark-mode .circle-user-btn {
-  background: #333;
-  color: #eee;
-}
-body.dark-mode .circle-more-btn:hover, body.dark-mode .circle-add-btn:hover, body.dark-mode .circle-user-btn:hover {
-  background: #409eff;
-  color: #fff;
-}
-body.dark-mode aside {
-  background: #181c20;
-  color: #eee;
-  border-right: 1px solid #222;
 }
 
 /* 忘记密码链接样式 */
@@ -326,4 +98,721 @@ body.dark-mode aside {
 .send-email-code-btn:disabled {
   background: #ccc;
   cursor: not-allowed;
+}
+
+/* ========== 主面板布局 ========== */
+#main-panel {
+  max-width: 900px;
+  margin: 5vh auto;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 16px #0001;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  height: 80vh; 
+}
+
+/* ========== 主体内容 ========== */
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 32px 12px 32px;
+  border-bottom: 1px solid #eee;
+  font-size: 1.1em;
+}
+
+.main-content {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+/* ========== 侧边栏 ========== */
+aside {
+  width: 200px;
+  border-right: 1px solid #eee;
+  background: #fafbfc;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* Tab栏 */
+.tab-bar {
+  display: flex;
+  border-bottom: 1px solid #eee;
+}
+
+.tab {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 10px 0;
+  font-size: 1em;
+  cursor: pointer;
+  color: #888;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s, border-bottom 0.2s;
+}
+
+.tab.active {
+  color: #222;
+  border-bottom: 2px solid #222;
+}
+
+/* 列表区域 */
+.list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.list-item {
+  padding: 10px 18px;
+  cursor: pointer;
+  border-radius: 4px;
+  margin: 2px 8px;
+  transition: background 0.15s;
+}
+
+.list-item:hover, .list-item.selected {
+  background: #f0f0f0;
+}
+
+.friend-list-title, .group-list-title {
+  font-size: 1em;
+  margin-left: 60px;
+  margin-top: 6px;
+  margin-bottom: 8px;
+}
+
+#friend-list, #group-list {
+  margin-top: 0;
+  padding-top: 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* ========== 聊天区域 ========== */
+#chat-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+#chat-title {
+  padding: 14px 18px;
+  border-bottom: 1px solid #eee;
+  font-weight: bold;
+  background: #fafbfc;
+}
+
+#chat-history {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px;
+  font-size: 1em;
+  background: #fff;
+}
+
+#chat-input-bar {
+  display: flex;
+  border-top: 1px solid #eee;
+  padding: 10px 18px;
+  background: #fafbfc;
+}
+
+#chat-input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1em;
+  margin-right: 8px;
+}
+
+#send-btn {
+  padding: 8px 18px;
+  background: #222;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#send-btn:hover {
+  background: #444;
+}
+
+/* ========== 圆形按钮 ========== */
+.circle-add-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #409eff;
+  color: #fff;
+  font-size: 1.1em;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  cursor: pointer;
+  outline: none;
+  padding: 0;
+  margin: 0;
+}
+
+.circle-add-btn:hover, .circle-add-btn:focus {
+  background: #1976d2;
+}
+
+.circle-more-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #e0e0e0;
+  color: #555;
+  font-size: 1.2em;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 22px;
+  transition: background 0.2s;
+  cursor: pointer;
+  outline: none;
+  padding: 0;
+  margin-left: 12px;
+  margin-right: 0px;
+}
+
+.circle-more-btn:hover, .circle-more-btn:focus {
+  background: #bdbdbd;
+}
+
+.circle-user-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #409eff;
+  color: #fff;
+  font-size: 1.1em;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  cursor: pointer;
+  outline: none;
+  padding: 0;
+  margin-left: 8px;
+}
+
+.circle-user-btn:hover, .circle-user-btn:focus {
+  background: #1976d2;
+}
+
+/* ========== 秘密模式相关 ========== */
+/* 秘密模式按钮样式 */
+#secret-mode-btn {
+  transition: all 0.3s ease;
+}
+
+#secret-mode-btn:hover {
+  transform: scale(1.05);
+}
+
+.secret-mode-btn {
+  margin-left: 12px;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.secret-mode-btn.active {
+  background: #409eff;
+  color: #fff;
+}
+
+.secret-mode-btn:hover {
+  transform: scale(1.05);
+}
+
+/* 秘密聊天样式 */
+.secret-badge {
+  color: #409eff;
+  font-size: 0.8em;
+  margin-left: 4px;
+}
+
+/* 秘密聊天消息特殊样式 */
+.message .text-content:has(.secret-icon) {
+  border-left: 3px solid #409eff;
+  padding-left: 8px;
+}
+
+/* 加密状态指示器 */
+.encryption-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8em;
+  color: #409eff;
+  margin-left: 8px;
+}
+
+/* ========== 消息样式 ========== */
+/* 消息容器 */
+.message-container {
+  margin: 8px 0;
+}
+
+.message-container.self {
+  text-align: right;
+}
+
+.message-container.other {
+  text-align: left;
+}
+
+/* 消息气泡 */
+.message-bubble {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 16px;
+  max-width: 60%;
+  word-break: break-all;
+}
+
+.message-bubble.self {
+  background: #409eff;
+  color: #fff;
+}
+
+.message-bubble.other {
+  background: #eee;
+  color: #222;
+}
+
+/* 消息时间 */
+.message-time {
+  font-size: 0.85em;
+  color: #bbb;
+  margin-top: 2px;
+}
+
+/* 消息额外信息 */
+.message-extra {
+  font-size: 0.9em;
+  color: #888;
+}
+
+/* 图片消息 */
+.message-image {
+  max-width: 180px;
+  max-height: 120px;
+  border-radius: 8px;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+/* 文件链接 */
+.file-link {
+  color: #409eff;
+  text-decoration: underline;
+}
+
+/* 空状态提示 */
+.empty-state {
+  color: #888;
+  padding: 16px;
+}
+
+.empty-state.error {
+  color: #e74c3c;
+}
+
+.empty-state.info {
+  color: #409eff;
+}
+
+/* ========== 通知样式 ========== */
+.notification-item {
+  padding: 10px 16px;
+  border-bottom: 1px solid #eee;
+  word-break: break-all;
+}
+
+/* ========== 表单样式 ========== */
+/* 重置密码表单 */
+.reset-form-container {
+  margin-bottom: 12px;
+}
+
+.reset-form-input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.reset-form-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.reset-form-code-input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.reset-form-code-btn {
+  padding: 8px 12px;
+  background: #409eff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* ========== 弹窗样式 ========== */
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  z-index: 1000;
+}
+
+.modal-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  min-width: 300px;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+  display: none;
+  z-index: 1001;
+}
+
+.modal-title {
+  padding: 20px 20px 10px 20px;
+  font-size: 1.2em;
+  font-weight: bold;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-content {
+  padding: 20px;
+}
+
+.modal-actions {
+  padding: 10px 20px 20px 20px;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.modal-input-label {
+  margin: 8px 0 2px 0;
+  font-size: 0.98em;
+  color: #333;
+}
+
+.modal-input {
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 6px;
+  padding: 7px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1em;
+}
+
+.modal-input:focus {
+  outline: none;
+  border-color: #409eff;
+  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2);
+}
+
+.modal-btn {
+  border: none;
+  border-radius: 4px;
+  padding: 7px 18px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.modal-btn-primary {
+  background: #409eff;
+  color: #fff;
+}
+
+.modal-btn-primary:hover {
+  background: #1976d2;
+}
+
+.modal-btn-secondary {
+  background: #eee;
+  color: #222;
+}
+
+.modal-btn-secondary:hover {
+  background: #ddd;
+}
+
+/* ========== 工具类样式 ========== */
+/* 列表项布局 */
+.list-item-flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.list-item-name {
+  flex: 1;
+}
+
+/* 按钮间距 */
+.btn-margin-right {
+  margin-right: 8px;
+}
+
+/* 危险按钮样式 */
+.btn-danger {
+  background: #e74c3c !important;
+  color: #fff !important;
+}
+
+.btn-danger:hover {
+  background: #c0392b !important;
+}
+
+/* 未读消息徽章 */
+.unread-badge {
+  background: #e74c3c;
+  color: #fff;
+  font-size: 0.85em;
+  border-radius: 10px;
+  padding: 2px 7px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+/* 可点击元素 */
+.clickable {
+  cursor: pointer;
+}
+
+/* 表情菜单 */
+.emoji-menu {
+  position: absolute;
+  bottom: 60px;
+  left: 20px;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 8px;
+  z-index: 1000;
+}
+
+.emoji-btn {
+  font-size: 1.2em;
+  margin: 2px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.emoji-btn:hover {
+  background: #f0f0f0;
+}
+
+/* ========== 暗色模式样式 ========== */
+body.dark-mode {
+  background: #181c20;
+  color: #eee;
+}
+
+body.dark-mode #main-panel {
+  background: #23272b;
+  color: #eee;
+}
+
+body.dark-mode #chat-history {
+  background: #23272b;
+  color: #eee;
+}
+
+body.dark-mode #chat-title {
+  background: #23272b;
+  color: #eee;
+}
+
+body.dark-mode #chat-input-bar {
+  background: #23272b;
+  border-top: 1px solid #333;
+}
+
+body.dark-mode #chat-input {
+  background: #181c20;
+  color: #eee;
+  border: 1px solid #444;
+}
+
+body.dark-mode #send-btn {
+  background: #409eff;
+  color: #fff;
+}
+
+body.dark-mode #send-btn:hover {
+  background: #1976d2;
+}
+
+body.dark-mode .list-item.selected, body.dark-mode .list-item:hover {
+  background: #222b36;
+}
+
+body.dark-mode .list-item {
+  color: #eee;
+}
+
+body.dark-mode .circle-more-btn, body.dark-mode .circle-add-btn, body.dark-mode .circle-user-btn {
+  background: #333;
+  color: #eee;
+}
+
+body.dark-mode .circle-more-btn:hover, body.dark-mode .circle-add-btn:hover, body.dark-mode .circle-user-btn:hover {
+  background: #409eff;
+  color: #fff;
+}
+
+body.dark-mode aside {
+  background: #181c20;
+  color: #eee;
+  border-right: 1px solid #222;
+}
+
+/* 暗色模式下的tab样式 */
+body.dark-mode .tab {
+  color: #aaa;
+}
+
+body.dark-mode .tab.active {
+  color: #409eff;
+  border-bottom: 2px solid #409eff;
+}
+
+body.dark-mode .tab-bar {
+  border-bottom: 1px solid #333;
+}
+
+body.dark-mode .secret-badge {
+  color: #66b3ff;
+}
+
+body.dark-mode .message .text-content:has(.secret-icon) {
+  border-left-color: #66b3ff;
+}
+
+body.dark-mode .encryption-status {
+  color: #66b3ff;
+}
+
+/* 暗色模式下的弹窗样式 */
+body.dark-mode .modal-dialog {
+  background: #23272b;
+  color: #eee;
+}
+
+body.dark-mode .modal-title {
+  border-bottom: 1px solid #333;
+}
+
+body.dark-mode .modal-input-label {
+  color: #eee;
+}
+
+body.dark-mode .modal-input {
+  background: #181c20;
+  color: #eee;
+  border: 1px solid #444;
+}
+
+body.dark-mode .modal-input:focus {
+  border-color: #409eff;
+}
+
+body.dark-mode .modal-btn-secondary {
+  background: #333;
+  color: #eee;
+}
+
+body.dark-mode .modal-btn-secondary:hover {
+  background: #444;
+}
+
+/* 暗色模式下的其他元素 */
+body.dark-mode .emoji-menu {
+  background: #23272b;
+  border: 1px solid #333;
+}
+
+body.dark-mode .emoji-btn:hover {
+  background: #333;
+}
+
+body.dark-mode .unread-badge {
+  background: #e74c3c;
+  color: #fff;
+}
+
+body.dark-mode .message-bubble.other {
+  background: #333;
+  color: #eee;
+}
+
+body.dark-mode .message-time {
+  color: #888;
+}
+
+body.dark-mode .message-extra {
+  color: #aaa;
+}
+
+body.dark-mode .notification-item {
+  border-bottom: 1px solid #333;
+}
+
+body.dark-mode .reset-form-input,
+body.dark-mode .reset-form-code-input {
+  background: #181c20;
+  color: #eee;
+  border: 1px solid #444;
 }
