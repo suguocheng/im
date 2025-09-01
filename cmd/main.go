@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"im/api"
-	"im/core/plugin"
 	"im/core/protocol"
 	pb "im/core/protocol/pb"
 	"im/core/storage"
@@ -47,11 +46,6 @@ func main() {
 			log.Printf("关闭存储时出错: %v", err)
 		}
 	}()
-
-	// 初始化插件
-	for _, p := range plugin.All() {
-		p.Init()
-	}
 
 	// 启动HTTP服务
 	go func() {

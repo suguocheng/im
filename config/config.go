@@ -44,16 +44,11 @@ type MongoDBConfig struct {
 
 // 初始化配置
 func init() {
-	// 尝试加载.env文件
-	if err := godotenv.Load(); err != nil {
-		// 如果.env文件不存在，尝试加载config.env
-		if err := godotenv.Load("config.env"); err != nil {
-			log.Println("未找到.env或config.env文件，将使用环境变量或默认值")
-		} else {
-			log.Println("已加载config.env文件")
-		}
+	// 加载config.env配置文件
+	if err := godotenv.Load("config.env"); err != nil {
+		log.Println("未找到config.env文件，将使用环境变量或默认值")
 	} else {
-		log.Println("已加载.env文件")
+		log.Println("已加载config.env文件")
 	}
 }
 

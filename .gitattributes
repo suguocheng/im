@@ -1,0 +1,6 @@
+# 忽略掉 protobuf 生成的 JS / JSON
+web/protobuf/bundle.js linguist-generated=true
+web/protobuf/bundle.json linguist-generated=true
+
+# 确保 Go 代码正常统计
+*.go linguist-detectable=true

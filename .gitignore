@@ -1,3 +1,9 @@
 # 忽略本地环境配置
-.env
 config.env
+
+bin/
+
+scripts/logs/
+scripts/pids/
+
+uploads/

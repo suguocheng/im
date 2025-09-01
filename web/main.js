@@ -2139,6 +2139,18 @@ document.addEventListener('DOMContentLoaded', function() {
         if (currentFriend) selectFriend(currentFriend.uid, currentFriend.name, currentFriend.remark);
         if (currentGroup) selectGroup(currentGroup.groupId, currentGroup.name, currentGroup.remark);
       }
+      
+      // 强制重置所有按钮的hover状态，防止主题切换时样式卡住
+      setTimeout(() => {
+        const buttons = document.querySelectorAll('.circle-add-btn, .circle-more-btn, .circle-user-btn');
+        buttons.forEach(btn => {
+          btn.blur(); // 移除焦点状态
+          btn.style.pointerEvents = 'none'; // 临时禁用鼠标事件
+          setTimeout(() => {
+            btn.style.pointerEvents = ''; // 重新启用鼠标事件
+          }, 10);
+        });
+      }, 50);
     }
 
 

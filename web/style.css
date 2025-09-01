@@ -270,7 +270,7 @@ aside {
 }
 
 .circle-add-btn:hover, .circle-add-btn:focus {
-  background: #1976d2;
+  background: #1976d2 !important;
 }
 
 .circle-more-btn {
@@ -294,7 +294,7 @@ aside {
 }
 
 .circle-more-btn:hover, .circle-more-btn:focus {
-  background: #bdbdbd;
+  background: #bdbdbd !important;
 }
 
 .circle-user-btn {
@@ -316,7 +316,7 @@ aside {
 }
 
 .circle-user-btn:hover, .circle-user-btn:focus {
-  background: #1976d2;
+  background: #1976d2 !important;
 }
 
 /* ========== 秘密模式相关 ========== */
@@ -704,13 +704,13 @@ body.dark-mode .list-item {
 }
 
 body.dark-mode .circle-more-btn, body.dark-mode .circle-add-btn, body.dark-mode .circle-user-btn {
-  background: #333;
-  color: #eee;
+  background: #333 !important;
+  color: #eee !important;
 }
 
 body.dark-mode .circle-more-btn:hover, body.dark-mode .circle-add-btn:hover, body.dark-mode .circle-user-btn:hover {
-  background: #409eff;
-  color: #fff;
+  background: #409eff !important;
+  color: #fff !important;
 }
 
 body.dark-mode aside {
