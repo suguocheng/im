@@ -1,109 +1,116 @@
 #!/bin/bash
 
-# IM系统停止脚本
+# 停止所有微服务脚本
+
+set -e
 
 # 颜色定义
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
-# 项目根目录
-PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PID_DIR="$PROJECT_DIR/scripts/pids"
+# 服务列表（不包括 etcd，因为它是系统服务）
+SERVICES=(
+    "traefik"
+    "user-service"
+    "friend-service"
+    "group-service"
+    "message-service"
+    "file-service"
+    "notification-service"
+)
 
-echo -e "${BLUE}=== IM即时通讯系统停止脚本 ===${NC}"
-echo -e "项目目录: $PROJECT_DIR"
-echo -e "PID目录: $PID_DIR"
-echo ""
+# 端口映射（兜底清理）
+PORT_OF(){
+  case "$1" in
+    traefik) echo 8087;;
+    user-service) echo 8081;;
+    friend-service) echo 8082;;
+    group-service) echo 8083;;
+    message-service) echo 8084;;
+    file-service) echo 8085;;
+    notification-service) echo 8086;;
+    *) echo "";;
+  esac
+}
 
-# 停止Go后端服务
-if [ -f "$PID_DIR/im_server.pid" ]; then
-    GO_PID=$(cat "$PID_DIR/im_server.pid")
-    if kill -0 $GO_PID 2>/dev/null; then
-        echo -e "${BLUE}正在停止Go后端服务 (PID: $GO_PID)...${NC}"
-        kill $GO_PID
-        
-        # 等待进程结束
-        for i in {1..10}; do
-            if ! kill -0 $GO_PID 2>/dev/null; then
-                break
-            fi
-            sleep 1
-        done
-        
-        # 如果进程还在运行，强制杀死
-        if kill -0 $GO_PID 2>/dev/null; then
-            echo -e "${YELLOW}强制停止Go后端服务...${NC}"
-            kill -9 $GO_PID
-        fi
-        
-        rm -f "$PID_DIR/im_server.pid"
-        echo -e "${GREEN}Go后端服务已停止${NC}"
-    else
-        echo -e "${YELLOW}Go后端服务进程不存在，清理PID文件${NC}"
-        rm -f "$PID_DIR/im_server.pid"
+kill_by_pid(){
+  local pid="$1"
+  if [ -z "$pid" ]; then return 1; fi
+  if ps -p "$pid" > /dev/null 2>&1; then
+    kill "$pid" 2>/dev/null || true
+    sleep 1
+    if ps -p "$pid" > /dev/null 2>&1; then
+      kill -9 "$pid" 2>/dev/null || true
+      sleep 1
     fi
-else
-    echo -e "${YELLOW}未找到Go后端服务PID文件${NC}"
-fi
+  fi
+}
 
-echo ""
-
-# 停止Python静态文件服务器
-if [ -f "$PID_DIR/static_server.pid" ]; then
-    PYTHON_PID=$(cat "$PID_DIR/static_server.pid")
-    if kill -0 $PYTHON_PID 2>/dev/null; then
-        echo -e "${BLUE}正在停止Python静态文件服务器 (PID: $PYTHON_PID)...${NC}"
-        kill $PYTHON_PID
-        
-        # 等待进程结束
-        for i in {1..5}; do
-            if ! kill -0 $PYTHON_PID 2>/dev/null; then
-                break
-            fi
-            sleep 1
-        done
-        
-        # 如果进程还在运行，强制杀死
-        if kill -0 $PYTHON_PID 2>/dev/null; then
-            echo -e "${YELLOW}强制停止Python静态文件服务器...${NC}"
-            kill -9 $PYTHON_PID
-        fi
-        
-        rm -f "$PID_DIR/static_server.pid"
-        echo -e "${GREEN}Python静态文件服务器已停止${NC}"
-    else
-        echo -e "${YELLOW}Python静态文件服务器进程不存在，清理PID文件${NC}"
-        rm -f "$PID_DIR/static_server.pid"
+kill_by_port(){
+  local port="$1"
+  [ -z "$port" ] && return 1
+  if command -v lsof >/dev/null 2>&1; then
+    local pids
+    pids=$(lsof -ti tcp:"$port" 2>/dev/null || true)
+    if [ -n "$pids" ]; then
+      kill $pids 2>/dev/null || true
+      sleep 1
+      pids=$(lsof -ti tcp:"$port" 2>/dev/null || true)
+      if [ -n "$pids" ]; then
+        kill -9 $pids 2>/dev/null || true
+      fi
     fi
-else
-    echo -e "${YELLOW}未找到Python静态文件服务器PID文件${NC}"
-fi
+  elif command -v fuser >/dev/null 2>&1; then
+    fuser -k ${port}/tcp 2>/dev/null || true
+  fi
+}
 
-echo ""
+echo -e "${BLUE}🛑 停止IM系统微服务...${NC}"
+echo -e "${YELLOW}ℹ️  注意: etcd 是系统服务，不会被此脚本停止${NC}"
 
-# 清理可能残留的进程
-echo -e "${BLUE}清理可能残留的进程...${NC}"
+# 停止各个服务
+for service in "${SERVICES[@]}"; do
+    PID_FILE="scripts/pids/$service.pid"
+    PORT="$(PORT_OF "$service")"
 
-# 查找并停止可能残留的Go进程
-GO_PROCESSES=$(pgrep -f "go run cmd/main.go" 2>/dev/null || true)
-if [ ! -z "$GO_PROCESSES" ]; then
-    echo -e "${YELLOW}发现残留的Go进程: $GO_PROCESSES${NC}"
-    echo $GO_PROCESSES | xargs kill -9 2>/dev/null || true
-    echo -e "${GREEN}已清理残留的Go进程${NC}"
-fi
+    if [ -f "$PID_FILE" ]; then
+        PID=$(cat "$PID_FILE")
+        if ps -p "$PID" > /dev/null 2>&1; then
+            echo -e "${YELLOW}停止 $service 服务 (PID: $PID)...${NC}"
+            kill_by_pid "$PID"
+            echo -e "${GREEN}✅ $service 服务已停止${NC}"
+        else
+            echo -e "${YELLOW}⚠️  $service 服务未运行或PID无效${NC}"
+        fi
+        rm -f "$PID_FILE"
+    else
+        echo -e "${YELLOW}⚠️  $service 服务PID文件不存在${NC}"
+    fi
 
-# 查找并停止可能残留的Python HTTP服务器进程
-PYTHON_PROCESSES=$(pgrep -f "python3 -m http.server 8088" 2>/dev/null || true)
-if [ ! -z "$PYTHON_PROCESSES" ]; then
-    echo -e "${YELLOW}发现残留的Python进程: $PYTHON_PROCESSES${NC}"
-    echo $PYTHON_PROCESSES | xargs kill -9 2>/dev/null || true
-    echo -e "${GREEN}已清理残留的Python进程${NC}"
-fi
+    # 兜底：如果端口仍被占用，按端口清理
+    if [ -n "$PORT" ]; then
+      if (command -v lsof >/dev/null 2>&1 && lsof -ti tcp:"$PORT" >/dev/null 2>&1) || \
+         (command -v ss >/dev/null 2>&1 && ss -ltn | grep -q ":$PORT ") || \
+         (command -v netstat >/dev/null 2>&1 && netstat -tuln 2>/dev/null | grep -q ":$PORT ")
+      then
+        echo -e "${YELLOW}端口 $PORT 仍被占用，执行兜底清理...${NC}"
+        kill_by_port "$PORT"
+      fi
+    fi
+done
 
-echo ""
-echo -e "${GREEN}=== 所有服务已停止 ===${NC}"
-echo -e "启动服务: ${YELLOW}./scripts/start.sh${NC}"
-echo -e "查看状态: ${YELLOW}./scripts/status.sh${NC}" 
+# 清理进程
+echo -e "${BLUE}🧹 清理残留进程...${NC}"
+pkill -f "etcd" 2>/dev/null || true
+pkill -f "traefik" 2>/dev/null || true
+pkill -f "user-service" 2>/dev/null || true
+pkill -f "friend-service" 2>/dev/null || true
+pkill -f "group-service" 2>/dev/null || true
+pkill -f "message-service" 2>/dev/null || true
+pkill -f "file-service" 2>/dev/null || true
+pkill -f "notification-service" 2>/dev/null || true
+
+echo -e "${GREEN}🎉 所有微服务已停止！${NC}"

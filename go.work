@@ -1,0 +1,11 @@
+go 1.24.3
+
+use (
+	.
+	./internal/services/user-service
+	./internal/services/friend-service
+	./internal/services/group-service
+	./internal/services/message-service
+	./internal/services/file-service
+	./internal/services/notification-service
+)

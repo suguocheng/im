@@ -1,8 +1,59 @@
 // ======= 统一API/WS地址配置 =======
-// const API_BASE = 'https://dealer-assets-theaters-widespread.trycloudflare.com';
-// const WS_BASE = 'wss://dealer-assets-theaters-widespread.trycloudflare.com/ws';
-const API_BASE = 'http://127.0.0.1:8081';
-const WS_BASE = 'ws://127.0.0.1:8081/ws';
+// 微服务架构 - 前端直接访问，API通过网关访问
+const API_BASE = 'http://127.0.0.1:8087';
+const WS_BASE = 'ws://127.0.0.1:8087/ws';
+
+// ======= 微服务API路径映射 =======
+const API_PATHS = {
+  // 用户服务
+  user_info: '/api/user/user_info',
+  login: '/api/user/login',
+  register: '/api/user/register',
+  update_username: '/api/user/update_username',
+  update_pwd: '/api/user/update_password',
+  delete_account: '/api/user/delete_account',
+  logout: '/api/user/logout',
+  send_email_code: '/api/notification/send_email_code',
+  reset_password: '/api/user/reset_password',
+  
+  // 好友服务
+  friend_list: '/api/friend/friend_list',
+  friend_info: '/api/friend/friend_info',
+  update_friend_remark: '/api/friend/update_friend_remark',
+  set_friend_dnd: '/api/friend/set_friend_dnd',
+  delete_friend: '/api/friend/delete_friend',
+  add_friend: '/api/friend/add_friend',
+  friend_request_list: '/api/friend/friend_request_list',
+  handle_friend_request: '/api/friend/handle_friend_request',
+  
+  // 群组服务
+  group_list: '/api/group/group_list',
+  group_info: '/api/group/group_info',
+  group_member_info: '/api/group/group_member_info',
+  set_group_remark: '/api/group/set_group_remark',
+  leave_group: '/api/group/leave_group',
+  dismiss_group: '/api/group/dismiss_group',
+  set_group_nickname: '/api/group/set_group_nickname',
+  set_group_dnd: '/api/group/set_group_dnd',
+  get_group_dnd: '/api/group/get_group_dnd',
+  invite_to_group: '/api/group/invite_to_group',
+  update_group_name: '/api/group/update_group_name',
+  kick_from_group: '/api/group/kick_from_group',
+  set_group_mute: '/api/group/set_group_mute',
+  set_group_admin: '/api/group/set_group_admin',
+  group_members: '/api/group/group_members',
+  create_group: '/api/group/create_group',
+  join_group: '/api/group/join_group',
+  group_request_list: '/api/group/group_request_list',
+  handle_group_request: '/api/group/handle_group_request',
+  
+  // 消息服务
+  get_recent_private_messages: '/api/message/get_recent_private_messages',
+  get_recent_group_messages: '/api/message/get_recent_group_messages',
+  
+  // 文件服务
+  upload: '/upload'
+};
 
 // ========== 端到端加密工具 ==========
 // 密钥管理
@@ -316,7 +367,7 @@ document.addEventListener('DOMContentLoaded', function() {
       (async function() {
         try {
           const req = UserInfoReq.encode(UserInfoReq.create({ token: savedToken })).finish();
-          const resp = await fetch(`${API_BASE}/user_info`, {
+          const resp = await fetch(`${API_BASE}${API_PATHS.user_info}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-protobuf' },
             body: req
@@ -351,7 +402,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // protobuf编码请求体
         const payload = { uid, password: pwd };
         const body = LoginReq.encode(LoginReq.create(payload)).finish();
-        const resp = await fetch(`${API_BASE}/login`, {
+        const resp = await fetch(`${API_BASE}${API_PATHS.login}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-protobuf' },
           body
@@ -390,7 +441,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // protobuf编码请求体
         const payload = { username, email, password: pwd, emailCode };
         const body = RegisterReq.encode(RegisterReq.create(payload)).finish();
-        const resp = await fetch(`${API_BASE}/register`, {
+        const resp = await fetch(`${API_BASE}${API_PATHS.register}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-protobuf' },
           body
@@ -416,7 +467,7 @@ document.addEventListener('DOMContentLoaded', function() {
       // 获取用户信息
       try {
         const userInfoReq = UserInfoReq.encode(UserInfoReq.create({ token: tokenVal })).finish();
-        const resp = await fetch(`${API_BASE}/user_info`, {
+        const resp = await fetch(`${API_BASE}${API_PATHS.user_info}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-protobuf' },
           body: userInfoReq
@@ -440,7 +491,7 @@ document.addEventListener('DOMContentLoaded', function() {
     async function fetchFriendList(uid, tokenVal) {
       try {
         const friendListReq = FriendListReq.encode(FriendListReq.create({ uid, token: tokenVal })).finish();
-        const resp = await fetch(`${API_BASE}/friend_list`, {
+        const resp = await fetch(`${API_BASE}${API_PATHS.friend_list}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-protobuf' },
           body: friendListReq
@@ -490,7 +541,7 @@ document.addEventListener('DOMContentLoaded', function() {
           const FriendInfoResp = root.lookupType('protocol.FriendInfoResp');
           const reqBuf = FriendInfoReq.encode(FriendInfoReq.create({ uid: myUid, friendUid: uid, token })).finish();
           try {
-            const resp = await fetch(`${API_BASE}/friend_info`, {
+            const resp = await fetch(`${API_BASE}${API_PATHS.friend_info}`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/x-protobuf' },
               body: reqBuf
@@ -526,7 +577,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 onOk: async ([remark]) => {
                   const UpdateFriendRemarkReq = root.lookupType('protocol.UpdateFriendRemarkReq');
                   const reqBuf = UpdateFriendRemarkReq.encode(UpdateFriendRemarkReq.create({ uid: myUid, friendUid: uid, remark, token })).finish();
-                  const resp = await fetch(`${API_BASE}/update_friend_remark`, {
+                  const resp = await fetch(`${API_BASE}${API_PATHS.update_friend_remark}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-protobuf' },
                     body: reqBuf
@@ -546,7 +597,7 @@ document.addEventListener('DOMContentLoaded', function() {
             dndBtn.onclick = async function() {
               const SetFriendDNDReq = root.lookupType('protocol.SetFriendDNDReq');
               const reqBuf = SetFriendDNDReq.encode(SetFriendDNDReq.create({ uid: myUid, friendUid: uid, dnd: !info.dnd, token })).finish();
-              const resp = await fetch(`${API_BASE}/set_friend_dnd`, {
+              const resp = await fetch(`${API_BASE}${API_PATHS.set_friend_dnd}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-protobuf' },
                 body: reqBuf
@@ -565,7 +616,7 @@ document.addEventListener('DOMContentLoaded', function() {
               if (!confirm('确定要删除该好友吗？')) return;
               const DeleteFriendReq = root.lookupType('protocol.DeleteFriendReq');
               const reqBuf = DeleteFriendReq.encode(DeleteFriendReq.create({ uid: myUid, friendUid: uid, token })).finish();
-              const resp = await fetch(`${API_BASE}/delete_friend`, {
+              const resp = await fetch(`${API_BASE}${API_PATHS.delete_friend}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-protobuf' },
                 body: reqBuf
@@ -649,7 +700,7 @@ document.addEventListener('DOMContentLoaded', function() {
     async function fetchGroupList(tokenVal) {
       try {
         const req = GroupListReq.encode(GroupListReq.create({ uid: myUid, token: tokenVal })).finish();
-        const resp = await fetch(`${API_BASE}/group_list`, {
+        const resp = await fetch(`${API_BASE}${API_PATHS.group_list}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-protobuf' },
           body: req
@@ -695,7 +746,7 @@ document.addEventListener('DOMContentLoaded', function() {
           const GroupInfoResp = root.lookupType('protocol.GroupInfoResp');
           const reqBuf = GroupInfoReq.encode(GroupInfoReq.create({ groupId })).finish();
           try {
-            const resp = await fetch(`${API_BASE}/group_info`, {
+            const resp = await fetch(`${API_BASE}${API_PATHS.group_info}`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/x-protobuf' },
               body: reqBuf
@@ -714,7 +765,7 @@ document.addEventListener('DOMContentLoaded', function() {
               const infoReq = root.lookupType('protocol.GroupMemberInfoReq');
               const infoResp = root.lookupType('protocol.GroupMemberInfoResp');
               const infoReqBuf = infoReq.encode(infoReq.create({ groupId, uid: myUid })).finish();
-              const resp = await fetch(`${API_BASE}/group_member_info`, {
+              const resp = await fetch(`${API_BASE}${API_PATHS.group_member_info}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-protobuf' },
                 body: infoReqBuf
@@ -736,7 +787,17 @@ document.addEventListener('DOMContentLoaded', function() {
               // 备注直接用group.remark
               // 免打扰需查接口
               const dndReq = GroupDNDReq.encode(GroupDNDReq.create({ groupId, uid: myUid })).finish();
-              // 这里假设有获取群免打扰状态的接口，若无则跳过
+              const dndResp = await fetch(`${API_BASE}${API_PATHS.get_group_dnd}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-protobuf' },
+                body: dndReq
+              });
+              const dndBuf = await dndResp.arrayBuffer();
+              const dndApiMsg = APIResp.decode(new Uint8Array(dndBuf));
+              if (dndApiMsg.code === 0) {
+                const dndData = GroupDNDResp.decode(dndApiMsg.data);
+                dnd = dndData.dnd;
+              }
             } catch {}
             // 弹窗内容
             let html = `<div style='margin-bottom:8px;'><b>群ID:</b> ${info.groupId}</div>`;
@@ -766,7 +827,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 onOk: async ([newRemark]) => {
                   const SetGroupRemarkReq = root.lookupType('protocol.SetGroupRemarkReq');
                   const reqBuf = SetGroupRemarkReq.encode(SetGroupRemarkReq.create({ groupId, uid: myUid, remark: newRemark })).finish();
-                  const resp = await fetch(`${API_BASE}/set_group_remark`, {
+                  const resp = await fetch(`${API_BASE}${API_PATHS.set_group_remark}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-protobuf' },
                     body: reqBuf
@@ -788,7 +849,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!confirm('确定要退出该群组吗？')) return;
                 const LeaveGroupReq = root.lookupType('protocol.LeaveGroupReq');
                 const reqBuf = LeaveGroupReq.encode(LeaveGroupReq.create({ groupId, uid: myUid })).finish();
-                const resp = await fetch(`${API_BASE}/leave_group`, {
+                const resp = await fetch(`${API_BASE}${API_PATHS.leave_group}`, {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/x-protobuf' },
                   body: reqBuf
@@ -809,7 +870,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!confirm('确定要解散该群组吗？')) return;
                 const DismissGroupReq = root.lookupType('protocol.DismissGroupReq');
                 const reqBuf = DismissGroupReq.encode(DismissGroupReq.create({ groupId, operatorUid: myUid })).finish();
-                const resp = await fetch(`${API_BASE}/dismiss_group`, {
+                const resp = await fetch(`${API_BASE}${API_PATHS.dismiss_group}`, {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/x-protobuf' },
                   body: reqBuf
@@ -833,7 +894,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 onOk: async ([nickname]) => {
                   const SetGroupNicknameReq = root.lookupType('protocol.SetGroupNicknameReq');
                   const reqBuf = SetGroupNicknameReq.encode(SetGroupNicknameReq.create({ groupId, uid: myUid, nickname })).finish();
-                  const resp = await fetch(`${API_BASE}/set_group_nickname`, {
+                  const resp = await fetch(`${API_BASE}${API_PATHS.set_group_nickname}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-protobuf' },
                     body: reqBuf
@@ -853,15 +914,21 @@ document.addEventListener('DOMContentLoaded', function() {
             dndBtn.onclick = async function() {
               const SetGroupDNDReq = root.lookupType('protocol.SetGroupDNDReq');
               const reqBuf = SetGroupDNDReq.encode(SetGroupDNDReq.create({ groupId, uid: myUid, dnd: !dnd })).finish();
-              const resp = await fetch(`${API_BASE}/set_group_dnd`, {
+              const resp = await fetch(`${API_BASE}${API_PATHS.set_group_dnd}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-protobuf' },
                 body: reqBuf
               });
               const buf = await resp.arrayBuffer();
               const apiMsg = APIResp.decode(new Uint8Array(buf));
-              alert(apiMsg.msg || (apiMsg.code === 0 ? '设置成功' : '设置失败'));
-              fetchGroupList(token);
+              if (apiMsg.code === 0) {
+                // 更新本地状态
+                dnd = !dnd;
+                dndBtn.textContent = dnd ? '关闭群免打扰' : '开启群免打扰';
+                alert('设置成功');
+              } else {
+                alert('设置失败: ' + apiMsg.msg);
+              }
             };
             actionsDiv.insertBefore(dndBtn, actionsDiv.firstChild);
             // 邀请新成员按钮
@@ -876,7 +943,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 onOk: async ([uids]) => {
                   const InviteToGroupReq = root.lookupType('protocol.InviteToGroupReq');
                   const reqBuf = InviteToGroupReq.encode(InviteToGroupReq.create({ groupId, inviterUid: myUid, inviteeUids: uids.split(',').map(s => s.trim()).filter(Boolean) })).finish();
-                  const resp = await fetch(`${API_BASE}/invite_to_group`, {
+                  const resp = await fetch(`${API_BASE}${API_PATHS.invite_to_group}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-protobuf' },
                     body: reqBuf
@@ -902,7 +969,7 @@ document.addEventListener('DOMContentLoaded', function() {
                   onOk: async ([newName]) => {
                     const UpdateGroupNameReq = root.lookupType('protocol.UpdateGroupNameReq');
                     const reqBuf = UpdateGroupNameReq.encode(UpdateGroupNameReq.create({ groupId, operatorUid: myUid, newName })).finish();
-                    const resp = await fetch(`${API_BASE}/update_group_name`, {
+                    const resp = await fetch(`${API_BASE}${API_PATHS.update_group_name}`, {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/x-protobuf' },
                       body: reqBuf
@@ -927,7 +994,7 @@ document.addEventListener('DOMContentLoaded', function() {
                   onOk: async ([targetUid]) => {
                     const KickFromGroupReq = root.lookupType('protocol.KickFromGroupReq');
                     const reqBuf = KickFromGroupReq.encode(KickFromGroupReq.create({ groupId, operatorUid: myUid, targetUid })).finish();
-                    const resp = await fetch(`${API_BASE}/kick_from_group`, {
+                    const resp = await fetch(`${API_BASE}${API_PATHS.kick_from_group}`, {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/x-protobuf' },
                       body: reqBuf
@@ -954,7 +1021,7 @@ document.addEventListener('DOMContentLoaded', function() {
                   onOk: async ([targetUid, mute]) => {
                     const SetGroupMuteReq = root.lookupType('protocol.SetGroupMuteReq');
                     const reqBuf = SetGroupMuteReq.encode(SetGroupMuteReq.create({ groupId, operatorUid: myUid, targetUid, mute: mute === 'true' })).finish();
-                    const resp = await fetch(`${API_BASE}/set_group_mute`, {
+                    const resp = await fetch(`${API_BASE}${API_PATHS.set_group_mute}`, {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/x-protobuf' },
                       body: reqBuf
@@ -984,7 +1051,7 @@ document.addEventListener('DOMContentLoaded', function() {
                   onOk: async ([targetUid, setAdmin]) => {
                     const SetGroupAdminReq = root.lookupType('protocol.SetGroupAdminReq');
                     const reqBuf = SetGroupAdminReq.encode(SetGroupAdminReq.create({ groupId, operatorUid: myUid, targetUid, setAdmin: setAdmin === 'true' })).finish();
-                    const resp = await fetch(`${API_BASE}/set_group_admin`, {
+                    const resp = await fetch(`${API_BASE}${API_PATHS.set_group_admin}`, {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/x-protobuf' },
                       body: reqBuf
@@ -1007,7 +1074,7 @@ document.addEventListener('DOMContentLoaded', function() {
               const GroupMembersResp = root.lookupType('protocol.GroupMembersResp');
               const reqBuf = GroupMembersReq.encode(GroupMembersReq.create({ groupId })).finish();
               try {
-                const resp = await fetch(`${API_BASE}/group_members`, {
+                const resp = await fetch(`${API_BASE}${API_PATHS.group_members}`, {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/x-protobuf' },
                   body: reqBuf
@@ -1199,7 +1266,7 @@ document.addEventListener('DOMContentLoaded', function() {
       // 上传文件
       const form = new FormData();
       form.append('file', file);
-      const resp = await fetch(`${API_BASE}/upload`, { method: 'POST', body: form });
+      const resp = await fetch(`${API_BASE}${API_PATHS.upload}`, { method: 'POST', body: form });
       if (!resp.ok) { alert('上传失败'); return; }
       const buf = await resp.arrayBuffer();
       const APIResp = root.lookupType('protocol.APIResp');
@@ -1332,7 +1399,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     function formatTime(ts) {
       if (!ts) return '';
-      const d = new Date(Number(ts));
+      const d = new Date(Number(ts) * 1000); // 将秒转换为毫秒
       const y = d.getFullYear();
       const m = (d.getMonth() + 1).toString().padStart(2, '0');
       const day = d.getDate().toString().padStart(2, '0');
@@ -1527,7 +1594,7 @@ document.addEventListener('DOMContentLoaded', function() {
           // 群聊未读
           else if ((msg.type === 'chat' || msg.type === 'image' || msg.type === 'file') && msg.groupId && (!currentGroup || msg.groupId !== currentGroup.groupId)) {
             unreadMap['group:' + msg.groupId] = (unreadMap['group:' + msg.groupId] || 0) + 1;
-            renderGroupList([]);
+            renderGroupList(groupListCache);
           }
           else if (msg.type === 'error') {
             if (msg.content && (msg.content.indexOf('请先登录') !== -1 || msg.content.indexOf('未登录') !== -1)) {
@@ -1608,7 +1675,7 @@ document.addEventListener('DOMContentLoaded', function() {
               const UserInfoResp = root.lookupType('protocol.UserInfoResp');
               const reqBuf = UserInfoReq.encode(UserInfoReq.create({ token })).finish();
               try {
-                const resp = await fetch(`${API_BASE}/user_info`, {
+                const resp = await fetch(`${API_BASE}${API_PATHS.user_info}`, {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/x-protobuf' },
                   body: reqBuf
@@ -1634,7 +1701,7 @@ document.addEventListener('DOMContentLoaded', function() {
                   const UpdateUsernameReq = root.lookupType('protocol.UpdateUsernameReq');
                   const APIResp = root.lookupType('protocol.APIResp');
                   const reqBuf = UpdateUsernameReq.encode(UpdateUsernameReq.create({ uid: myUid, newUsername })).finish();
-                  const resp = await fetch(`${API_BASE}/update_username`, {
+                  const resp = await fetch(`${API_BASE}${API_PATHS.update_username}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-protobuf' },
                     body: reqBuf
@@ -1659,7 +1726,7 @@ document.addEventListener('DOMContentLoaded', function() {
                   const UpdatePwdReq = root.lookupType('protocol.UpdatePwdReq');
                   const APIResp = root.lookupType('protocol.APIResp');
                   const reqBuf = UpdatePwdReq.encode(UpdatePwdReq.create({ uid: myUid, oldPwd, newPwd })).finish();
-                  const resp = await fetch(`${API_BASE}/update_pwd`, {
+                  const resp = await fetch(`${API_BASE}${API_PATHS.update_pwd}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-protobuf' },
                     body: reqBuf
@@ -1676,7 +1743,7 @@ document.addEventListener('DOMContentLoaded', function() {
               const DeleteAccountReq = root.lookupType('protocol.DeleteAccountReq');
               const APIResp = root.lookupType('protocol.APIResp');
               const reqBuf = DeleteAccountReq.encode(DeleteAccountReq.create({ uid: myUid })).finish();
-              fetch(`${API_BASE}/delete_account`, {
+              fetch(`${API_BASE}${API_PATHS.delete_account}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-protobuf' },
                 body: reqBuf
@@ -1699,22 +1766,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const logoutBtn = document.getElementById('uc-logout');
             if (logoutBtn) logoutBtn.onclick = async function() {
               if (!token) { showLoginPanel(); return; }
-              try {
-                const LogoutReq = root.lookupType('protocol.LogoutReq');
-                const APIResp = root.lookupType('protocol.APIResp');
-                const reqBuf = LogoutReq.encode(LogoutReq.create({ token })).finish();
-                const resp = await fetch(`${API_BASE}/logout`, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/x-protobuf' },
-                  body: reqBuf
-                });
-                if (!resp.ok) throw new Error('网络错误');
-                const buf = await resp.arrayBuffer();
-                const msg = APIResp.decode(new Uint8Array(buf));
-                if (msg.code !== 0) throw new Error(msg.msg);
-              } catch (e) {
-                alert('退出失败: ' + (e.message || e));
-              }
+              
+              // 先执行本地登出逻辑
               window.localStorage.removeItem('token');
               window.localStorage.removeItem('uid');
               token = null;
@@ -1723,6 +1776,22 @@ document.addEventListener('DOMContentLoaded', function() {
               window.myUid = myUid;
               if (ws) { ws.close(); ws = null; }
               showLoginPanel();
+              
+              // 尝试通知服务器（不阻塞用户界面）
+              try {
+                const LogoutReq = root.lookupType('protocol.LogoutReq');
+                const reqBuf = LogoutReq.encode(LogoutReq.create({ token: window.localStorage.getItem('token') })).finish();
+                const resp = await fetch(`${API_BASE}${API_PATHS.logout}`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/x-protobuf' },
+                  body: reqBuf
+                });
+                if (!resp.ok) {
+                  console.warn('登出API调用失败，但本地已登出');
+                }
+              } catch (e) {
+                console.warn('登出API调用异常，但本地已登出:', e.message);
+              }
             };
           }, 100);
         };
@@ -1798,7 +1867,7 @@ document.addEventListener('DOMContentLoaded', function() {
                   const APIResp = root.lookupType('protocol.APIResp');
                   const reqBuf = AddFriendReq.encode(AddFriendReq.create({ fromUid: myUid, toUid, verifyMsg, token })).finish();
                   try {
-                    const resp = await fetch(`${API_BASE}/add_friend`, {
+                    const resp = await fetch(`${API_BASE}${API_PATHS.add_friend}`, {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/x-protobuf' },
                       body: reqBuf
@@ -1821,7 +1890,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const FriendRequestListResp = root.lookupType('protocol.FriendRequestListResp');
             const reqBuf = FriendListReq.encode(FriendListReq.create({ uid: myUid, token })).finish();
             try {
-              const resp = await fetch(`${API_BASE}/friend_request_list`, {
+              const resp = await fetch(`${API_BASE}${API_PATHS.friend_request_list}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-protobuf' },
                 body: reqBuf
@@ -1858,7 +1927,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const fromUid = btn.getAttribute('data-uid');
                     const HandleFriendRequestReq = root.lookupType('protocol.HandleFriendRequestReq');
                     const reqBuf = HandleFriendRequestReq.encode(HandleFriendRequestReq.create({ fromUid, toUid: myUid, accept: true, token })).finish();
-                    const resp = await fetch(`${API_BASE}/handle_friend_request`, {
+                    const resp = await fetch(`${API_BASE}${API_PATHS.handle_friend_request}`, {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/x-protobuf' },
                       body: reqBuf
@@ -1873,7 +1942,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const fromUid = btn.getAttribute('data-uid');
                     const HandleFriendRequestReq = root.lookupType('protocol.HandleFriendRequestReq');
                     const reqBuf = HandleFriendRequestReq.encode(HandleFriendRequestReq.create({ fromUid, toUid: myUid, accept: false, token })).finish();
-                    const resp = await fetch(`${API_BASE}/handle_friend_request`, {
+                    const resp = await fetch(`${API_BASE}${API_PATHS.handle_friend_request}`, {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/x-protobuf' },
                       body: reqBuf
@@ -1920,7 +1989,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const APIResp = root.lookupType('protocol.APIResp');
                 const reqBuf = CreateGroupReq.encode(CreateGroupReq.create({ name: groupName, ownerUid: myUid, token })).finish();
                 try {
-                  const resp = await fetch(`${API_BASE}/create_group`, {
+                  const resp = await fetch(`${API_BASE}${API_PATHS.create_group}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-protobuf' },
                     body: reqBuf
@@ -1949,7 +2018,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const APIResp = root.lookupType('protocol.APIResp');
                 const reqBuf = JoinGroupReq.encode(JoinGroupReq.create({ groupId, uid: myUid, token })).finish();
                 try {
-                  const resp = await fetch(`${API_BASE}/join_group`, {
+                  const resp = await fetch(`${API_BASE}${API_PATHS.join_group}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-protobuf' },
                     body: reqBuf
@@ -1971,7 +2040,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const GroupRequestListResp = root.lookupType('protocol.GroupRequestListResp');
             const reqBuf = GroupRequestListReq.encode(GroupRequestListReq.create({ uid: myUid, token })).finish();
             try {
-              const resp = await fetch(`${API_BASE}/group_request_list`, {
+              const resp = await fetch(`${API_BASE}${API_PATHS.group_request_list}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-protobuf' },
                 body: reqBuf
@@ -2010,7 +2079,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const inviteeUid = btn.getAttribute('data-invitee');
                     const HandleGroupRequestReq = root.lookupType('protocol.HandleGroupRequestReq');
                     const reqBuf = HandleGroupRequestReq.encode(HandleGroupRequestReq.create({ id, groupId, inviteeUid, approve: true, token })).finish();
-                    const resp = await fetch(`${API_BASE}/handle_group_request`, {
+                    const resp = await fetch(`${API_BASE}${API_PATHS.handle_group_request}`, {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/x-protobuf' },
                       body: reqBuf
@@ -2027,7 +2096,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const inviteeUid = btn.getAttribute('data-invitee');
                     const HandleGroupRequestReq = root.lookupType('protocol.HandleGroupRequestReq');
                     const reqBuf = HandleGroupRequestReq.encode(HandleGroupRequestReq.create({ id, groupId, inviteeUid, approve: false, token })).finish();
-                    const resp = await fetch(`${API_BASE}/handle_group_request`, {
+                    const resp = await fetch(`${API_BASE}${API_PATHS.handle_group_request}`, {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/x-protobuf' },
                       body: reqBuf
@@ -2079,7 +2148,7 @@ document.addEventListener('DOMContentLoaded', function() {
       let uid1 = from, uid2 = to;
       if (uid1 > uid2) { const tmp = uid1; uid1 = uid2; uid2 = tmp; }
       const reqBuf = GetRecentPrivateMessagesReq.encode(GetRecentPrivateMessagesReq.create({ from: uid1, to: uid2, count })).finish();
-      const resp = await fetch(`${API_BASE}/get_recent_private_messages`, {
+      const resp = await fetch(`${API_BASE}${API_PATHS.get_recent_private_messages}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-protobuf' },
         body: reqBuf
@@ -2094,7 +2163,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // 拉取最近N条群聊消息
     async function fetchRecentGroupMessages(groupId, count) {
       const reqBuf = GetRecentGroupMessagesReq.encode(GetRecentGroupMessagesReq.create({ groupId: groupId, count })).finish();
-      const resp = await fetch(`${API_BASE}/get_recent_group_messages`, {
+      const resp = await fetch(`${API_BASE}${API_PATHS.get_recent_group_messages}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-protobuf' },
         body: reqBuf
@@ -2176,7 +2245,7 @@ document.addEventListener('DOMContentLoaded', function() {
           purpose: 'register' 
         })).finish();
         
-        fetch(`${API_BASE}/send_email_code`, {
+        fetch(`${API_BASE}${API_PATHS.send_email_code}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-protobuf' },
           body: reqBuf
@@ -2245,7 +2314,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 newPassword: newPassword 
               })).finish();
               
-              const resp = await fetch(`${API_BASE}/reset_password`, {
+              const resp = await fetch(`${API_BASE}${API_PATHS.reset_password}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-protobuf' },
                 body: reqBuf
@@ -2287,7 +2356,7 @@ document.addEventListener('DOMContentLoaded', function() {
           purpose: 'reset_password' 
         })).finish();
         
-        fetch(`${API_BASE}/send_email_code`, {
+        fetch(`${API_BASE}${API_PATHS.send_email_code}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-protobuf' },
           body: reqBuf

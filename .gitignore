@@ -3,7 +3,9 @@ config.env
 
 bin/
 
+docs/
+
 scripts/logs/
 scripts/pids/
 
-uploads/
+internal/services/file-service/uploads/
