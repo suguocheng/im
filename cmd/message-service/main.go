@@ -9,6 +9,7 @@ import (
 	"im/internal/services/message-service/service"
 	"im/internal/services/message-service/storage"
 	"im/internal/shared/config"
+	"im/internal/shared/database"
 	"im/internal/shared/logger"
 )
 
@@ -19,14 +20,21 @@ func main() {
 	// 初始化日志
 	logger := logger.NewLogger(cfg.Log.Level)
 
+	// 初始化数据库连接池管理器
+	dbManager, err := database.NewManager(cfg.Database, cfg.Redis, cfg.Mongo, logger)
+	if err != nil {
+		logger.Fatalf("初始化数据库连接池失败: %v", err)
+	}
+	defer dbManager.Close()
+
 	// 初始化存储
-	storage, err := storage.NewMessageStorage(cfg.Database, cfg.Redis)
+	messageStorage, err := storage.NewMessageStorage(dbManager)
 	if err != nil {
 		logger.Fatalf("初始化存储失败: %v", err)
 	}
 
 	// 初始化服务
-	messageService := service.NewMessageService(storage, logger)
+	messageService := service.NewMessageService(messageStorage, logger)
 
 	// 初始化处理器
 	messageHandler := handler.NewMessageHandler(messageService, logger)

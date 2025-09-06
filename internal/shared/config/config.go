@@ -68,7 +68,20 @@ type FileConfig struct {
 // LoadServiceConfig 加载服务配置
 func LoadServiceConfig(serviceName string) *ServiceConfig {
 	// 加载环境变量（优先根目录 config.env）
-	_ = godotenv.Load("config.env")
+	// 尝试多个路径
+	configPaths := []string{
+		"config.env",
+		"../../config.env",
+		"../../../config.env",
+	}
+
+	var err error
+	for _, path := range configPaths {
+		err = godotenv.Load(path)
+		if err == nil {
+			break
+		}
+	}
 
 	// 根据服务名设置不同的端口
 	port := getPortForService(serviceName)
@@ -129,7 +142,8 @@ func getPortForService(serviceName string) int {
 
 // getEnv 获取环境变量，如果不存在则返回默认值
 func getEnv(key, defaultValue string) string {
-	if value := os.Getenv(key); value != "" {
+	value := os.Getenv(key)
+	if value != "" {
 		return value
 	}
 	return defaultValue

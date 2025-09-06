@@ -5,16 +5,18 @@ import (
 	"io"
 	"net/http"
 
-	"im/internal/shared/logger"
-	pb "im/internal/shared/protocol/pb"
 	"im/internal/services/notification-service/service"
+	"im/internal/shared/logger"
+	"im/internal/shared/performance"
+	pb "im/internal/shared/protocol/pb"
 
 	"google.golang.org/protobuf/proto"
 )
 
 type NotificationHandler struct {
-	svc    *service.NotificationService
-	logger *logger.Logger
+	requestHandler *performance.RequestHandler
+	svc            *service.NotificationService
+	logger         *logger.Logger
 }
 
 func NewNotificationHandler(svc *service.NotificationService, logger *logger.Logger) *NotificationHandler {
@@ -22,23 +24,10 @@ func NewNotificationHandler(svc *service.NotificationService, logger *logger.Log
 }
 
 func (h *NotificationHandler) RegisterRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("/send_email_code", h.handleCORS(h.sendEmailCode))
-	mux.HandleFunc("/reset_password", h.handleCORS(h.resetPassword))
+	mux.HandleFunc("/send_email_code", h.requestHandler.HandleRequest(h.sendEmailCode))
+	mux.HandleFunc("/reset_password", h.requestHandler.HandleRequest(h.resetPassword))
 	// 新增：注册验证码校验
-	mux.HandleFunc("/verify_email_code_register", h.handleCORS(h.verifyEmailCodeRegister))
-}
-
-func (h *NotificationHandler) handleCORS(next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-		if r.Method == http.MethodOptions {
-			w.WriteHeader(http.StatusOK)
-			return
-		}
-		next(w, r)
-	}
+	mux.HandleFunc("/verify_email_code_register", h.requestHandler.HandleRequest(h.verifyEmailCodeRegister))
 }
 
 func (h *NotificationHandler) writeResp(w http.ResponseWriter, code int, msg string, data []byte) {

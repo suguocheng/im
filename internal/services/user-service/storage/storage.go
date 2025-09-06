@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	"im/internal/shared/config"
 	"im/internal/services/user-service/model"
 	"im/internal/services/user-service/utils"
+	"im/internal/shared/database"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -26,24 +26,12 @@ type UserStorage interface {
 
 // MySQLUserStorage MySQL用户存储实现
 type MySQLUserStorage struct {
-	db *sql.DB
+	dbManager *database.Manager
 }
 
 // NewUserStorage 创建用户存储实例
-func NewUserStorage(cfg config.DatabaseConfig) (UserStorage, error) {
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-		cfg.Username, cfg.Password, cfg.Host, cfg.Port, cfg.Database)
-
-	db, err := sql.Open("mysql", dsn)
-	if err != nil {
-		return nil, fmt.Errorf("连接数据库失败: %v", err)
-	}
-
-	if err := db.Ping(); err != nil {
-		return nil, fmt.Errorf("数据库连接测试失败: %v", err)
-	}
-
-	storage := &MySQLUserStorage{db: db}
+func NewUserStorage(dbManager *database.Manager) (UserStorage, error) {
+	storage := &MySQLUserStorage{dbManager: dbManager}
 	if err := storage.initTables(); err != nil {
 		return nil, fmt.Errorf("初始化表失败: %v", err)
 	}
@@ -66,7 +54,7 @@ func (s *MySQLUserStorage) initTables() error {
 		INDEX idx_email (email)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;`
 
-	_, err := s.db.Exec(createTableSQL)
+	_, err := s.dbManager.GetMySQL().Exec(createTableSQL)
 	return err
 }
 
@@ -79,7 +67,7 @@ func (s *MySQLUserStorage) CreateUser(username, password, email string) (string,
 	}
 
 	// 使用事务确保原子性
-	tx, err := s.db.Begin()
+	tx, err := s.dbManager.GetMySQL().Begin()
 	if err != nil {
 		return "", fmt.Errorf("开启事务失败: %v", err)
 	}
@@ -116,7 +104,7 @@ func (s *MySQLUserStorage) CreateUser(username, password, email string) (string,
 // GetUserByUID 根据UID获取用户
 func (s *MySQLUserStorage) GetUserByUID(uid string) (*model.User, error) {
 	query := `SELECT uid, username, password, email, created_at, updated_at FROM users WHERE uid = ?`
-	row := s.db.QueryRow(query, uid)
+	row := s.dbManager.GetMySQL().QueryRow(query, uid)
 
 	user := &model.User{}
 	err := row.Scan(&user.UID, &user.Username, &user.Password, &user.Email, &user.CreatedAt, &user.UpdatedAt)
@@ -133,7 +121,7 @@ func (s *MySQLUserStorage) GetUserByUID(uid string) (*model.User, error) {
 // GetUserByEmail 根据邮箱获取用户
 func (s *MySQLUserStorage) GetUserByEmail(email string) (*model.User, error) {
 	query := `SELECT uid, username, password, email, created_at, updated_at FROM users WHERE email = ?`
-	row := s.db.QueryRow(query, email)
+	row := s.dbManager.GetMySQL().QueryRow(query, email)
 
 	user := &model.User{}
 	err := row.Scan(&user.UID, &user.Username, &user.Password, &user.Email, &user.CreatedAt, &user.UpdatedAt)
@@ -165,7 +153,7 @@ func (s *MySQLUserStorage) UpdatePassword(uid, password string) error {
 	}
 
 	query := `UPDATE users SET password = ? WHERE uid = ?`
-	_, err = s.db.Exec(query, hashedPassword, uid)
+	_, err = s.dbManager.GetMySQL().Exec(query, hashedPassword, uid)
 	if err != nil {
 		return fmt.Errorf("更新密码失败: %v", err)
 	}
@@ -176,7 +164,7 @@ func (s *MySQLUserStorage) UpdatePassword(uid, password string) error {
 // UpdateUsername 更新用户名
 func (s *MySQLUserStorage) UpdateUsername(uid, username string) error {
 	query := `UPDATE users SET username = ? WHERE uid = ?`
-	_, err := s.db.Exec(query, username, uid)
+	_, err := s.dbManager.GetMySQL().Exec(query, username, uid)
 	if err != nil {
 		return fmt.Errorf("更新用户名失败: %v", err)
 	}
@@ -187,7 +175,7 @@ func (s *MySQLUserStorage) UpdateUsername(uid, username string) error {
 // DeleteUser 删除用户
 func (s *MySQLUserStorage) DeleteUser(uid string) error {
 	query := `DELETE FROM users WHERE uid = ?`
-	_, err := s.db.Exec(query, uid)
+	_, err := s.dbManager.GetMySQL().Exec(query, uid)
 	if err != nil {
 		return fmt.Errorf("删除用户失败: %v", err)
 	}
@@ -197,5 +185,6 @@ func (s *MySQLUserStorage) DeleteUser(uid string) error {
 
 // Close 关闭数据库连接
 func (s *MySQLUserStorage) Close() error {
-	return s.db.Close()
+	// 数据库连接由管理器统一管理，这里不需要关闭
+	return nil
 }

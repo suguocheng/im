@@ -1,56 +1,68 @@
 package handler
 
 import (
-	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 	"time"
 
-	"im/internal/shared/auth"
-	pb "im/internal/shared/protocol/pb"
-	"im/internal/shared/logger"
 	"im/internal/services/group-service/service"
+	"im/internal/shared/auth"
+	"im/internal/shared/logger"
+	"im/internal/shared/performance"
+	pb "im/internal/shared/protocol/pb"
+	"im/internal/shared/rpc"
 
 	"google.golang.org/protobuf/proto"
 )
 
 // GroupHandler 群组处理器
 type GroupHandler struct {
-	service *service.GroupService
-	logger  *logger.Logger
+	requestHandler *performance.RequestHandler
+	service        *service.GroupService
+	logger         *logger.Logger
+	rpcManager     *rpc.Manager
 }
 
 // NewGroupHandler 创建群组处理器
 func NewGroupHandler(service *service.GroupService, logger *logger.Logger) *GroupHandler {
+	// 创建RPC管理器
+	rpcManager := rpc.NewManager(logger)
+
+	// 注册微服务
+	rpcManager.RegisterService("user-service", "http://127.0.0.1:8081")
+	rpcManager.RegisterService("notification-service", "http://127.0.0.1:8086")
+
 	return &GroupHandler{
-		service: service,
-		logger:  logger,
+		service:        service,
+		logger:         logger,
+		requestHandler: performance.NewRequestHandler(logger),
+		rpcManager:     rpcManager,
 	}
 }
 
 // RegisterRoutes 注册路由
 func (h *GroupHandler) RegisterRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("/create_group", h.handleCORS(h.createGroup))
-	mux.HandleFunc("/join_group", h.handleCORS(h.joinGroup))
-	mux.HandleFunc("/group_list", h.handleCORS(h.getGroupList))
-	mux.HandleFunc("/group_info", h.handleCORS(h.getGroupInfo))
-	mux.HandleFunc("/group_members", h.handleCORS(h.getGroupMembers))
-	mux.HandleFunc("/leave_group", h.handleCORS(h.leaveGroup))
-	mux.HandleFunc("/group_member_info", h.handleCORS(h.getGroupMemberInfo))
-	mux.HandleFunc("/invite_to_group", h.handleCORS(h.inviteToGroup))
-	mux.HandleFunc("/set_group_nickname", h.handleCORS(h.setGroupNickname))
-	mux.HandleFunc("/set_group_remark", h.handleCORS(h.setGroupRemark))
-	mux.HandleFunc("/set_group_dnd", h.handleCORS(h.setGroupDND))
-	mux.HandleFunc("/get_group_dnd", h.handleCORS(h.getGroupDND))
-	mux.HandleFunc("/set_group_mute", h.handleCORS(h.setGroupMute))
-	mux.HandleFunc("/kick_from_group", h.handleCORS(h.kickFromGroup))
-	mux.HandleFunc("/update_group_name", h.handleCORS(h.updateGroupName))
-	mux.HandleFunc("/set_group_admin", h.handleCORS(h.setGroupAdmin))
-	mux.HandleFunc("/dismiss_group", h.handleCORS(h.dismissGroup))
-	mux.HandleFunc("/group_request_list", h.handleCORS(h.getGroupRequestList))
-	mux.HandleFunc("/handle_group_request", h.handleCORS(h.handleGroupRequest))
+	mux.HandleFunc("/create_group", h.requestHandler.HandleRequest(h.createGroup))
+	mux.HandleFunc("/join_group", h.requestHandler.HandleRequest(h.joinGroup))
+	mux.HandleFunc("/group_list", h.requestHandler.HandleRequest(h.getGroupList))
+	mux.HandleFunc("/group_info", h.requestHandler.HandleRequest(h.getGroupInfo))
+	mux.HandleFunc("/group_members", h.requestHandler.HandleRequest(h.getGroupMembers))
+	mux.HandleFunc("/leave_group", h.requestHandler.HandleRequest(h.leaveGroup))
+	mux.HandleFunc("/group_member_info", h.requestHandler.HandleRequest(h.getGroupMemberInfo))
+	mux.HandleFunc("/invite_to_group", h.requestHandler.HandleRequest(h.inviteToGroup))
+	mux.HandleFunc("/set_group_nickname", h.requestHandler.HandleRequest(h.setGroupNickname))
+	mux.HandleFunc("/set_group_remark", h.requestHandler.HandleRequest(h.setGroupRemark))
+	mux.HandleFunc("/set_group_dnd", h.requestHandler.HandleRequest(h.setGroupDND))
+	mux.HandleFunc("/get_group_dnd", h.requestHandler.HandleRequest(h.getGroupDND))
+	mux.HandleFunc("/set_group_mute", h.requestHandler.HandleRequest(h.setGroupMute))
+	mux.HandleFunc("/kick_from_group", h.requestHandler.HandleRequest(h.kickFromGroup))
+	mux.HandleFunc("/update_group_name", h.requestHandler.HandleRequest(h.updateGroupName))
+	mux.HandleFunc("/set_group_admin", h.requestHandler.HandleRequest(h.setGroupAdmin))
+	mux.HandleFunc("/dismiss_group", h.requestHandler.HandleRequest(h.dismissGroup))
+	mux.HandleFunc("/group_request_list", h.requestHandler.HandleRequest(h.getGroupRequestList))
+	mux.HandleFunc("/handle_group_request", h.requestHandler.HandleRequest(h.handleGroupRequest))
 }
 
 // writeResp 写入响应
@@ -61,30 +73,14 @@ func (h *GroupHandler) writeResp(w http.ResponseWriter, code int, msg string, da
 	w.Write(b)
 }
 
-// handleCORS 处理CORS
-func (h *GroupHandler) handleCORS(handler http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-
-		if r.Method == "OPTIONS" {
-			w.WriteHeader(http.StatusOK)
-			return
-		}
-
-		handler(w, r)
-	}
-}
-
 // 内部: 推送通知到消息服务
 func (h *GroupHandler) notify(to string, n *pb.Notification) {
-	nURL := os.Getenv("MESSAGE_SERVICE_NOTIFY_URL")
-	if nURL == "" {
-		nURL = "http://127.0.0.1:8084/notify"
+	ctx := context.Background()
+
+	_, err := h.rpcManager.CallWithRetry(ctx, "message-service", "/notify", n, 3)
+	if err != nil {
+		h.logger.Errorf("发送通知失败: %v", err)
 	}
-	b, _ := proto.Marshal(n)
-	_, _ = http.Post(nURL, "application/x-protobuf", bytes.NewReader(b))
 }
 
 // createGroup 创建群组
@@ -891,33 +887,31 @@ func (h *GroupHandler) handleGroupRequest(w http.ResponseWriter, r *http.Request
 
 // fetchUsernameByUID 从用户服务获取用户名
 func (h *GroupHandler) fetchUsernameByUID(uid string) string {
-	userURL := os.Getenv("USER_SERVICE_INFO_URL")
-	if userURL == "" {
-		userURL = "http://127.0.0.1:8081/user_info"
-	}
+	ctx := context.Background()
 
 	// 生成临时token用于内部调用
 	tempToken, err := auth.GenerateToken(uid)
 	if err != nil {
+		h.logger.Errorf("生成token失败: %v", err)
 		return ""
 	}
 
 	req := &pb.UserInfoReq{Token: tempToken}
-	b, _ := proto.Marshal(req)
-	resp, err := http.Post(userURL, "application/x-protobuf", bytes.NewReader(b))
+	resp, err := h.rpcManager.CallWithRetry(ctx, "user-service", "/user_info", req, 3)
 	if err != nil {
+		h.logger.Errorf("获取用户信息失败: %v", err)
 		return ""
 	}
-	defer resp.Body.Close()
 
-	buf, _ := io.ReadAll(resp.Body)
 	var api pb.APIResp
-	if err := proto.Unmarshal(buf, &api); err != nil || api.Code != 0 {
+	if err := proto.Unmarshal(resp, &api); err != nil || api.Code != 0 {
+		h.logger.Errorf("解析用户信息响应失败: %v", err)
 		return ""
 	}
 
 	userResp := &pb.UserInfoResp{}
 	if err := proto.Unmarshal(api.Data, userResp); err != nil {
+		h.logger.Errorf("解析用户信息数据失败: %v", err)
 		return ""
 	}
 
@@ -928,9 +922,9 @@ func (h *GroupHandler) fetchUsernameByUID(uid string) string {
 func (h *GroupHandler) Start(port int) error {
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
-	
+
 	addr := fmt.Sprintf(":%d", port)
 	h.logger.Infof("服务启动在端口 %d", port)
-	
+
 	return http.ListenAndServe(addr, mux)
 }

@@ -1,40 +1,55 @@
 package handler
 
 import (
-	"bytes"
+	"context"
 	"io"
 	"net/http"
-	"os"
 
 	"im/internal/services/friend-service/service"
 	"im/internal/shared/auth"
 	"im/internal/shared/logger"
+	"im/internal/shared/performance"
 	pb "im/internal/shared/protocol/pb"
+	"im/internal/shared/rpc"
 
 	"google.golang.org/protobuf/proto"
 )
 
 // FriendHandler 好友处理器
 type FriendHandler struct {
-	service *service.FriendService
-	logger  *logger.Logger
+	service        *service.FriendService
+	logger         *logger.Logger
+	requestHandler *performance.RequestHandler
+	rpcManager     *rpc.Manager
 }
 
 // NewFriendHandler 创建好友处理器
 func NewFriendHandler(service *service.FriendService, logger *logger.Logger) *FriendHandler {
-	return &FriendHandler{service: service, logger: logger}
+	// 创建RPC管理器
+	rpcManager := rpc.NewManager(logger)
+
+	// 注册微服务
+	rpcManager.RegisterService("user-service", "http://127.0.0.1:8081")
+	rpcManager.RegisterService("notification-service", "http://127.0.0.1:8086")
+
+	return &FriendHandler{
+		service:        service,
+		logger:         logger,
+		requestHandler: performance.NewRequestHandler(logger),
+		rpcManager:     rpcManager,
+	}
 }
 
 // RegisterRoutes 注册路由
 func (h *FriendHandler) RegisterRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("/add_friend", h.handleCORS(h.addFriend))
-	mux.HandleFunc("/friend_list", h.handleCORS(h.getFriendList))
-	mux.HandleFunc("/friend_info", h.handleCORS(h.getFriendInfo))
-	mux.HandleFunc("/update_friend_remark", h.handleCORS(h.updateFriendRemark))
-	mux.HandleFunc("/set_friend_dnd", h.handleCORS(h.setFriendDND))
-	mux.HandleFunc("/delete_friend", h.handleCORS(h.deleteFriend))
-	mux.HandleFunc("/friend_request_list", h.handleCORS(h.getFriendRequestList))
-	mux.HandleFunc("/handle_friend_request", h.handleCORS(h.handleFriendRequest))
+	mux.HandleFunc("/add_friend", h.requestHandler.HandleRequest(h.addFriend))
+	mux.HandleFunc("/friend_list", h.requestHandler.HandleRequest(h.getFriendList))
+	mux.HandleFunc("/friend_info", h.requestHandler.HandleRequest(h.getFriendInfo))
+	mux.HandleFunc("/update_friend_remark", h.requestHandler.HandleRequest(h.updateFriendRemark))
+	mux.HandleFunc("/set_friend_dnd", h.requestHandler.HandleRequest(h.setFriendDND))
+	mux.HandleFunc("/delete_friend", h.requestHandler.HandleRequest(h.deleteFriend))
+	mux.HandleFunc("/friend_request_list", h.requestHandler.HandleRequest(h.getFriendRequestList))
+	mux.HandleFunc("/handle_friend_request", h.requestHandler.HandleRequest(h.handleFriendRequest))
 }
 
 // writeResp 写入响应
@@ -45,90 +60,80 @@ func (h *FriendHandler) writeResp(w http.ResponseWriter, code int, msg string, d
 	w.Write(b)
 }
 
-// handleCORS 处理CORS
-func (h *FriendHandler) handleCORS(handler http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-
-		if r.Method == "OPTIONS" {
-			w.WriteHeader(http.StatusOK)
-			return
-		}
-
-		handler(w, r)
-	}
-}
-
 // helper: 调用用户服务获取单个用户名
 func (h *FriendHandler) fetchUsernameByUID(uid string) string {
-	userURL := os.Getenv("USER_SERVICE_INFO_URL")
-	if userURL == "" {
-		userURL = "http://127.0.0.1:8081/user_info"
-	}
+	ctx := context.Background()
+
 	// 生成正确的 JWT token 来获取用户信息
 	token, err := auth.GenerateToken(uid)
 	if err != nil {
+		h.logger.Errorf("生成token失败: %v", err)
 		return ""
 	}
+
 	req := &pb.UserInfoReq{Token: token}
-	b, _ := proto.Marshal(req)
-	resp, err := http.Post(userURL, "application/x-protobuf", bytes.NewReader(b))
+	resp, err := h.rpcManager.CallWithRetry(ctx, "user-service", "/user_info", req, 3)
 	if err != nil {
+		h.logger.Errorf("获取用户信息失败: %v", err)
 		return ""
 	}
-	defer resp.Body.Close()
-	buf, _ := io.ReadAll(resp.Body)
+
 	var api pb.APIResp
-	if err := proto.Unmarshal(buf, &api); err != nil || api.Code != 0 {
+	if err := proto.Unmarshal(resp, &api); err != nil || api.Code != 0 {
+		h.logger.Errorf("解析用户信息响应失败: %v", err)
 		return ""
 	}
+
 	info := &pb.UserInfoResp{}
 	if err := proto.Unmarshal(api.Data, info); err != nil {
+		h.logger.Errorf("解析用户信息数据失败: %v", err)
 		return ""
 	}
+
 	return info.Username
 }
 
 // fetchEmailByUID 从用户服务获取用户邮箱
 func (h *FriendHandler) fetchEmailByUID(uid string) string {
-	userURL := os.Getenv("USER_SERVICE_INFO_URL")
-	if userURL == "" {
-		userURL = "http://127.0.0.1:8081/user_info"
-	}
+	ctx := context.Background()
+
 	// 生成正确的 JWT token 来获取用户信息
 	token, err := auth.GenerateToken(uid)
 	if err != nil {
+		h.logger.Errorf("生成token失败: %v", err)
 		return ""
 	}
+
 	req := &pb.UserInfoReq{Token: token}
-	b, _ := proto.Marshal(req)
-	resp, err := http.Post(userURL, "application/x-protobuf", bytes.NewReader(b))
+	resp, err := h.rpcManager.CallWithRetry(ctx, "user-service", "/user_info", req, 3)
 	if err != nil {
+		h.logger.Errorf("获取用户信息失败: %v", err)
 		return ""
 	}
-	defer resp.Body.Close()
-	buf, _ := io.ReadAll(resp.Body)
+
 	var api pb.APIResp
-	if err := proto.Unmarshal(buf, &api); err != nil || api.Code != 0 {
+	if err := proto.Unmarshal(resp, &api); err != nil || api.Code != 0 {
+		h.logger.Errorf("解析用户信息响应失败: %v", err)
 		return ""
 	}
+
 	info := &pb.UserInfoResp{}
 	if err := proto.Unmarshal(api.Data, info); err != nil {
+		h.logger.Errorf("解析用户信息数据失败: %v", err)
 		return ""
 	}
+
 	return info.Email
 }
 
 // helper: 调用消息服务推送通知
 func (h *FriendHandler) notify(to string, notif *pb.Notification) {
-	nURL := os.Getenv("MESSAGE_SERVICE_NOTIFY_URL")
-	if nURL == "" {
-		nURL = "http://127.0.0.1:8084/notify"
+	ctx := context.Background()
+
+	_, err := h.rpcManager.CallWithRetry(ctx, "message-service", "/notify", notif, 3)
+	if err != nil {
+		h.logger.Errorf("发送通知失败: %v", err)
 	}
-	b, _ := proto.Marshal(notif)
-	_, _ = http.Post(nURL, "application/x-protobuf", bytes.NewReader(b))
 }
 
 // addFriend 添加好友

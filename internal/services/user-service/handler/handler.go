@@ -1,43 +1,54 @@
 package handler
 
 import (
-	"bytes"
+	"context"
 	"io"
 	"net/http"
-	"os"
 
 	"im/internal/services/user-service/service"
 	"im/internal/shared/auth"
 	"im/internal/shared/logger"
+	"im/internal/shared/performance"
 	pb "im/internal/shared/protocol/pb"
+	"im/internal/shared/rpc"
 
 	"google.golang.org/protobuf/proto"
 )
 
 // UserHandler 用户处理器
 type UserHandler struct {
-	service *service.UserService
-	logger  *logger.Logger
+	service        *service.UserService
+	logger         *logger.Logger
+	requestHandler *performance.RequestHandler
+	rpcManager     *rpc.Manager
 }
 
 // NewUserHandler 创建用户处理器
 func NewUserHandler(service *service.UserService, logger *logger.Logger) *UserHandler {
+	// 创建RPC管理器
+	rpcManager := rpc.NewManager(logger)
+
+	// 注册微服务
+	rpcManager.RegisterService("notification-service", "http://127.0.0.1:8086")
+
 	return &UserHandler{
-		service: service,
-		logger:  logger,
+		service:        service,
+		logger:         logger,
+		requestHandler: performance.NewRequestHandler(logger),
+		rpcManager:     rpcManager,
 	}
 }
 
 // RegisterRoutes 注册路由
 func (h *UserHandler) RegisterRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("/register", h.handleCORS(h.register))
-	mux.HandleFunc("/login", h.handleCORS(h.login))
-	mux.HandleFunc("/logout", h.handleCORS(h.logout))
-	mux.HandleFunc("/user_info", h.handleCORS(h.getUserInfo))
-	mux.HandleFunc("/update_username", h.handleCORS(h.updateUsername))
-	mux.HandleFunc("/update_password", h.handleCORS(h.updatePassword))
-	mux.HandleFunc("/delete_account", h.handleCORS(h.deleteAccount))
-	mux.HandleFunc("/reset_password", h.handleCORS(h.resetPassword))
+	mux.HandleFunc("/register", h.requestHandler.HandleRequest(h.register))
+	mux.HandleFunc("/login", h.requestHandler.HandleRequest(h.login))
+	mux.HandleFunc("/logout", h.requestHandler.HandleRequest(h.logout))
+	mux.HandleFunc("/user_info", h.requestHandler.HandleRequest(h.getUserInfo))
+	mux.HandleFunc("/update_username", h.requestHandler.HandleRequest(h.updateUsername))
+	mux.HandleFunc("/update_password", h.requestHandler.HandleRequest(h.updatePassword))
+	mux.HandleFunc("/delete_account", h.requestHandler.HandleRequest(h.deleteAccount))
+	mux.HandleFunc("/reset_password", h.requestHandler.HandleRequest(h.resetPassword))
 }
 
 // writeResp 写入响应
@@ -46,22 +57,6 @@ func (h *UserHandler) writeResp(w http.ResponseWriter, code int, msg string, dat
 	resp := &pb.APIResp{Code: int32(code), Msg: msg, Data: data}
 	b, _ := proto.Marshal(resp)
 	w.Write(b)
-}
-
-// handleCORS 处理CORS
-func (h *UserHandler) handleCORS(handler http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-
-		if r.Method == "OPTIONS" {
-			w.WriteHeader(http.StatusOK)
-			return
-		}
-
-		handler(w, r)
-	}
 }
 
 // register 用户注册
@@ -284,21 +279,18 @@ func (h *UserHandler) resetPassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 调用通知服务校验验证码
-	notifURL := os.Getenv("NOTIFICATION_SERVICE_URL")
-	if notifURL == "" {
-		notifURL = "http://127.0.0.1:8086/reset_password"
-	}
+	ctx := context.Background()
 	verifyReq := &pb.ResetPasswordReq{Email: req.Email, EmailCode: req.EmailCode}
-	vrb, _ := proto.Marshal(verifyReq)
-	resp, err := http.Post(notifURL, "application/x-protobuf", bytes.NewReader(vrb))
+	resp, err := h.rpcManager.CallWithRetry(ctx, "notification-service", "/reset_password", verifyReq, 3)
 	if err != nil {
+		h.logger.Errorf("调用通知服务失败: %v", err)
 		h.writeResp(w, 1, "验证码服务不可用", nil)
 		return
 	}
-	defer resp.Body.Close()
-	buf, _ := io.ReadAll(resp.Body)
+
 	var api pb.APIResp
-	if err := proto.Unmarshal(buf, &api); err != nil || api.Code != 0 {
+	if err := proto.Unmarshal(resp, &api); err != nil || api.Code != 0 {
+		h.logger.Errorf("验证码校验失败: %v", err)
 		h.writeResp(w, 1, "验证码无效", nil)
 		return
 	}

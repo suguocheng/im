@@ -5,31 +5,34 @@ import (
 	"net/http"
 	"strings"
 
-	pb "im/internal/shared/protocol/pb"
-	"im/internal/shared/logger"
 	"im/internal/services/file-service/service"
+	"im/internal/shared/logger"
+	"im/internal/shared/performance"
+	pb "im/internal/shared/protocol/pb"
 
 	"google.golang.org/protobuf/proto"
 )
 
 // FileHandler 文件处理器
 type FileHandler struct {
-	service *service.FileService
-	logger  *logger.Logger
+	requestHandler *performance.RequestHandler
+	service        *service.FileService
+	logger         *logger.Logger
 }
 
 // NewFileHandler 创建文件处理器
 func NewFileHandler(service *service.FileService, logger *logger.Logger) *FileHandler {
 	return &FileHandler{
-		service: service,
-		logger:  logger,
+		service:        service,
+		logger:         logger,
+		requestHandler: performance.NewRequestHandler(logger),
 	}
 }
 
 // RegisterRoutes 注册路由
 func (h *FileHandler) RegisterRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("/upload", h.handleCORS(h.uploadFile))
-	mux.HandleFunc("/uploads/", h.handleCORS(h.downloadFile))
+	mux.HandleFunc("/upload", h.requestHandler.HandleRequest(h.uploadFile))
+	mux.HandleFunc("/uploads/", h.requestHandler.HandleRequest(h.downloadFile))
 }
 
 // writeResp 写入响应
@@ -38,22 +41,6 @@ func (h *FileHandler) writeResp(w http.ResponseWriter, code int, msg string, dat
 	resp := &pb.APIResp{Code: int32(code), Msg: msg, Data: data}
 	b, _ := proto.Marshal(resp)
 	w.Write(b)
-}
-
-// handleCORS 处理CORS
-func (h *FileHandler) handleCORS(handler http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-
-		if r.Method == "OPTIONS" {
-			w.WriteHeader(http.StatusOK)
-			return
-		}
-
-		handler(w, r)
-	}
 }
 
 // uploadFile 文件上传处理器
@@ -116,9 +103,9 @@ func (h *FileHandler) downloadFile(w http.ResponseWriter, r *http.Request) {
 func (h *FileHandler) Start(port int) error {
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
-	
+
 	addr := fmt.Sprintf(":%d", port)
 	h.logger.Infof("服务启动在端口 %d", port)
-	
+
 	return http.ListenAndServe(addr, mux)
 }

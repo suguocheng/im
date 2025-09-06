@@ -1,19 +1,20 @@
 package handler
 
 import (
-	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"net/http"
-	"os"
-	"sync"
 	"time"
 
 	"im/internal/services/message-service/model"
 	"im/internal/services/message-service/service"
 	"im/internal/shared/auth"
 	"im/internal/shared/logger"
+	"im/internal/shared/performance"
 	pb "im/internal/shared/protocol/pb"
+	"im/internal/shared/rpc"
+	ws "im/internal/shared/websocket"
 
 	"github.com/gorilla/websocket"
 
@@ -22,30 +23,59 @@ import (
 
 // MessageHandler 消息处理器
 type MessageHandler struct {
-	service *service.MessageService
-	logger  *logger.Logger
+	service           *service.MessageService
+	logger            *logger.Logger
+	requestHandler    *performance.RequestHandler
+	connectionManager *ws.ConnectionManager
+	rpcManager        *rpc.Manager
 }
 
-// 维护在线连接
-var (
-	upgrader = websocket.Upgrader{CheckOrigin: func(r *http.Request) bool { return true }}
-	userConn sync.Map // uid -> *websocket.Conn
-)
+// WebSocket升级器
+var upgrader = websocket.Upgrader{
+	CheckOrigin:     func(r *http.Request) bool { return true },
+	ReadBufferSize:  4096,
+	WriteBufferSize: 4096,
+}
 
 // NewMessageHandler 创建消息处理器
 func NewMessageHandler(service *service.MessageService, logger *logger.Logger) *MessageHandler {
+	connectionManager := ws.NewConnectionManager(logger)
+
+	// 启动心跳检测
+	go connectionManager.StartHeartbeat(context.Background())
+
+	// 定期清理死连接
+	go func() {
+		ticker := time.NewTicker(5 * time.Minute)
+		defer ticker.Stop()
+		for range ticker.C {
+			connectionManager.CleanupDeadConnections()
+		}
+	}()
+
+	// 创建RPC管理器
+	rpcManager := rpc.NewManager(logger)
+
+	// 注册微服务
+	rpcManager.RegisterService("group-service", "http://127.0.0.1:8083")
+	rpcManager.RegisterService("friend-service", "http://127.0.0.1:8082")
+	rpcManager.RegisterService("user-service", "http://127.0.0.1:8081")
+
 	return &MessageHandler{
-		service: service,
-		logger:  logger,
+		service:           service,
+		logger:            logger,
+		requestHandler:    performance.NewRequestHandler(logger),
+		connectionManager: connectionManager,
+		rpcManager:        rpcManager,
 	}
 }
 
 // RegisterRoutes 注册路由
 func (h *MessageHandler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/ws", h.ws)
-	mux.HandleFunc("/notify", h.handleCORS(h.notify))
-	mux.HandleFunc("/get_recent_private_messages", h.handleCORS(h.getRecentPrivateMessages))
-	mux.HandleFunc("/get_recent_group_messages", h.handleCORS(h.getRecentGroupMessages))
+	mux.HandleFunc("/notify", h.requestHandler.HandleRequest(h.notify))
+	mux.HandleFunc("/get_recent_private_messages", h.requestHandler.HandleRequest(h.getRecentPrivateMessages))
+	mux.HandleFunc("/get_recent_group_messages", h.requestHandler.HandleRequest(h.getRecentGroupMessages))
 }
 
 // writeResp 写入响应
@@ -56,30 +86,10 @@ func (h *MessageHandler) writeResp(w http.ResponseWriter, code int, msg string, 
 	w.Write(b)
 }
 
-// handleCORS 处理CORS
-func (h *MessageHandler) handleCORS(handler http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-
-		if r.Method == "OPTIONS" {
-			w.WriteHeader(http.StatusOK)
-			return
-		}
-
-		handler(w, r)
-	}
-}
-
 // 内部: 发送通知给在线用户
 func (h *MessageHandler) sendNotification(to string, notif *pb.Notification) {
-	if v, ok := userConn.Load(to); ok {
-		if conn, ok2 := v.(*websocket.Conn); ok2 {
-			b, _ := proto.Marshal(notif)
-			_ = conn.WriteMessage(websocket.BinaryMessage, b)
-		}
-	} else {
+	b, _ := proto.Marshal(notif)
+	if err := h.connectionManager.BroadcastToUser(to, b); err != nil {
 		// 用户离线，存储离线消息
 		h.storeOfflineNotification(to, notif)
 	}
@@ -136,26 +146,27 @@ func (h *MessageHandler) pushOfflineMessages(userID string, conn *websocket.Conn
 
 // 内部: 获取群组成员列表
 func (h *MessageHandler) getGroupMembers(groupID string) []string {
-	groupURL := os.Getenv("GROUP_SERVICE_MEMBERS_URL")
-	if groupURL == "" {
-		groupURL = "http://127.0.0.1:8083/group_members"
-	}
+	ctx := context.Background()
 	req := &pb.GroupMembersReq{GroupId: groupID}
-	b, _ := proto.Marshal(req)
-	resp, err := http.Post(groupURL, "application/x-protobuf", bytes.NewReader(b))
+
+	resp, err := h.rpcManager.CallWithRetry(ctx, "group-service", "/group_members", req, 3)
 	if err != nil {
+		h.logger.Errorf("获取群组成员失败: %v", err)
 		return nil
 	}
-	defer resp.Body.Close()
-	buf, _ := io.ReadAll(resp.Body)
+
 	var api pb.APIResp
-	if err := proto.Unmarshal(buf, &api); err != nil || api.Code != 0 {
+	if err := proto.Unmarshal(resp, &api); err != nil || api.Code != 0 {
+		h.logger.Errorf("解析群组成员响应失败: %v", err)
 		return nil
 	}
+
 	membersResp := &pb.GroupMembersResp{}
 	if err := proto.Unmarshal(api.Data, membersResp); err != nil {
+		h.logger.Errorf("解析群组成员数据失败: %v", err)
 		return nil
 	}
+
 	var uids []string
 	for _, m := range membersResp.Members {
 		uids = append(uids, m.Uid)
@@ -165,104 +176,102 @@ func (h *MessageHandler) getGroupMembers(groupID string) []string {
 
 // 内部: 获取群组信息
 func (h *MessageHandler) getGroupInfo(groupID string) (string, error) {
-	groupURL := os.Getenv("GROUP_SERVICE_INFO_URL")
-	if groupURL == "" {
-		groupURL = "http://127.0.0.1:8083/group_info"
-	}
+	ctx := context.Background()
 	req := &pb.GroupInfoReq{GroupId: groupID}
-	b, _ := proto.Marshal(req)
-	resp, err := http.Post(groupURL, "application/x-protobuf", bytes.NewReader(b))
+
+	resp, err := h.rpcManager.CallWithRetry(ctx, "group-service", "/group_info", req, 3)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("获取群组信息失败: %v", err)
 	}
-	defer resp.Body.Close()
-	buf, _ := io.ReadAll(resp.Body)
+
 	var api pb.APIResp
-	if err := proto.Unmarshal(buf, &api); err != nil || api.Code != 0 {
-		return "", err
+	if err := proto.Unmarshal(resp, &api); err != nil || api.Code != 0 {
+		return "", fmt.Errorf("解析群组信息响应失败: %v", err)
 	}
+
 	infoResp := &pb.GroupInfoResp{}
 	if err := proto.Unmarshal(api.Data, infoResp); err != nil {
-		return "", err
+		return "", fmt.Errorf("解析群组信息数据失败: %v", err)
 	}
+
 	return infoResp.Group.Name, nil
 }
 
 // 内部: 检查好友免打扰状态
 func (h *MessageHandler) isFriendDND(fromUID, toUID string) bool {
-	friendURL := os.Getenv("FRIEND_SERVICE_INFO_URL")
-	if friendURL == "" {
-		friendURL = "http://127.0.0.1:8082/friend_info"
-	}
+	ctx := context.Background()
 	req := &pb.FriendInfoReq{Uid: toUID, FriendUid: fromUID}
-	b, _ := proto.Marshal(req)
-	resp, err := http.Post(friendURL, "application/x-protobuf", bytes.NewReader(b))
+
+	resp, err := h.rpcManager.CallWithRetry(ctx, "friend-service", "/friend_info", req, 3)
 	if err != nil {
+		h.logger.Errorf("检查好友免打扰状态失败: %v", err)
 		return false // 出错时不阻止通知
 	}
-	defer resp.Body.Close()
-	buf, _ := io.ReadAll(resp.Body)
+
 	var api pb.APIResp
-	if err := proto.Unmarshal(buf, &api); err != nil || api.Code != 0 {
+	if err := proto.Unmarshal(resp, &api); err != nil || api.Code != 0 {
+		h.logger.Errorf("解析好友信息响应失败: %v", err)
 		return false
 	}
+
 	infoResp := &pb.FriendInfoResp{}
 	if err := proto.Unmarshal(api.Data, infoResp); err != nil {
+		h.logger.Errorf("解析好友信息数据失败: %v", err)
 		return false
 	}
+
 	return infoResp.Dnd
 }
 
 // 内部: 检查群组免打扰状态
 func (h *MessageHandler) isGroupDND(groupID, userUID string) bool {
-	groupURL := os.Getenv("GROUP_SERVICE_DND_URL")
-	if groupURL == "" {
-		groupURL = "http://127.0.0.1:8083/get_group_dnd"
-	}
+	ctx := context.Background()
 	req := &pb.SetGroupDNDReq{GroupId: groupID, Uid: userUID}
-	b, _ := proto.Marshal(req)
-	resp, err := http.Post(groupURL, "application/x-protobuf", bytes.NewReader(b))
+
+	resp, err := h.rpcManager.CallWithRetry(ctx, "group-service", "/get_group_dnd", req, 3)
 	if err != nil {
+		h.logger.Errorf("检查群组免打扰状态失败: %v", err)
 		return false // 出错时不阻止通知
 	}
-	defer resp.Body.Close()
-	buf, _ := io.ReadAll(resp.Body)
+
 	var api pb.APIResp
-	if err := proto.Unmarshal(buf, &api); err != nil || api.Code != 0 {
+	if err := proto.Unmarshal(resp, &api); err != nil || api.Code != 0 {
+		h.logger.Errorf("解析群组免打扰响应失败: %v", err)
 		return false
 	}
+
 	dndResp := &pb.SetGroupDNDResp{}
 	if err := proto.Unmarshal(api.Data, dndResp); err != nil {
+		h.logger.Errorf("解析群组免打扰数据失败: %v", err)
 		return false
 	}
+
 	return dndResp.Dnd
 }
 
 // 内部: 检查群成员是否被禁言
 func (h *MessageHandler) isGroupMemberMuted(groupID, userUID string) bool {
-	groupURL := os.Getenv("GROUP_SERVICE_MEMBERS_URL")
-	if groupURL == "" {
-		groupURL = "http://127.0.0.1:8083/group_members"
-	}
+	ctx := context.Background()
 	req := &pb.GroupMembersReq{GroupId: groupID}
-	b, _ := proto.Marshal(req)
-	resp, err := http.Post(groupURL, "application/x-protobuf", bytes.NewReader(b))
+
+	resp, err := h.rpcManager.CallWithRetry(ctx, "group-service", "/group_members", req, 3)
 	if err != nil {
 		h.logger.Errorf("调用群组服务获取成员列表失败: %v", err)
 		return false // 出错时不阻止发送
 	}
-	defer resp.Body.Close()
-	buf, _ := io.ReadAll(resp.Body)
+
 	var api pb.APIResp
-	if err := proto.Unmarshal(buf, &api); err != nil || api.Code != 0 {
+	if err := proto.Unmarshal(resp, &api); err != nil || api.Code != 0 {
 		h.logger.Errorf("群组服务返回错误: code=%d, msg=%s", api.Code, api.Msg)
 		return false
 	}
+
 	membersResp := &pb.GroupMembersResp{}
 	if err := proto.Unmarshal(api.Data, membersResp); err != nil {
 		h.logger.Errorf("解析群成员列表失败: %v", err)
 		return false
 	}
+
 	// 查找指定用户并检查禁言状态
 	h.logger.Infof("获取到群组 %s 的成员列表，共 %d 个成员", groupID, len(membersResp.Members))
 	for _, member := range membersResp.Members {
@@ -290,7 +299,7 @@ func (h *MessageHandler) ws(w http.ResponseWriter, r *http.Request) {
 		_, data, err := conn.ReadMessage()
 		if err != nil {
 			if uid != "" {
-				userConn.Delete(uid)
+				h.connectionManager.RemoveConnection(uid)
 			}
 			return
 		}
@@ -317,7 +326,12 @@ func (h *MessageHandler) ws(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			uid = parsed
-			userConn.Store(uid, conn)
+
+			// 添加到连接管理器
+			if err := h.connectionManager.AddConnection(uid, conn); err != nil {
+				h.logger.Errorf("添加连接失败: %v", err)
+				return
+			}
 
 			// 推送离线消息
 			h.pushOfflineMessages(uid, conn)
@@ -361,19 +375,14 @@ func (h *MessageHandler) ws(w http.ResponseWriter, r *http.Request) {
 			// 获取群成员并广播
 			members := h.getGroupMembers(msg.GroupId)
 			groupName, _ := h.getGroupInfo(msg.GroupId)
+
+			// 使用连接管理器进行群组广播
+			b, _ := proto.Marshal(&msg)
+			h.connectionManager.BroadcastToGroup(members, b)
+
+			// 发送通知给群组成员
 			for _, memberUID := range members {
-				if memberUID == uid {
-					// 回显给自己
-					bSelf, _ := proto.Marshal(&msg)
-					_ = conn.WriteMessage(websocket.BinaryMessage, bSelf)
-				} else {
-					// 转发给其他在线成员
-					if v, ok := userConn.Load(memberUID); ok {
-						if toConn, ok2 := v.(*websocket.Conn); ok2 {
-							b, _ := proto.Marshal(&msg)
-							_ = toConn.WriteMessage(websocket.BinaryMessage, b)
-						}
-					}
+				if memberUID != uid {
 					// 检查群组免打扰状态，只有未设置免打扰且非秘密模式时才发送通知
 					if !h.isGroupDND(msg.GroupId, memberUID) && msg.Type != "secret_chat" {
 						n := &pb.Notification{Type: "group_chat_message", From: uid, To: memberUID, GroupId: msg.GroupId, GroupName: groupName, Content: msg.Content}
@@ -394,16 +403,14 @@ func (h *MessageHandler) ws(w http.ResponseWriter, r *http.Request) {
 				_, _ = h.service.SendPrivateMessage(uid, msg.To, msg.Type, msg.Content, msg.Extra)
 			}
 
-			// 在线转发给对方
-			if v, ok := userConn.Load(msg.To); ok {
-				if toConn, ok2 := v.(*websocket.Conn); ok2 {
-					b, _ := proto.Marshal(&msg)
-					_ = toConn.WriteMessage(websocket.BinaryMessage, b)
-				}
+			// 转发给对方
+			b, _ := proto.Marshal(&msg)
+			if err := h.connectionManager.BroadcastToUser(msg.To, b); err != nil {
+				// 对方离线，消息已存储，无需额外处理
 			}
+
 			// 回显给自己
-			bSelf, _ := proto.Marshal(&msg)
-			_ = conn.WriteMessage(websocket.BinaryMessage, bSelf)
+			_ = conn.WriteMessage(websocket.BinaryMessage, b)
 			// 检查好友免打扰状态，只有未设置免打扰且非秘密模式时才发送通知
 			if !h.isFriendDND(uid, msg.To) && msg.Type != "secret_chat" {
 				n := &pb.Notification{Type: "private_chat_message", From: uid, To: msg.To, Content: msg.Content}

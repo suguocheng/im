@@ -1,31 +1,37 @@
 package service
 
 import (
-	"bytes"
+	"context"
 	"fmt"
-	"io"
-	"net/http"
-	"os"
 
-	"im/internal/shared/protocol/pb"
-	"im/internal/shared/logger"
 	"im/internal/services/user-service/model"
 	"im/internal/services/user-service/storage"
+	"im/internal/shared/logger"
+	"im/internal/shared/protocol/pb"
+	"im/internal/shared/rpc"
 
 	"google.golang.org/protobuf/proto"
 )
 
 // UserService 用户服务
 type UserService struct {
-	storage storage.UserStorage
-	logger  *logger.Logger
+	storage    storage.UserStorage
+	logger     *logger.Logger
+	rpcManager *rpc.Manager
 }
 
 // NewUserService 创建用户服务实例
 func NewUserService(storage storage.UserStorage, logger *logger.Logger) *UserService {
+	// 创建RPC管理器
+	rpcManager := rpc.NewManager(logger)
+
+	// 注册微服务
+	rpcManager.RegisterService("notification-service", "http://127.0.0.1:8086")
+
 	return &UserService{
-		storage: storage,
-		logger:  logger,
+		storage:    storage,
+		logger:     logger,
+		rpcManager: rpcManager,
 	}
 }
 
@@ -109,38 +115,19 @@ func (s *UserService) DeleteUser(uid string) error {
 
 // VerifyEmailCode 验证邮箱验证码
 func (s *UserService) VerifyEmailCode(email, code, purpose string) bool {
-	// 调用通知服务验证邮箱验证码
-	notificationURL := os.Getenv("NOTIFICATION_SERVICE_URL")
-	if notificationURL == "" {
-		notificationURL = "http://127.0.0.1:8086"
-	}
-
 	req := &pb.ResetPasswordReq{
 		Email:     email,
 		EmailCode: code,
 	}
 
-	b, err := proto.Marshal(req)
-	if err != nil {
-		s.logger.Errorf("序列化请求失败: %v", err)
-		return false
-	}
-
-	resp, err := http.Post(notificationURL+"/verify_email_code_register", "application/x-protobuf", bytes.NewReader(b))
+	resp, err := s.rpcManager.CallWithRetry(context.Background(), "notification-service", "/verify_email_code_register", req, 3)
 	if err != nil {
 		s.logger.Errorf("调用通知服务失败: %v", err)
 		return false
 	}
-	defer resp.Body.Close()
-
-	buf, err := io.ReadAll(resp.Body)
-	if err != nil {
-		s.logger.Errorf("读取响应失败: %v", err)
-		return false
-	}
 
 	var apiResp pb.APIResp
-	if err := proto.Unmarshal(buf, &apiResp); err != nil {
+	if err := proto.Unmarshal(resp, &apiResp); err != nil {
 		s.logger.Errorf("解析响应失败: %v", err)
 		return false
 	}
