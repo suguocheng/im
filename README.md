@@ -28,10 +28,9 @@ im/
 │       ├── config/         # 配置管理
 │       ├── logger/         # 日志管理
 │       ├── discovery/      # 服务发现
-│       ├── middleware/     # 性能中间件
-│       ├── websocket/      # WebSocket连接管理
+│       ├── performance/    # 性能优化组件
 │       ├── database/       # 数据库连接池
-│       ├── cache/          # 缓存策略
+│       ├── queue/          # 消息队列系统
 │       └── rpc/            # 微服务通信
 ├── web/                    # 前端界面
 ├── scripts/                # 管理脚本

@@ -8,13 +8,16 @@ import (
 	"time"
 
 	"im/internal/services/message-service/model"
+	msgqueue "im/internal/services/message-service/queue"
 	"im/internal/services/message-service/service"
+	ws "im/internal/services/message-service/websocket"
 	"im/internal/shared/auth"
+	"im/internal/shared/database"
 	"im/internal/shared/logger"
 	"im/internal/shared/performance"
 	pb "im/internal/shared/protocol/pb"
+	"im/internal/shared/queue"
 	"im/internal/shared/rpc"
-	ws "im/internal/shared/websocket"
 
 	"github.com/gorilla/websocket"
 
@@ -28,6 +31,7 @@ type MessageHandler struct {
 	requestHandler    *performance.RequestHandler
 	connectionManager *ws.ConnectionManager
 	rpcManager        *rpc.Manager
+	queueManager      *queue.Manager
 }
 
 // WebSocket升级器
@@ -38,7 +42,7 @@ var upgrader = websocket.Upgrader{
 }
 
 // NewMessageHandler 创建消息处理器
-func NewMessageHandler(service *service.MessageService, logger *logger.Logger) *MessageHandler {
+func NewMessageHandler(service *service.MessageService, logger *logger.Logger, dbManager *database.Manager) *MessageHandler {
 	connectionManager := ws.NewConnectionManager(logger)
 
 	// 启动心跳检测
@@ -61,13 +65,22 @@ func NewMessageHandler(service *service.MessageService, logger *logger.Logger) *
 	rpcManager.RegisterService("friend-service", "http://127.0.0.1:8082")
 	rpcManager.RegisterService("user-service", "http://127.0.0.1:8081")
 
-	return &MessageHandler{
+	// 创建消息队列管理器
+	queueManager := queue.NewManager(dbManager, logger)
+
+	handler := &MessageHandler{
 		service:           service,
 		logger:            logger,
 		requestHandler:    performance.NewRequestHandler(logger),
 		connectionManager: connectionManager,
 		rpcManager:        rpcManager,
+		queueManager:      queueManager,
 	}
+
+	// 启动消息队列消费者
+	go handler.startQueueConsumers()
+
+	return handler
 }
 
 // RegisterRoutes 注册路由
@@ -366,17 +379,17 @@ func (h *MessageHandler) ws(w http.ResponseWriter, r *http.Request) {
 			msg.From = uid
 			msg.Timestamp = time.Now().Unix() // 设置正确的时间戳
 
+			// 获取群成员
+			members := h.getGroupMembers(msg.GroupId)
+
 			// 秘密模式消息不进行持久化存储
 			if msg.Type != "secret_chat" {
-				// 业务存储
-				_, _ = h.service.SendGroupMessage(uid, msg.GroupId, msg.Type, msg.Content, msg.Extra)
+				// 发布消息到队列进行异步处理
+				h.publishGroupMessage(uid, msg.GroupId, msg.Type, msg.Content, msg.Extra, members)
 			}
-
-			// 获取群成员并广播
-			members := h.getGroupMembers(msg.GroupId)
 			groupName, _ := h.getGroupInfo(msg.GroupId)
 
-			// 使用连接管理器进行群组广播
+			// 使用连接管理器进行群组广播（包括发送者）
 			b, _ := proto.Marshal(&msg)
 			h.connectionManager.BroadcastToGroup(members, b)
 
@@ -399,8 +412,8 @@ func (h *MessageHandler) ws(w http.ResponseWriter, r *http.Request) {
 
 			// 秘密模式消息不进行持久化存储
 			if msg.Type != "secret_chat" {
-				// 业务存储
-				_, _ = h.service.SendPrivateMessage(uid, msg.To, msg.Type, msg.Content, msg.Extra)
+				// 发布消息到队列进行异步处理
+				h.publishPrivateMessage(uid, msg.To, msg.Type, msg.Content, msg.Extra)
 			}
 
 			// 转发给对方
@@ -524,4 +537,92 @@ func (h *MessageHandler) Start(port int) error {
 	h.logger.Infof("服务启动在端口 %d", port)
 
 	return http.ListenAndServe(addr, mux)
+}
+
+// startQueueConsumers 启动消息队列消费者
+func (h *MessageHandler) startQueueConsumers() {
+	ctx := context.Background()
+
+	// 创建消息处理器
+	messageProcessor := NewMessageProcessor(h.service, h.connectionManager, h.logger)
+
+	// 创建处理器管理器
+	processorManager := queue.NewProcessorManager(h.queueManager, h.logger)
+
+	// 注册消息处理器（为每种消息类型注册）
+	processorManager.RegisterProcessor(&privateMessageProcessor{messageProcessor})
+	processorManager.RegisterProcessor(&groupMessageProcessor{messageProcessor})
+
+	// 启动消费者
+	consumerConfigs := []queue.ConsumerConfig{
+		{
+			StreamName:    queue.StreamMessageProcessing,
+			ConsumerGroup: queue.ConsumerGroupMessageProcessor,
+			ConsumerName:  "message-processor-1",
+		},
+	}
+
+	if err := processorManager.StartMultipleConsumers(ctx, consumerConfigs); err != nil {
+		h.logger.Errorf("启动消息队列消费者失败: %v", err)
+	}
+}
+
+// NewMessageProcessor 创建消息处理器
+func NewMessageProcessor(messageService *service.MessageService, connectionManager *ws.ConnectionManager, logger *logger.Logger) *msgqueue.MessageProcessor {
+	return msgqueue.NewMessageProcessor(messageService, connectionManager, logger)
+}
+
+// privateMessageProcessor 私聊消息处理器包装器
+type privateMessageProcessor struct {
+	*msgqueue.MessageProcessor
+}
+
+func (p *privateMessageProcessor) GetMessageType() string {
+	return queue.MessageTypePrivateMessage
+}
+
+// groupMessageProcessor 群聊消息处理器包装器
+type groupMessageProcessor struct {
+	*msgqueue.MessageProcessor
+}
+
+func (p *groupMessageProcessor) GetMessageType() string {
+	return queue.MessageTypeGroupMessage
+}
+
+// publishPrivateMessage 发布私聊消息到队列
+func (h *MessageHandler) publishPrivateMessage(from, to, msgType, content, extra string) {
+	ctx := context.Background()
+
+	data := map[string]interface{}{
+		"from":    from,
+		"to":      to,
+		"type":    msgType,
+		"content": content,
+		"extra":   extra,
+	}
+
+	_, err := h.queueManager.PublishMessage(ctx, queue.StreamMessageProcessing, queue.MessageTypePrivateMessage, data)
+	if err != nil {
+		h.logger.Errorf("发布私聊消息到队列失败: %v", err)
+	}
+}
+
+// publishGroupMessage 发布群聊消息到队列
+func (h *MessageHandler) publishGroupMessage(from, groupID, msgType, content, extra string, members []string) {
+	ctx := context.Background()
+
+	data := map[string]interface{}{
+		"from":     from,
+		"group_id": groupID,
+		"type":     msgType,
+		"content":  content,
+		"extra":    extra,
+		"members":  members,
+	}
+
+	_, err := h.queueManager.PublishMessage(ctx, queue.StreamMessageProcessing, queue.MessageTypeGroupMessage, data)
+	if err != nil {
+		h.logger.Errorf("发布群聊消息到队列失败: %v", err)
+	}
 }

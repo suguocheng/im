@@ -37,7 +37,7 @@ func main() {
 	messageService := service.NewMessageService(messageStorage, logger)
 
 	// 初始化处理器
-	messageHandler := handler.NewMessageHandler(messageService, logger)
+	messageHandler := handler.NewMessageHandler(messageService, logger, dbManager)
 
 	// 设置路由
 	mux := http.NewServeMux()

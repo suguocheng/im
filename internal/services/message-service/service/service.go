@@ -165,3 +165,13 @@ func (s *MessageService) GetOfflineMessages(userID string) ([]*model.IMMessage, 
 func (s *MessageService) ClearOfflineMessages(userID string) error {
 	return s.storage.ClearOfflineMessages(userID)
 }
+
+// StorePrivateMessage 存储私聊消息到MongoDB
+func (s *MessageService) StorePrivateMessage(message *model.PrivateMessage) error {
+	return s.storage.StorePrivateMessage(message)
+}
+
+// StoreGroupMessage 存储群聊消息到MongoDB
+func (s *MessageService) StoreGroupMessage(message *model.GroupMessage) error {
+	return s.storage.StoreGroupMessage(message)
+}
