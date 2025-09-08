@@ -4,14 +4,19 @@ import (
 	"context"
 	"io"
 	"net/http"
+	"sync"
+	"time"
 
 	"im/internal/services/friend-service/service"
 	"im/internal/shared/auth"
 	"im/internal/shared/database"
+	"im/internal/shared/discovery"
 	"im/internal/shared/logger"
 	"im/internal/shared/performance"
 	pb "im/internal/shared/protocol/pb"
 	"im/internal/shared/rpc"
+	"os"
+	"strings"
 
 	"google.golang.org/protobuf/proto"
 )
@@ -29,9 +34,18 @@ func NewFriendHandler(service *service.FriendService, logger *logger.Logger, dbM
 	// 创建RPC管理器
 	rpcManager := rpc.NewManager(logger)
 
-	// 注册微服务
-	rpcManager.RegisterService("user-service", "http://127.0.0.1:8090")
-	rpcManager.RegisterService("notification-service", "http://127.0.0.1:8140")
+	// 启用etcd服务发现（如果提供了ETCD_ENDPOINTS，则优先使用）
+	endpoints := os.Getenv("ETCD_ENDPOINTS")
+	if endpoints == "" {
+		endpoints = "localhost:2379"
+	}
+	disc, err := discovery.New(discovery.Config{Endpoints: strings.Split(endpoints, ",")})
+	if err != nil {
+		logger.Fatalf("etcd 连接失败，无法启动服务发现: %v", err)
+	}
+	rpcManager.UseEtcd(disc, "/im/services")
+	_ = rpcManager.WatchService("user-service")
+	_ = rpcManager.WatchService("notification-service")
 
 	return &FriendHandler{
 		service:        service,
@@ -127,6 +141,33 @@ func (h *FriendHandler) fetchEmailByUID(uid string) string {
 	return info.Email
 }
 
+// fetchUserInfo 从用户服务获取用户名与邮箱（支持外部超时控制）
+func (h *FriendHandler) fetchUserInfo(ctx context.Context, uid string) (string, string) {
+	// 生成 JWT token
+	token, err := auth.GenerateToken(uid)
+	if err != nil {
+		h.logger.Errorf("生成token失败: %v", err)
+		return "", ""
+	}
+	req := &pb.UserInfoReq{Token: token}
+	resp, err := h.rpcManager.CallWithRetry(ctx, "user-service", "/user_info", req, 2)
+	if err != nil {
+		h.logger.Errorf("获取用户信息失败: %v", err)
+		return "", ""
+	}
+	var api pb.APIResp
+	if err := proto.Unmarshal(resp, &api); err != nil || api.Code != 0 {
+		h.logger.Errorf("解析用户信息响应失败: %v", err)
+		return "", ""
+	}
+	info := &pb.UserInfoResp{}
+	if err := proto.Unmarshal(api.Data, info); err != nil {
+		h.logger.Errorf("解析用户信息数据失败: %v", err)
+		return "", ""
+	}
+	return info.Username, info.Email
+}
+
 // helper: 调用消息服务推送通知
 func (h *FriendHandler) notify(to string, notif *pb.Notification) {
 	ctx := context.Background()
@@ -197,16 +238,37 @@ func (h *FriendHandler) getFriendList(w http.ResponseWriter, r *http.Request) {
 		h.writeResp(w, 1, "获取好友列表失败", nil)
 		return
 	}
-	var friendUsernames []string
-	for _, f := range friends {
-		uname := h.fetchUsernameByUID(f)
-		friendUsernames = append(friendUsernames, uname)
+	friendUsernames := make([]string, len(friends))
+	remarks := make([]string, len(friends))
+	ctx, cancel := context.WithTimeout(context.Background(), 1500*time.Millisecond)
+	defer cancel()
+	var wg sync.WaitGroup
+	for i, fuid := range friends {
+		idx := i
+		uidCopy := fuid
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			select {
+			case <-ctx.Done():
+				return
+			default:
+			}
+			friendUsernames[idx] = h.fetchUsernameByUID(uidCopy)
+		}()
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			select {
+			case <-ctx.Done():
+				return
+			default:
+			}
+			remark, _ := h.service.GetFriendRemark(req.Uid, uidCopy)
+			remarks[idx] = remark
+		}()
 	}
-	var remarks []string
-	for _, f := range friends {
-		remark, _ := h.service.GetFriendRemark(req.Uid, f)
-		remarks = append(remarks, remark)
-	}
+	wg.Wait()
 	resp := &pb.FriendListResp{FriendUids: friends, FriendUsernames: friendUsernames, Remarks: remarks, Code: 0, Msg: "ok"}
 	data, _ := proto.Marshal(resp)
 	h.writeResp(w, 0, "ok", data)
@@ -228,13 +290,44 @@ func (h *FriendHandler) getFriendInfo(w http.ResponseWriter, r *http.Request) {
 		h.writeResp(w, 1, "缺少UID", nil)
 		return
 	}
-	remark, _ := h.service.GetFriendRemark(req.Uid, req.FriendUid)
-	dnd, _ := h.service.GetFriendDND(req.Uid, req.FriendUid)
-	uname := h.fetchUsernameByUID(req.FriendUid)
-	email := h.fetchEmailByUID(req.FriendUid)
+
+	// 并行获取 备注/DND 与 用户信息，并设置超时
+	ctx, cancel := context.WithTimeout(context.Background(), 1200*time.Millisecond)
+	defer cancel()
+	var wg sync.WaitGroup
+	var remark string
+	var dnd bool
+	var username string
+	var email string
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		select {
+		case <-ctx.Done():
+			return
+		default:
+		}
+		remark, _ = h.service.GetFriendRemark(req.Uid, req.FriendUid)
+		dnd, _ = h.service.GetFriendDND(req.Uid, req.FriendUid)
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		select {
+		case <-ctx.Done():
+			return
+		default:
+		}
+		username, email = h.fetchUserInfo(ctx, req.FriendUid)
+	}()
+
+	wg.Wait()
+
 	resp := &pb.FriendInfoResp{
 		Uid:      req.FriendUid,
-		Username: uname,
+		Username: username,
 		Email:    email,
 		Remark:   remark,
 		Code:     0,

@@ -320,6 +320,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let groupListCache = null;
     let secretMode = false;
     let secretBtn = null;
+    let wsReady = false; // 等待服务端login_ack后再认为就绪
     
     // 将关键变量设置为全局变量，以便加密函数可以访问
     window.currentFriend = currentFriend;
@@ -1186,7 +1187,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function isValidMessageType(type) {
       const validTypes = [
-        'chat', 'secret_chat', 'image', 'file', 'login', 'error'
+        'chat', 'secret_chat', 'image', 'file', 'login', 'error', 'login_ack', 'ping'
       ];
       return validTypes.includes(type);
     }
@@ -1283,7 +1284,7 @@ document.addEventListener('DOMContentLoaded', function() {
         filename: fileInfo.filename || '',
         filesize: fileInfo.size || file.size,
         mimeType: fileInfo.type || file.type,
-        timestamp: Date.now(),
+        timestamp: Math.floor(Date.now()/1000),
       };
       if (currentFriend) {
         msgObj.to = currentFriend.uid;
@@ -1346,7 +1347,7 @@ document.addEventListener('DOMContentLoaded', function() {
         from: myUid,
         type: secretMode ? 'secret_chat' : 'chat',
         content: content,
-        timestamp: Date.now(),
+        timestamp: Math.floor(Date.now()/1000),
       };
       if (currentFriend) {
         msgObj.to = currentFriend.uid;
@@ -1440,6 +1441,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // 登录认证
         const loginMsg = IMMessage.encode(IMMessage.create({ type: 'login', token })).finish();
         ws.send(loginMsg);
+        wsReady = false;
         
         // 启动心跳
         if (heartbeatInterval) clearInterval(heartbeatInterval);
@@ -1461,7 +1463,10 @@ document.addEventListener('DOMContentLoaded', function() {
         ws.close();
       };
       ws.onmessage = async (event) => {
-        console.log('onmessage start');
+        // 仅处理二进制protobuf消息，忽略任何文本/非二进制控制信息
+        if (!(event.data instanceof ArrayBuffer)) {
+          return;
+        }
         try {
           const buf = new Uint8Array(event.data);
           
@@ -1474,7 +1479,7 @@ document.addEventListener('DOMContentLoaded', function() {
             notif = Notification.decode(buf);
             // 验证是否为有效的通知消息
             if (notif && notif.type && isValidNotificationType(notif.type)) {
-              console.log('收到通知消息:', notif.type);
+              // 收到通知
               
               // 判断是否为当前聊天对象的消息，若是则不弹窗
               if (
@@ -1492,9 +1497,11 @@ document.addEventListener('DOMContentLoaded', function() {
                   break;
                 case 'private_chat_message':
                   display = `[私聊] ${notif.fromUsername}: ${notif.content}`;
+                  // 通知仅用于弹窗提示；未读统一由 IMMessage 分支计算
                   break;
                 case 'group_chat_message':
                   display = `[群聊][${notif.groupName || ''}] ${notif.fromUsername}: ${notif.content}`;
+                  // 通知仅用于弹窗提示；未读统一由 IMMessage 分支计算
                   break;
                 case 'group_application_pending':
                   display = `[群申请] ${notif.fromUsername}(${notif.from}) 申请加入群聊 [${notif.groupName || ''}]`;
@@ -1536,8 +1543,7 @@ document.addEventListener('DOMContentLoaded', function() {
               return;
             }
           } catch (e) {
-            // Notification 解码失败，继续尝试 IMMessage
-            console.log('Notification 解码失败，尝试 IMMessage');
+            // Notification 解码失败，继续尝试 IMMessage（静默）
           }
           
           // 尝试解码为 IMMessage（聊天消息）
@@ -1545,19 +1551,21 @@ document.addEventListener('DOMContentLoaded', function() {
           try {
             msg = IMMessage.decode(buf);
             // 验证是否为有效的聊天消息
-            if (msg && msg.type && isValidMessageType(msg.type)) {
-              console.log('收到聊天消息:', msg.type);
-            } else {
-              console.log('无效的聊天消息类型:', msg?.type);
+            if (!(msg && msg.type && isValidMessageType(msg.type))) {
               return;
             }
           } catch (e) {
-            console.log('IMMessage 解码失败:', e);
             return;
           }
           
+          // 连接就绪信号与心跳
+          if (msg.type === 'ping') { return; }
+          if (msg.type === 'login_ack') { wsReady = true; return; }
+          if (!wsReady) { return; }
+          
           if (!msg) return;
           // 私聊消息
+          // 收到消息
           console.log('收到消息', msg);
           if ((msg.type === 'chat' || msg.type === 'secret_chat') && currentFriend && msg.from === currentFriend.uid && msg.to === myUid) {
             let displayContent = msg.content;

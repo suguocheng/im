@@ -2,6 +2,7 @@ package websocket
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -10,9 +11,11 @@ import (
 	"time"
 
 	"im/internal/shared/logger"
+	pb "im/internal/shared/protocol/pb"
 
 	"github.com/gorilla/websocket"
 	"github.com/redis/go-redis/v9"
+	"google.golang.org/protobuf/proto"
 )
 
 // ConnectionInfo 连接信息
@@ -109,6 +112,11 @@ func (cm *ConnectionManager) AddConnection(userID string, conn *websocket.Conn) 
 
 	cm.logger.Infof("用户 %s 连接已添加，当前连接数: %d", userID, len(cm.connections))
 
+	// 发送登录就绪确认(login_ack)为protobuf二进制
+	ack := &pb.IMMessage{Type: "login_ack", Content: "ok", Timestamp: time.Now().Unix()}
+	b, _ := proto.Marshal(ack)
+	_ = conn.WriteMessage(websocket.BinaryMessage, b)
+
 	return nil
 }
 
@@ -141,6 +149,26 @@ func (cm *ConnectionManager) GetConnection(userID string) (*websocket.Conn, bool
 
 	conn, exists := cm.connections[userID]
 	return conn, exists
+}
+
+// IsUserOnline 分布式在线检查（本地或其他实例）
+func (cm *ConnectionManager) IsUserOnline(userID string) bool {
+	// 本地先查
+	cm.mu.RLock()
+	if _, exists := cm.connections[userID]; exists {
+		cm.mu.RUnlock()
+		return true
+	}
+	cm.mu.RUnlock()
+
+	// 再查Redis中的连接键
+	ctx := context.Background()
+	key := fmt.Sprintf("ws_connection:%s", userID)
+	n, err := cm.redis.Exists(ctx, key).Result()
+	if err != nil {
+		return false
+	}
+	return n > 0
 }
 
 // BroadcastToGroup 群组广播
@@ -182,9 +210,10 @@ func (cm *ConnectionManager) BroadcastToUser(userID string, message []byte) erro
 	channel := fmt.Sprintf("ws_broadcast:%s", userID)
 
 	// 构造消息
+	encoded := base64.StdEncoding.EncodeToString(message)
 	broadcastMsg := map[string]interface{}{
 		"user_id": userID,
-		"message": string(message), // 将[]byte转换为string
+		"message": encoded,
 		"from":    cm.instanceID,
 	}
 
@@ -199,7 +228,7 @@ func (cm *ConnectionManager) BroadcastToUser(userID string, message []byte) erro
 		return fmt.Errorf("发布广播消息失败: %v", err)
 	}
 
-	cm.logger.Infof("用户 %s 不在当前实例，已通过Redis广播", userID)
+	// debug log removed
 	return nil
 }
 
@@ -245,7 +274,7 @@ func (cm *ConnectionManager) StartRedisSubscriber(ctx context.Context) {
 
 // handleBroadcastMessage 处理广播消息
 func (cm *ConnectionManager) handleBroadcastMessage(payload string) {
-	cm.logger.Infof("收到跨实例广播消息: %s", payload)
+	cm.logger.Debugf("[WS] cross-instance received bytes=%d", len(payload))
 
 	var broadcastMsg map[string]interface{}
 	err := json.Unmarshal([]byte(payload), &broadcastMsg)
@@ -265,6 +294,12 @@ func (cm *ConnectionManager) handleBroadcastMessage(payload string) {
 		cm.logger.Errorf("广播消息缺少message")
 		return
 	}
+	// base64解码
+	raw, err := base64.StdEncoding.DecodeString(messageData)
+	if err != nil {
+		cm.logger.Errorf("广播消息解码失败: %v", err)
+		return
+	}
 
 	from, ok := broadcastMsg["from"].(string)
 	if !ok {
@@ -277,6 +312,26 @@ func (cm *ConnectionManager) handleBroadcastMessage(payload string) {
 		return
 	}
 
+	// 试探解析payload类型，便于更有意义的日志
+	decodedAs := "unknown"
+	{
+		var im pb.IMMessage
+		if err := proto.Unmarshal(raw, &im); err == nil && im.GetType() != "" {
+			decodedAs = "im"
+			cm.logger.Debugf("[WS][im] recv: to=%s type=%s group=%s bytes=%d", userID, im.GetType(), im.GetGroupId(), len(raw))
+		}
+	}
+	if decodedAs == "unknown" {
+		var nf pb.Notification
+		if err := proto.Unmarshal(raw, &nf); err == nil && nf.GetType() != "" {
+			decodedAs = "notif"
+			cm.logger.Debugf("[WS][notif] recv: to=%s type=%s group=%s bytes=%d", userID, nf.GetType(), nf.GetGroupId(), len(raw))
+		}
+	}
+	if decodedAs == "unknown" {
+		cm.logger.Warnf("[WS] recv undecodable payload: to=%s bytes=%d", userID, len(raw))
+	}
+
 	// 检查用户是否在当前实例
 	cm.mu.RLock()
 	conn, exists := cm.connections[userID]
@@ -285,11 +340,30 @@ func (cm *ConnectionManager) handleBroadcastMessage(payload string) {
 	if exists {
 		// 用户在当前实例，发送消息
 		conn.SetWriteDeadline(time.Now().Add(cm.writeTimeout))
-		err := conn.WriteMessage(websocket.BinaryMessage, []byte(messageData))
+		err := conn.WriteMessage(websocket.BinaryMessage, raw)
 		if err != nil {
-			cm.logger.Errorf("发送跨实例消息失败: %v", err)
+			cm.logger.Errorf("发送跨实例消息失败(%s): %v", decodedAs, err)
 		} else {
-			cm.logger.Infof("成功发送跨实例消息给用户: %s", userID)
+			cm.logger.Debugf("成功发送跨实例消息给用户(%s): %s", decodedAs, userID)
+		}
+		return
+	}
+
+	// 可能存在刚登录与订阅竞态：稍作重试
+	for i := 0; i < 3; i++ {
+		time.Sleep(100 * time.Millisecond)
+		cm.mu.RLock()
+		conn, exists = cm.connections[userID]
+		cm.mu.RUnlock()
+		if exists {
+			conn.SetWriteDeadline(time.Now().Add(cm.writeTimeout))
+			err := conn.WriteMessage(websocket.BinaryMessage, raw)
+			if err != nil {
+				cm.logger.Errorf("发送跨实例消息失败(重试,%s): %v", decodedAs, err)
+			} else {
+				cm.logger.Debugf("成功发送跨实例消息给用户(重试,%s): %s", decodedAs, userID)
+			}
+			return
 		}
 	}
 }
@@ -299,7 +373,6 @@ func (cm *ConnectionManager) sendHeartbeat() {
 	cm.mu.RLock()
 	defer cm.mu.RUnlock()
 
-	heartbeatMsg := []byte("ping")
 	var wg sync.WaitGroup
 
 	for userID, conn := range cm.connections {
@@ -307,7 +380,10 @@ func (cm *ConnectionManager) sendHeartbeat() {
 		go func(userID string, conn *websocket.Conn) {
 			defer wg.Done()
 			conn.SetWriteDeadline(time.Now().Add(cm.writeTimeout))
-			if err := conn.WriteMessage(websocket.PingMessage, heartbeatMsg); err != nil {
+			// 发送protobuf心跳
+			hb := &pb.IMMessage{Type: "ping", Timestamp: time.Now().Unix()}
+			data, _ := proto.Marshal(hb)
+			if err := conn.WriteMessage(websocket.BinaryMessage, data); err != nil {
 				cm.logger.Errorf("发送心跳失败，用户: %s, 错误: %v", userID, err)
 				// 连接可能已断开，将在下次清理时移除
 			}
@@ -329,9 +405,11 @@ func (cm *ConnectionManager) CleanupDeadConnections() {
 	defer cm.mu.Unlock()
 
 	for userID, conn := range cm.connections {
-		// 尝试发送ping检测连接状态
+		// 尝试发送protobuf心跳检测连接状态
 		conn.SetWriteDeadline(time.Now().Add(1 * time.Second))
-		if err := conn.WriteMessage(websocket.PingMessage, []byte("ping")); err != nil {
+		hb := &pb.IMMessage{Type: "ping", Timestamp: time.Now().Unix()}
+		data, _ := proto.Marshal(hb)
+		if err := conn.WriteMessage(websocket.BinaryMessage, data); err != nil {
 			conn.Close()
 			delete(cm.connections, userID)
 			cm.logger.Infof("清理死连接: %s", userID)

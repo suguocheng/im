@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 
@@ -37,7 +38,13 @@ func (p *ClientPool) GetClient(serviceName, baseURL string) *ServiceClient {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 
-	if client, exists := p.clients[serviceName]; exists {
+	// 规范化地址，缺少协议时默认 http
+	if !strings.HasPrefix(baseURL, "http://") && !strings.HasPrefix(baseURL, "https://") {
+		baseURL = "http://" + baseURL
+	}
+
+	key := serviceName + "|" + baseURL
+	if client, exists := p.clients[key]; exists {
 		return client
 	}
 
@@ -55,7 +62,7 @@ func (p *ClientPool) GetClient(serviceName, baseURL string) *ServiceClient {
 		timeout: 30 * time.Second,
 	}
 
-	p.clients[serviceName] = client
+	p.clients[key] = client
 	return client
 }
 

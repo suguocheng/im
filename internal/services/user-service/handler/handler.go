@@ -8,10 +8,13 @@ import (
 	"im/internal/services/user-service/service"
 	"im/internal/shared/auth"
 	"im/internal/shared/database"
+	"im/internal/shared/discovery"
 	"im/internal/shared/logger"
 	"im/internal/shared/performance"
 	pb "im/internal/shared/protocol/pb"
 	"im/internal/shared/rpc"
+	"os"
+	"strings"
 
 	"google.golang.org/protobuf/proto"
 )
@@ -29,8 +32,17 @@ func NewUserHandler(service *service.UserService, logger *logger.Logger, dbManag
 	// 创建RPC管理器
 	rpcManager := rpc.NewManager(logger)
 
-	// 注册微服务
-	rpcManager.RegisterService("notification-service", "http://127.0.0.1:8140")
+	// 启用etcd服务发现（如果提供了ETCD_ENDPOINTS，则优先使用）
+	endpoints := os.Getenv("ETCD_ENDPOINTS")
+	if endpoints == "" {
+		endpoints = "localhost:2379"
+	}
+	disc, err := discovery.New(discovery.Config{Endpoints: strings.Split(endpoints, ",")})
+	if err != nil {
+		logger.Fatalf("etcd 连接失败，无法启动服务发现: %v", err)
+	}
+	rpcManager.UseEtcd(disc, "/im/services")
+	_ = rpcManager.WatchService("notification-service")
 
 	return &UserHandler{
 		service:        service,

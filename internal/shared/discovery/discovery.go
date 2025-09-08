@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"strings"
 	"time"
 
+	"go.etcd.io/etcd/api/v3/mvccpb"
 	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
@@ -22,6 +24,11 @@ type Client struct {
 // Registrar 服务注册器
 type Registrar struct {
 	client *clientv3.Client
+}
+
+// Instance 服务实例
+type Instance struct {
+	Address string
 }
 
 // New 创建新的etcd客户端
@@ -75,6 +82,67 @@ func (r *Registrar) Deregister() {
 	if r.client != nil {
 		r.client.Close()
 	}
+}
+
+// ListInstances 列出某服务的所有实例
+func (c *Client) ListInstances(ctx context.Context, prefix, serviceName string) ([]Instance, error) {
+	keyPrefix := fmt.Sprintf("%s/%s/", prefix, serviceName)
+	resp, err := c.client.Get(ctx, keyPrefix, clientv3.WithPrefix())
+	if err != nil {
+		return nil, err
+	}
+	var result []Instance
+	for _, kv := range resp.Kvs {
+		if kv == nil || kv.Value == nil {
+			continue
+		}
+		addr := string(kv.Value)
+		if strings.TrimSpace(addr) == "" {
+			continue
+		}
+		result = append(result, Instance{Address: addr})
+	}
+	return result, nil
+}
+
+// WatchService 持续监听某服务的实例变化，并在每次变化时回调返回完整实例列表
+func (c *Client) WatchService(ctx context.Context, prefix, serviceName string, onChange func([]Instance)) error {
+	keyPrefix := fmt.Sprintf("%s/%s/", prefix, serviceName)
+
+	// 初次加载
+	instances, err := c.ListInstances(ctx, prefix, serviceName)
+	if err == nil {
+		onChange(instances)
+	}
+
+	watchChan := c.client.Watch(ctx, keyPrefix, clientv3.WithPrefix())
+	go func() {
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case wr, ok := <-watchChan:
+				if !ok {
+					return
+				}
+				// 仅当有PUT/DELETE时，重新列举
+				changed := false
+				for _, ev := range wr.Events {
+					if ev.Type == mvccpb.PUT || ev.Type == mvccpb.DELETE {
+						changed = true
+						break
+					}
+				}
+				if changed {
+					list, err := c.ListInstances(context.Background(), prefix, serviceName)
+					if err == nil {
+						onChange(list)
+					}
+				}
+			}
+		}
+	}()
+	return nil
 }
 
 // Close 关闭客户端

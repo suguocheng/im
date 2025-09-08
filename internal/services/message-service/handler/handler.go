@@ -2,7 +2,9 @@ package handler
 
 import (
 	"context"
+	"encoding/binary"
 	"fmt"
+	"hash/fnv"
 	"io"
 	"net/http"
 	"os"
@@ -14,6 +16,7 @@ import (
 	ws "im/internal/services/message-service/websocket"
 	"im/internal/shared/auth"
 	"im/internal/shared/database"
+	"im/internal/shared/discovery"
 	"im/internal/shared/logger"
 	"im/internal/shared/performance"
 	pb "im/internal/shared/protocol/pb"
@@ -21,6 +24,8 @@ import (
 	"im/internal/shared/rpc"
 
 	"github.com/gorilla/websocket"
+
+	"strings"
 
 	"google.golang.org/protobuf/proto"
 )
@@ -64,10 +69,19 @@ func NewMessageHandler(service *service.MessageService, logger *logger.Logger, d
 	// 创建RPC管理器
 	rpcManager := rpc.NewManager(logger)
 
-	// 注册微服务
-	rpcManager.RegisterService("group-service", "http://127.0.0.1:8110")
-	rpcManager.RegisterService("friend-service", "http://127.0.0.1:8100")
-	rpcManager.RegisterService("user-service", "http://127.0.0.1:8090")
+	// 启用etcd服务发现（如果提供了ETCD_ENDPOINTS，则优先使用）
+	endpoints := os.Getenv("ETCD_ENDPOINTS")
+	if endpoints == "" {
+		endpoints = "localhost:2379"
+	}
+	disc, err := discovery.New(discovery.Config{Endpoints: strings.Split(endpoints, ",")})
+	if err != nil {
+		logger.Fatalf("etcd 连接失败，无法启动服务发现: %v", err)
+	}
+	rpcManager.UseEtcd(disc, "/im/services")
+	_ = rpcManager.WatchService("group-service")
+	_ = rpcManager.WatchService("friend-service")
+	_ = rpcManager.WatchService("user-service")
 
 	// 创建消息队列管理器
 	queueManager := queue.NewManager(dbManager, logger)
@@ -85,6 +99,32 @@ func NewMessageHandler(service *service.MessageService, logger *logger.Logger, d
 	go handler.startQueueConsumers()
 
 	return handler
+}
+
+// computeMsgFingerprint 为消息生成稳定的短指纹，帮助跨日志关联
+func computeMsgFingerprint(msg *pb.IMMessage) string {
+	hasher := fnv.New64a()
+	// 使用关键字段构造指纹：from,to,groupId,type,timestamp,content前64字节
+	io.WriteString(hasher, msg.From)
+	io.WriteString(hasher, "|")
+	io.WriteString(hasher, msg.To)
+	io.WriteString(hasher, "|")
+	io.WriteString(hasher, msg.GroupId)
+	io.WriteString(hasher, "|")
+	io.WriteString(hasher, msg.Type)
+	io.WriteString(hasher, "|")
+	var tsBuf [8]byte
+	binary.BigEndian.PutUint64(tsBuf[:], uint64(msg.Timestamp))
+	hasher.Write(tsBuf[:])
+	io.WriteString(hasher, "|")
+	content := msg.Content
+	if len(content) > 64 {
+		content = content[:64]
+	}
+	io.WriteString(hasher, content)
+	sum := hasher.Sum64()
+	// 返回16进制短字符串
+	return fmt.Sprintf("%016x", sum)
 }
 
 // RegisterRoutes 注册路由
@@ -360,12 +400,13 @@ func (h *MessageHandler) ws(w http.ResponseWriter, r *http.Request) {
 		}
 		// 群聊消息处理
 		if msg.GroupId != "" {
-			h.logger.Infof("收到群聊消息: 用户 %s 在群组 %s 中发送消息", uid, msg.GroupId)
+			finger := computeMsgFingerprint(&msg)
+			h.logger.Debugf("[GROUP] recv: group=%s from=%s type=%s ts=%d fp=%s len=%d", msg.GroupId, uid, msg.Type, msg.Timestamp, finger, len(msg.Content))
 			// 检查发送者是否被禁言
 			muted := h.isGroupMemberMuted(msg.GroupId, uid)
-			h.logger.Infof("用户 %s 在群组 %s 中的禁言状态: %v", uid, msg.GroupId, muted)
+			h.logger.Debugf("[GROUP] muted-check: group=%s uid=%s muted=%v", msg.GroupId, uid, muted)
 			if muted {
-				h.logger.Infof("用户 %s 被禁言，阻止消息发送", uid)
+				h.logger.Infof("[GROUP] muted-block: group=%s uid=%s", msg.GroupId, uid)
 				// 发送禁言提示消息给发送者
 				errorMsg := &pb.IMMessage{
 					Type:      "error",
@@ -378,41 +419,61 @@ func (h *MessageHandler) ws(w http.ResponseWriter, r *http.Request) {
 				_ = conn.WriteMessage(websocket.BinaryMessage, bError)
 				continue
 			}
-			h.logger.Infof("用户 %s 未被禁言，允许消息发送", uid)
+			h.logger.Debugf("[GROUP] muted-pass: group=%s uid=%s", msg.GroupId, uid)
 
 			msg.From = uid
 			msg.Timestamp = time.Now().Unix() // 设置正确的时间戳
 
 			// 获取群成员
 			members := h.getGroupMembers(msg.GroupId)
+			h.logger.Debugf("[GROUP] members: group=%s count=%d fp=%s", msg.GroupId, len(members), finger)
 
 			// 秘密模式消息不进行持久化存储
 			if msg.Type != "secret_chat" {
 				// 发布消息到队列进行异步处理
 				h.publishGroupMessage(uid, msg.GroupId, msg.Type, msg.Content, msg.Extra, members)
 			}
-			groupName, _ := h.getGroupInfo(msg.GroupId)
+			// groupName 不再用于通知，先省略调用避免未使用
 
-			// 使用连接管理器进行群组广播（排除发送者，避免重复显示）
+			// 群组实时推送：逐个用户调用 BroadcastToUser（支持跨实例），并去重
 			b, _ := proto.Marshal(&msg)
-			// 排除发送者，只广播给其他成员
-			otherMembers := make([]string, 0, len(members))
+			seen := make(map[string]struct{}, len(members))
+			pushed := 0
 			for _, memberUID := range members {
-				if memberUID != uid {
-					otherMembers = append(otherMembers, memberUID)
+				if memberUID == uid {
+					h.logger.Debugf("[GROUP] skip-sender: to=%s fp=%s", memberUID, finger)
+					continue
+				}
+				if _, ok := seen[memberUID]; ok {
+					h.logger.Debugf("[GROUP] duplicate-recipient: to=%s fp=%s", memberUID, finger)
+					continue
+				}
+				seen[memberUID] = struct{}{}
+				if err := h.connectionManager.BroadcastToUser(memberUID, b); err != nil {
+					h.logger.Warnf("[GROUP] push-failed: to=%s fp=%s err=%v", memberUID, finger, err)
+				} else {
+					pushed++
+					h.logger.Debugf("[GROUP] push-ok: to=%s fp=%s", memberUID, finger)
 				}
 			}
-			h.connectionManager.BroadcastToGroup(otherMembers, b)
+			h.logger.Infof("[GROUP] pushed: group=%s fp=%s recipients=%d pushed=%d", msg.GroupId, finger, len(seen), pushed)
 
-			// 发送通知给群组成员
+			// 恢复：发送群聊通知用于弹窗提示（前端不再基于通知累加未读）
 			for _, memberUID := range members {
-				if memberUID != uid {
-					// 检查群组免打扰状态，只有未设置免打扰且非秘密模式时才发送通知
-					if !h.isGroupDND(msg.GroupId, memberUID) && msg.Type != "secret_chat" {
-						n := &pb.Notification{Type: "group_chat_message", From: uid, To: memberUID, GroupId: msg.GroupId, GroupName: groupName, Content: msg.Content}
-						h.sendNotification(memberUID, n)
-					}
+				if memberUID == uid {
+					continue
 				}
+				if msg.Type == "secret_chat" {
+					h.logger.Debugf("[GROUP][notif] skip-secret: to=%s fp=%s", memberUID, finger)
+					continue
+				}
+				if h.isGroupDND(msg.GroupId, memberUID) {
+					h.logger.Infof("[GROUP][notif] skip-dnd: to=%s fp=%s", memberUID, finger)
+					continue
+				}
+				n := &pb.Notification{Type: "group_chat_message", From: uid, To: memberUID, GroupId: msg.GroupId, Content: msg.Content, Timestamp: msg.Timestamp}
+				h.logger.Infof("[GROUP][notif] send: to=%s fp=%s", memberUID, finger)
+				h.sendNotification(memberUID, n)
 			}
 			continue
 		}
@@ -434,9 +495,10 @@ func (h *MessageHandler) ws(w http.ResponseWriter, r *http.Request) {
 			}
 
 			// 注意：不发送回显给发送者，让前端自己处理回显
-			// 检查好友免打扰状态，只有未设置免打扰且非秘密模式时才发送通知
-			if !h.isFriendDND(uid, msg.To) && msg.Type != "secret_chat" {
-				n := &pb.Notification{Type: "private_chat_message", From: uid, To: msg.To, Content: msg.Content}
+			// 恢复：发送私聊通知用于弹窗提示（前端不再基于通知累加未读）
+			if msg.Type != "secret_chat" && !h.isFriendDND(uid, msg.To) {
+				n := &pb.Notification{Type: "private_chat_message", From: uid, To: msg.To, Content: msg.Content, Timestamp: msg.Timestamp}
+				h.logger.Infof("[PRIVATE][notif] send: to=%s from=%s", msg.To, uid)
 				h.sendNotification(msg.To, n)
 			}
 			continue

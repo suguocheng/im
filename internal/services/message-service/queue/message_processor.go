@@ -2,7 +2,6 @@ package queue
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	"im/internal/services/message-service/service"
@@ -77,11 +76,9 @@ func (mp *MessageProcessor) processPrivateMessage(ctx context.Context, message *
 		return fmt.Errorf("发送私聊消息失败: %v", err)
 	}
 
-	// 尝试实时推送给接收者
-	msgData, _ := json.Marshal(msg)
-	if err := mp.connectionManager.BroadcastToUser(to, msgData); err != nil {
-		mp.logger.Debugf("用户 %s 离线，消息将存储为离线消息", to)
-		// 存储为离线消息
+	// 仅当接收者全局不在线时，存储为离线消息（分布式判定）
+	if !mp.connectionManager.IsUserOnline(to) {
+		mp.logger.Debugf("用户 %s 不在线，消息存为离线消息", to)
 		mp.messageService.StoreOfflineMessage(to, msg)
 	}
 
