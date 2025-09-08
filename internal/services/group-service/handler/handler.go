@@ -9,6 +9,7 @@ import (
 
 	"im/internal/services/group-service/service"
 	"im/internal/shared/auth"
+	"im/internal/shared/database"
 	"im/internal/shared/logger"
 	"im/internal/shared/performance"
 	pb "im/internal/shared/protocol/pb"
@@ -26,18 +27,18 @@ type GroupHandler struct {
 }
 
 // NewGroupHandler 创建群组处理器
-func NewGroupHandler(service *service.GroupService, logger *logger.Logger) *GroupHandler {
+func NewGroupHandler(service *service.GroupService, logger *logger.Logger, dbManager *database.Manager) *GroupHandler {
 	// 创建RPC管理器
 	rpcManager := rpc.NewManager(logger)
 
 	// 注册微服务
-	rpcManager.RegisterService("user-service", "http://127.0.0.1:8081")
-	rpcManager.RegisterService("notification-service", "http://127.0.0.1:8086")
+	rpcManager.RegisterService("user-service", "http://127.0.0.1:8090")
+	rpcManager.RegisterService("notification-service", "http://127.0.0.1:8140")
 
 	return &GroupHandler{
 		service:        service,
 		logger:         logger,
-		requestHandler: performance.NewRequestHandler(logger),
+		requestHandler: performance.NewRequestHandler(logger, dbManager.GetRedis()),
 		rpcManager:     rpcManager,
 	}
 }

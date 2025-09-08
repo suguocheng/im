@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"im/internal/services/file-service/service"
+	"im/internal/shared/database"
 	"im/internal/shared/logger"
 	"im/internal/shared/performance"
 	pb "im/internal/shared/protocol/pb"
@@ -21,11 +22,11 @@ type FileHandler struct {
 }
 
 // NewFileHandler 创建文件处理器
-func NewFileHandler(service *service.FileService, logger *logger.Logger) *FileHandler {
+func NewFileHandler(service *service.FileService, logger *logger.Logger, dbManager *database.Manager) *FileHandler {
 	return &FileHandler{
 		service:        service,
 		logger:         logger,
-		requestHandler: performance.NewRequestHandler(logger),
+		requestHandler: performance.NewRequestHandler(logger, dbManager.GetRedis()),
 	}
 }
 

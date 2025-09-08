@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"net/http"
 	"os"
@@ -14,8 +15,17 @@ import (
 )
 
 func main() {
+	// 解析命令行参数
+	var port = flag.Int("port", 0, "服务端口")
+	flag.Parse()
+
 	// 加载配置
 	cfg := config.LoadServiceConfig("user-service")
+
+	// 如果指定了端口，使用命令行参数
+	if *port > 0 {
+		cfg.Server.Port = *port
+	}
 
 	// 初始化日志
 	logger := logger.NewLogger(cfg.Log.Level)
@@ -37,7 +47,7 @@ func main() {
 	userService := service.NewUserService(userStorage, logger)
 
 	// 初始化处理器
-	userHandler := handler.NewUserHandler(userService, logger)
+	userHandler := handler.NewUserHandler(userService, logger, dbManager)
 
 	// 设置路由
 	mux := http.NewServeMux()

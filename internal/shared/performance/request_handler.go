@@ -2,11 +2,13 @@ package performance
 
 import (
 	"context"
+	"fmt"
 	"net/http"
-	"sync"
 	"time"
 
 	"im/internal/shared/logger"
+
+	"github.com/redis/go-redis/v9"
 )
 
 // RequestHandler 请求处理器（集成限流、超时、CORS）
@@ -17,54 +19,61 @@ type RequestHandler struct {
 
 // RateLimiter 限流器
 type RateLimiter struct {
-	requests map[string][]time.Time
-	mu       sync.RWMutex
-	limit    int
-	window   time.Duration
+	redis  *redis.Client
+	limit  int
+	window time.Duration
 }
 
 // NewRateLimiter 创建限流器
-func NewRateLimiter(limit int, window time.Duration) *RateLimiter {
+func NewRateLimiter(redis *redis.Client, limit int, window time.Duration) *RateLimiter {
 	return &RateLimiter{
-		requests: make(map[string][]time.Time),
-		limit:    limit,
-		window:   window,
+		redis:  redis,
+		limit:  limit,
+		window: window,
 	}
 }
 
-// Allow 检查是否允许请求
+// Allow 检查是否允许请求（使用Redis分布式限流）
 func (rl *RateLimiter) Allow(ip string) bool {
-	rl.mu.Lock()
-	defer rl.mu.Unlock()
+	ctx := context.Background()
+	key := fmt.Sprintf("rate_limit:%s", ip)
 
-	now := time.Now()
-	cutoff := now.Add(-rl.window)
+	// 使用Redis的滑动窗口限流算法
+	now := time.Now().Unix()
+	windowStart := now - int64(rl.window.Seconds())
 
-	// 清理过期请求
-	if times, exists := rl.requests[ip]; exists {
-		var validTimes []time.Time
-		for _, t := range times {
-			if t.After(cutoff) {
-				validTimes = append(validTimes, t)
-			}
-		}
-		rl.requests[ip] = validTimes
+	// 清理过期的请求记录
+	rl.redis.ZRemRangeByScore(ctx, key, "0", fmt.Sprintf("%d", windowStart))
+
+	// 获取当前窗口内的请求数量
+	count, err := rl.redis.ZCard(ctx, key).Result()
+	if err != nil {
+		// Redis错误时允许请求通过
+		return true
 	}
 
 	// 检查是否超过限制
-	if len(rl.requests[ip]) >= rl.limit {
+	if count >= int64(rl.limit) {
 		return false
 	}
 
-	// 记录当前请求
-	rl.requests[ip] = append(rl.requests[ip], now)
+	// 添加当前请求到滑动窗口
+	member := fmt.Sprintf("%d:%d", now, time.Now().UnixNano())
+	rl.redis.ZAdd(ctx, key, redis.Z{
+		Score:  float64(now),
+		Member: member,
+	})
+
+	// 设置key的过期时间
+	rl.redis.Expire(ctx, key, rl.window)
+
 	return true
 }
 
 // NewRequestHandler 创建请求处理器
-func NewRequestHandler(logger *logger.Logger) *RequestHandler {
+func NewRequestHandler(logger *logger.Logger, redis *redis.Client) *RequestHandler {
 	return &RequestHandler{
-		rateLimiter: NewRateLimiter(100, time.Minute), // 100 req/min
+		rateLimiter: NewRateLimiter(redis, 100, time.Minute), // 100 req/min
 		logger:      logger,
 	}
 }
@@ -105,6 +114,6 @@ func (rh *RequestHandler) HandleRequest(handler http.HandlerFunc) http.HandlerFu
 }
 
 // SetRateLimit 设置限流参数
-func (rh *RequestHandler) SetRateLimit(limit int, window time.Duration) {
-	rh.rateLimiter = NewRateLimiter(limit, window)
+func (rh *RequestHandler) SetRateLimit(redis *redis.Client, limit int, window time.Duration) {
+	rh.rateLimiter = NewRateLimiter(redis, limit, window)
 }

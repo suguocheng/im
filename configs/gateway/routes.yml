@@ -71,41 +71,53 @@ http:
         - "cors"
 
   services:
-    # 用户服务
+    # 用户服务 - 轮询负载均衡策略
     user-service:
       loadBalancer:
         servers:
-          - url: "http://127.0.0.1:8081"
+          - url: "http://127.0.0.1:8090"  # 实例1
+          - url: "http://127.0.0.1:8091"  # 实例2
+          - url: "http://127.0.0.1:8092"  # 实例3
     
-    # 好友服务
+    # 好友服务 - 轮询负载均衡策略
     friend-service:
       loadBalancer:
         servers:
-          - url: "http://127.0.0.1:8082"
+          - url: "http://127.0.0.1:8100"  # 实例1
+          - url: "http://127.0.0.1:8101"  # 实例2
+          - url: "http://127.0.0.1:8102"  # 实例3
     
-    # 群组服务
+    # 群组服务 - 轮询负载均衡策略
     group-service:
       loadBalancer:
         servers:
-          - url: "http://127.0.0.1:8083"
+          - url: "http://127.0.0.1:8110"  # 实例1
+          - url: "http://127.0.0.1:8111"  # 实例2
+          - url: "http://127.0.0.1:8112"  # 实例3
     
-    # 消息服务
+    # 消息服务 - 轮询负载均衡策略
     message-service:
       loadBalancer:
         servers:
-          - url: "http://127.0.0.1:8084"
+          - url: "http://127.0.0.1:8120"  # 实例1
+          - url: "http://127.0.0.1:8121"  # 实例2
+          - url: "http://127.0.0.1:8122"  # 实例3
     
-    # 文件服务
+    # 文件服务 - 轮询负载均衡策略
     file-service:
       loadBalancer:
         servers:
-          - url: "http://127.0.0.1:8085"
+          - url: "http://127.0.0.1:8130"  # 实例1
+          - url: "http://127.0.0.1:8131"  # 实例2
+          - url: "http://127.0.0.1:8132"  # 实例3
     
-    # 通知服务
+    # 通知服务 - 轮询负载均衡策略
     notification-service:
       loadBalancer:
         servers:
-          - url: "http://127.0.0.1:8086"
+          - url: "http://127.0.0.1:8140"  # 实例1
+          - url: "http://127.0.0.1:8141"  # 实例2
+          - url: "http://127.0.0.1:8142"  # 实例3
 
   middlewares:
     # CORS中间件

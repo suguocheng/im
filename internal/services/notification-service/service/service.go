@@ -1,39 +1,49 @@
 package service
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"strconv"
 	"time"
 
 	"im/internal/shared/config"
+	"im/internal/shared/database"
 	"im/internal/shared/logger"
 
+	"github.com/redis/go-redis/v9"
 	"gopkg.in/gomail.v2"
 )
 
-// 验证码存储（暂时存在内存中，后面再转存redis）
-var emailCodes = make(map[string]EmailCode)
-
 // EmailCode 邮箱验证码结构
 type EmailCode struct {
-	Code     string
-	ExpireAt time.Time
-	Purpose  string // "register" 或 "reset_password"
+	Code     string    `json:"code"`
+	ExpireAt time.Time `json:"expire_at"`
+	Purpose  string    `json:"purpose"` // "register" 或 "reset_password"
 }
 
 // NotificationService 通知服务
 type NotificationService struct {
 	logger   *logger.Logger
 	emailCfg config.EmailConfig
+	redis    *redis.Client
 }
 
 // NewNotificationService 创建通知服务实例
 func NewNotificationService(logger *logger.Logger) *NotificationService {
 	cfg := config.LoadServiceConfig("notification-service")
+
+	// 初始化数据库连接池管理器
+	dbManager, err := database.NewManager(cfg.Database, cfg.Redis, cfg.Mongo, logger)
+	if err != nil {
+		logger.Fatalf("初始化数据库连接池失败: %v", err)
+	}
+
 	return &NotificationService{
 		logger:   logger,
 		emailCfg: cfg.Email,
+		redis:    dbManager.GetRedis(),
 	}
 }
 
@@ -42,11 +52,25 @@ func (ns *NotificationService) SendEmailCode(email, purpose string) error {
 	// 生成6位数字验证码
 	code := generateCode()
 
-	// 存储验证码（5分钟有效期）
-	emailCodes[email] = EmailCode{
+	// 存储验证码到Redis（5分钟有效期）
+	emailCode := EmailCode{
 		Code:     code,
 		ExpireAt: time.Now().Add(5 * time.Minute),
 		Purpose:  purpose,
+	}
+
+	// 序列化验证码数据
+	data, err := json.Marshal(emailCode)
+	if err != nil {
+		return fmt.Errorf("序列化验证码失败: %v", err)
+	}
+
+	// 存储到Redis，设置过期时间
+	ctx := context.Background()
+	key := fmt.Sprintf("email_code:%s", email)
+	err = ns.redis.Set(ctx, key, data, 5*time.Minute).Err()
+	if err != nil {
+		return fmt.Errorf("存储验证码到Redis失败: %v", err)
 	}
 
 	// 构建邮件内容
@@ -70,10 +94,10 @@ func (ns *NotificationService) SendEmailCode(email, purpose string) error {
 	}
 
 	// 发送邮件
-	err := ns.sendEmail(email, subject, body)
+	err = ns.sendEmail(email, subject, body)
 	if err != nil {
 		// 发送失败，删除存储的验证码
-		delete(emailCodes, email)
+		ns.redis.Del(ctx, key)
 		return fmt.Errorf("发送邮件失败: %v", err)
 	}
 
@@ -83,14 +107,32 @@ func (ns *NotificationService) SendEmailCode(email, purpose string) error {
 
 // VerifyEmailCode 验证邮箱验证码
 func (ns *NotificationService) VerifyEmailCode(email, code, purpose string) bool {
-	emailCode, exists := emailCodes[email]
-	if !exists {
+	ctx := context.Background()
+	key := fmt.Sprintf("email_code:%s", email)
+
+	// 从Redis获取验证码
+	data, err := ns.redis.Get(ctx, key).Result()
+	if err != nil {
+		if err == redis.Nil {
+			// 验证码不存在
+			return false
+		}
+		ns.logger.Errorf("从Redis获取验证码失败: %v", err)
+		return false
+	}
+
+	// 反序列化验证码数据
+	var emailCode EmailCode
+	err = json.Unmarshal([]byte(data), &emailCode)
+	if err != nil {
+		ns.logger.Errorf("反序列化验证码失败: %v", err)
 		return false
 	}
 
 	// 检查是否过期
 	if time.Now().After(emailCode.ExpireAt) {
-		delete(emailCodes, email)
+		// 过期，删除验证码
+		ns.redis.Del(ctx, key)
 		return false
 	}
 
@@ -100,7 +142,7 @@ func (ns *NotificationService) VerifyEmailCode(email, code, purpose string) bool
 	}
 
 	// 验证成功后删除验证码
-	delete(emailCodes, email)
+	ns.redis.Del(ctx, key)
 	return true
 }
 

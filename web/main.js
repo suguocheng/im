@@ -1292,8 +1292,16 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       const msgBuf = IMMessage.encode(IMMessage.create(msgObj)).finish();
       ws.send(msgBuf);
-      // 本地回显 - 移除，让服务器确认后再显示
-      // appendMessage({ from: myUid, content: msgObj.content, self: true, timestamp: msgObj.timestamp, type, extra: msgObj.extra });
+      
+      // 立即显示回显
+      appendMessage({ 
+        from: myUid, 
+        content: msgObj.content, 
+        self: true, 
+        timestamp: msgObj.timestamp, 
+        type: type, 
+        extra: msgObj.extra 
+      });
     }
 
     // ========== 消息发送 ==========
@@ -1347,6 +1355,16 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       const msgBuf = IMMessage.encode(IMMessage.create(msgObj)).finish();
       ws.send(msgBuf);
+      
+      // 立即显示回显
+      appendMessage({ 
+        from: myUid, 
+        content: displayContent, 
+        self: true, 
+        timestamp: msgObj.timestamp, 
+        type: msgObj.type 
+      });
+      
       chatInput.value = '';
     }
 

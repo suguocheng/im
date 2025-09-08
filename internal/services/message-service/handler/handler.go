@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"time"
 
 	"im/internal/services/message-service/model"
@@ -43,10 +44,13 @@ var upgrader = websocket.Upgrader{
 
 // NewMessageHandler 创建消息处理器
 func NewMessageHandler(service *service.MessageService, logger *logger.Logger, dbManager *database.Manager) *MessageHandler {
-	connectionManager := ws.NewConnectionManager(logger)
+	connectionManager := ws.NewConnectionManager(logger, dbManager.GetRedis())
 
 	// 启动心跳检测
 	go connectionManager.StartHeartbeat(context.Background())
+
+	// 启动Redis订阅，处理跨实例消息
+	go connectionManager.StartRedisSubscriber(context.Background())
 
 	// 定期清理死连接
 	go func() {
@@ -61,9 +65,9 @@ func NewMessageHandler(service *service.MessageService, logger *logger.Logger, d
 	rpcManager := rpc.NewManager(logger)
 
 	// 注册微服务
-	rpcManager.RegisterService("group-service", "http://127.0.0.1:8083")
-	rpcManager.RegisterService("friend-service", "http://127.0.0.1:8082")
-	rpcManager.RegisterService("user-service", "http://127.0.0.1:8081")
+	rpcManager.RegisterService("group-service", "http://127.0.0.1:8110")
+	rpcManager.RegisterService("friend-service", "http://127.0.0.1:8100")
+	rpcManager.RegisterService("user-service", "http://127.0.0.1:8090")
 
 	// 创建消息队列管理器
 	queueManager := queue.NewManager(dbManager, logger)
@@ -71,7 +75,7 @@ func NewMessageHandler(service *service.MessageService, logger *logger.Logger, d
 	handler := &MessageHandler{
 		service:           service,
 		logger:            logger,
-		requestHandler:    performance.NewRequestHandler(logger),
+		requestHandler:    performance.NewRequestHandler(logger, dbManager.GetRedis()),
 		connectionManager: connectionManager,
 		rpcManager:        rpcManager,
 		queueManager:      queueManager,
@@ -389,9 +393,16 @@ func (h *MessageHandler) ws(w http.ResponseWriter, r *http.Request) {
 			}
 			groupName, _ := h.getGroupInfo(msg.GroupId)
 
-			// 使用连接管理器进行群组广播（包括发送者）
+			// 使用连接管理器进行群组广播（排除发送者，避免重复显示）
 			b, _ := proto.Marshal(&msg)
-			h.connectionManager.BroadcastToGroup(members, b)
+			// 排除发送者，只广播给其他成员
+			otherMembers := make([]string, 0, len(members))
+			for _, memberUID := range members {
+				if memberUID != uid {
+					otherMembers = append(otherMembers, memberUID)
+				}
+			}
+			h.connectionManager.BroadcastToGroup(otherMembers, b)
 
 			// 发送通知给群组成员
 			for _, memberUID := range members {
@@ -422,8 +433,7 @@ func (h *MessageHandler) ws(w http.ResponseWriter, r *http.Request) {
 				// 对方离线，消息已存储，无需额外处理
 			}
 
-			// 回显给自己
-			_ = conn.WriteMessage(websocket.BinaryMessage, b)
+			// 注意：不发送回显给发送者，让前端自己处理回显
 			// 检查好友免打扰状态，只有未设置免打扰且非秘密模式时才发送通知
 			if !h.isFriendDND(uid, msg.To) && msg.Type != "secret_chat" {
 				n := &pb.Notification{Type: "private_chat_message", From: uid, To: msg.To, Content: msg.Content}
@@ -541,6 +551,14 @@ func (h *MessageHandler) Start(port int) error {
 
 // startQueueConsumers 启动消息队列消费者
 func (h *MessageHandler) startQueueConsumers() {
+	// 检查是否应该启动消费者（避免多实例重复处理）
+	// 通过检查环境变量PORT来判断是否为第一个实例
+	port := os.Getenv("PORT")
+	if port == "" || port != "8120" {
+		h.logger.Infof("跳过消息队列消费者启动 (端口: %s)", port)
+		return
+	}
+
 	ctx := context.Background()
 
 	// 创建消息处理器

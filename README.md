@@ -16,12 +16,12 @@ im/
 │   └── notification-service/ # 通知服务主程序
 ├── internal/               # 内部代码
 │   ├── services/           # 微服务实现
-│   │   ├── user-service/   # 用户服务 (8081)
-│   │   ├── friend-service/ # 好友服务 (8082)
-│   │   ├── group-service/  # 群组服务 (8083)
-│   │   ├── message-service/# 消息服务 (8084)
-│   │   ├── file-service/   # 文件服务 (8085)
-│   │   └── notification-service/ # 通知服务 (8086)
+│   │   ├── user-service/   # 用户服务 (8090-8092)
+│   │   ├── friend-service/ # 好友服务 (8100-8102)
+│   │   ├── group-service/  # 群组服务 (8110-8112)
+│   │   ├── message-service/# 消息服务 (8120-8122)
+│   │   ├── file-service/   # 文件服务 (8130-8132)
+│   │   └── notification-service/ # 通知服务 (8140-8142)
 │   └── shared/             # 共享代码
 │       ├── protocol/       # protobuf协议定义
 │       ├── auth/           # 认证模块
@@ -46,6 +46,12 @@ im/
 - 📁 **文件服务**: 文件上传、下载、管理
 - 🔔 **通知系统**: 邮箱验证、消息通知
 - 🔒 **秘密模式**: 端到端加密消息（不持久化）
+
+### 负载均衡策略
+- ⚖️ **轮询策略**: 自动将请求依次分发到各个实例
+- 🔄 **多实例部署**: 每个服务运行3个实例，提高可用性
+- 🛡️ **故障转移**: 实例故障时自动切换到健康实例
+- 📊 **均匀分发**: 确保请求平均分配到所有实例
 
 ## 🚀 快速开始
 
@@ -112,10 +118,10 @@ make start
 # 构建微服务
 make build
 
-# 启动微服务
+# 启动微服务（多实例）
 make start
 
-# 停止微服务
+# 停止微服务（停止所有实例）
 make stop
 
 # 清理文件
@@ -123,6 +129,18 @@ make clean
 
 # 查看帮助
 make help
+```
+
+### 多实例管理
+```bash
+# 启动所有服务（每个服务3个实例）
+./scripts/start.sh
+
+# 停止所有服务（停止所有实例）
+./scripts/stop.sh
+
+# 检查服务状态
+ps aux | grep -E "(user-service|friend-service|group-service|message-service|file-service|notification-service)"
 ```
 
 ## 🛠️ 技术栈

@@ -7,6 +7,7 @@ import (
 
 	"im/internal/services/user-service/service"
 	"im/internal/shared/auth"
+	"im/internal/shared/database"
 	"im/internal/shared/logger"
 	"im/internal/shared/performance"
 	pb "im/internal/shared/protocol/pb"
@@ -24,17 +25,17 @@ type UserHandler struct {
 }
 
 // NewUserHandler 创建用户处理器
-func NewUserHandler(service *service.UserService, logger *logger.Logger) *UserHandler {
+func NewUserHandler(service *service.UserService, logger *logger.Logger, dbManager *database.Manager) *UserHandler {
 	// 创建RPC管理器
 	rpcManager := rpc.NewManager(logger)
 
 	// 注册微服务
-	rpcManager.RegisterService("notification-service", "http://127.0.0.1:8086")
+	rpcManager.RegisterService("notification-service", "http://127.0.0.1:8140")
 
 	return &UserHandler{
 		service:        service,
 		logger:         logger,
-		requestHandler: performance.NewRequestHandler(logger),
+		requestHandler: performance.NewRequestHandler(logger, dbManager.GetRedis()),
 		rpcManager:     rpcManager,
 	}
 }

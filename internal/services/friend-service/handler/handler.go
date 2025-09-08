@@ -7,6 +7,7 @@ import (
 
 	"im/internal/services/friend-service/service"
 	"im/internal/shared/auth"
+	"im/internal/shared/database"
 	"im/internal/shared/logger"
 	"im/internal/shared/performance"
 	pb "im/internal/shared/protocol/pb"
@@ -24,18 +25,18 @@ type FriendHandler struct {
 }
 
 // NewFriendHandler 创建好友处理器
-func NewFriendHandler(service *service.FriendService, logger *logger.Logger) *FriendHandler {
+func NewFriendHandler(service *service.FriendService, logger *logger.Logger, dbManager *database.Manager) *FriendHandler {
 	// 创建RPC管理器
 	rpcManager := rpc.NewManager(logger)
 
 	// 注册微服务
-	rpcManager.RegisterService("user-service", "http://127.0.0.1:8081")
-	rpcManager.RegisterService("notification-service", "http://127.0.0.1:8086")
+	rpcManager.RegisterService("user-service", "http://127.0.0.1:8090")
+	rpcManager.RegisterService("notification-service", "http://127.0.0.1:8140")
 
 	return &FriendHandler{
 		service:        service,
 		logger:         logger,
-		requestHandler: performance.NewRequestHandler(logger),
+		requestHandler: performance.NewRequestHandler(logger, dbManager.GetRedis()),
 		rpcManager:     rpcManager,
 	}
 }

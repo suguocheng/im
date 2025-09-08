@@ -26,7 +26,7 @@ func NewUserService(storage storage.UserStorage, logger *logger.Logger) *UserSer
 	rpcManager := rpc.NewManager(logger)
 
 	// 注册微服务
-	rpcManager.RegisterService("notification-service", "http://127.0.0.1:8086")
+	rpcManager.RegisterService("notification-service", "http://127.0.0.1:8140")
 
 	return &UserService{
 		storage:    storage,

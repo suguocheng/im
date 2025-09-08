@@ -86,6 +86,11 @@ func LoadServiceConfig(serviceName string) *ServiceConfig {
 	// 根据服务名设置不同的端口
 	port := getPortForService(serviceName)
 
+	// 如果设置了环境变量PORT，优先使用环境变量
+	if envPort := getEnvAsInt("PORT", 0); envPort > 0 {
+		port = envPort
+	}
+
 	return &ServiceConfig{
 		Server: ServerConfig{
 			Port: port,
@@ -124,14 +129,24 @@ func LoadServiceConfig(serviceName string) *ServiceConfig {
 }
 
 // getPortForService 根据服务名获取端口
+// 端口分配规划：
+// 8080-8086: 单实例服务端口
+// 8087: Traefik网关
+// 8088: 前端界面
+// 8090-8099: 用户服务多实例 (8090, 8091, 8092...)
+// 8100-8109: 好友服务多实例 (8100, 8101, 8102...)
+// 8110-8119: 群组服务多实例 (8110, 8111, 8112...)
+// 8120-8129: 消息服务多实例 (8120, 8121, 8122...)
+// 8130-8139: 文件服务多实例 (8130, 8131, 8132...)
+// 8140-8149: 通知服务多实例 (8140, 8141, 8142...)
 func getPortForService(serviceName string) int {
 	ports := map[string]int{
-		"user-service":         8081,
-		"friend-service":       8082,
-		"group-service":        8083,
-		"message-service":      8084,
-		"file-service":         8085,
-		"notification-service": 8086,
+		"user-service":         8090, // 改为8090，支持多实例
+		"friend-service":       8100, // 改为8100，支持多实例
+		"group-service":        8110, // 改为8110，支持多实例
+		"message-service":      8120, // 改为8120，支持多实例
+		"file-service":         8130, // 改为8130，支持多实例
+		"notification-service": 8140, // 改为8140，支持多实例
 		"gateway":              8080,
 	}
 	if port, exists := ports[serviceName]; exists {
