@@ -7,14 +7,14 @@ import (
 
 	"im/internal/services/notification-service/service"
 	"im/internal/shared/logger"
-	"im/internal/shared/performance"
+	"im/internal/shared/middleware"
 	pb "im/internal/shared/protocol/pb"
 
 	"google.golang.org/protobuf/proto"
 )
 
 type NotificationHandler struct {
-	requestHandler *performance.RequestHandler
+	requestHandler *middleware.RequestHandler
 	svc            *service.NotificationService
 	logger         *logger.Logger
 }

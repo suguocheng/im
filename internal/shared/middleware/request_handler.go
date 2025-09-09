@@ -1,4 +1,4 @@
-package performance
+package middleware
 
 import (
 	"context"
@@ -91,10 +91,9 @@ func (rh *RequestHandler) HandleRequest(handler http.HandlerFunc) http.HandlerFu
 
 		// 2. CORS处理
 		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Credentials", "true")
-		w.Header().Set("Access-Control-Max-Age", "86400") // 24小时缓存
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+		w.Header().Set("Access-Control-Max-Age", "86400")
 
 		// 预检请求优化
 		if r.Method == "OPTIONS" {

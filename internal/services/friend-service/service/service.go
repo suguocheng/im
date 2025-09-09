@@ -21,15 +21,31 @@ func NewFriendService(storage storage.FriendStorage, logger *logger.Logger) *Fri
 	}
 }
 
-// AddFriend 添加好友
-func (s *FriendService) AddFriend(userUID, friendUID string) error {
-	s.logger.Infof("添加好友: %s -> %s", userUID, friendUID)
+// AddFriendRequest 添加好友请求
+func (s *FriendService) AddFriendRequest(fromUID, toUID, message string) error {
+	s.logger.Infof("添加好友请求: %s -> %s, 消息: %s", fromUID, toUID, message)
 
-	if userUID == friendUID {
-		return fmt.Errorf("不能添加自己为好友")
+	if fromUID == toUID {
+		return fmt.Errorf("不能向自己发送好友请求")
 	}
 
-	return s.storage.AddFriend(userUID, friendUID)
+	return s.storage.AddFriendRequest(fromUID, toUID, message)
+}
+
+// GetFriendRequests 获取好友请求列表
+func (s *FriendService) GetFriendRequests(userUID string) (map[string]string, error) {
+	s.logger.Debugf("获取好友请求列表: %s", userUID)
+	return s.storage.GetFriendRequests(userUID)
+}
+
+// HandleFriendRequest 处理好友请求
+func (s *FriendService) HandleFriendRequest(fromUID, toUID string, accept bool) error {
+	action := "拒绝"
+	if accept {
+		action = "接受"
+	}
+	s.logger.Infof("%s好友请求: %s -> %s", action, fromUID, toUID)
+	return s.storage.HandleFriendRequest(fromUID, toUID, accept)
 }
 
 // DeleteFriend 删除好友
@@ -66,31 +82,4 @@ func (s *FriendService) SetFriendDND(userUID, friendUID string, dnd bool) error 
 func (s *FriendService) GetFriendDND(userUID, friendUID string) (bool, error) {
 	s.logger.Debugf("获取好友免打扰状态: %s -> %s", userUID, friendUID)
 	return s.storage.GetFriendDND(userUID, friendUID)
-}
-
-// AddFriendRequest 添加好友请求
-func (s *FriendService) AddFriendRequest(fromUID, toUID, message string) error {
-	s.logger.Infof("添加好友请求: %s -> %s, 消息: %s", fromUID, toUID, message)
-
-	if fromUID == toUID {
-		return fmt.Errorf("不能向自己发送好友请求")
-	}
-
-	return s.storage.AddFriendRequest(fromUID, toUID, message)
-}
-
-// GetFriendRequests 获取好友请求列表
-func (s *FriendService) GetFriendRequests(userUID string) (map[string]string, error) {
-	s.logger.Debugf("获取好友请求列表: %s", userUID)
-	return s.storage.GetFriendRequests(userUID)
-}
-
-// HandleFriendRequest 处理好友请求
-func (s *FriendService) HandleFriendRequest(fromUID, toUID string, accept bool) error {
-	action := "拒绝"
-	if accept {
-		action = "接受"
-	}
-	s.logger.Infof("%s好友请求: %s -> %s", action, fromUID, toUID)
-	return s.storage.HandleFriendRequest(fromUID, toUID, accept)
 }

@@ -10,7 +10,7 @@ import (
 	"im/internal/shared/database"
 	"im/internal/shared/discovery"
 	"im/internal/shared/logger"
-	"im/internal/shared/performance"
+	"im/internal/shared/middleware"
 	pb "im/internal/shared/protocol/pb"
 	"im/internal/shared/rpc"
 	"os"
@@ -23,7 +23,7 @@ import (
 type UserHandler struct {
 	service        *service.UserService
 	logger         *logger.Logger
-	requestHandler *performance.RequestHandler
+	requestHandler *middleware.RequestHandler
 	rpcManager     *rpc.Manager
 }
 
@@ -47,7 +47,7 @@ func NewUserHandler(service *service.UserService, logger *logger.Logger, dbManag
 	return &UserHandler{
 		service:        service,
 		logger:         logger,
-		requestHandler: performance.NewRequestHandler(logger, dbManager.GetRedis()),
+		requestHandler: middleware.NewRequestHandler(logger, dbManager.GetRedis()),
 		rpcManager:     rpcManager,
 	}
 }

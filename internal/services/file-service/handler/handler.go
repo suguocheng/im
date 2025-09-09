@@ -8,7 +8,7 @@ import (
 	"im/internal/services/file-service/service"
 	"im/internal/shared/database"
 	"im/internal/shared/logger"
-	"im/internal/shared/performance"
+	"im/internal/shared/middleware"
 	pb "im/internal/shared/protocol/pb"
 
 	"google.golang.org/protobuf/proto"
@@ -16,7 +16,7 @@ import (
 
 // FileHandler 文件处理器
 type FileHandler struct {
-	requestHandler *performance.RequestHandler
+	requestHandler *middleware.RequestHandler
 	service        *service.FileService
 	logger         *logger.Logger
 }
@@ -26,7 +26,7 @@ func NewFileHandler(service *service.FileService, logger *logger.Logger, dbManag
 	return &FileHandler{
 		service:        service,
 		logger:         logger,
-		requestHandler: performance.NewRequestHandler(logger, dbManager.GetRedis()),
+		requestHandler: middleware.NewRequestHandler(logger, dbManager.GetRedis()),
 	}
 }
 

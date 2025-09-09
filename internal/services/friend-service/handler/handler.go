@@ -12,7 +12,7 @@ import (
 	"im/internal/shared/database"
 	"im/internal/shared/discovery"
 	"im/internal/shared/logger"
-	"im/internal/shared/performance"
+	"im/internal/shared/middleware"
 	pb "im/internal/shared/protocol/pb"
 	"im/internal/shared/rpc"
 	"os"
@@ -25,7 +25,7 @@ import (
 type FriendHandler struct {
 	service        *service.FriendService
 	logger         *logger.Logger
-	requestHandler *performance.RequestHandler
+	requestHandler *middleware.RequestHandler
 	rpcManager     *rpc.Manager
 }
 
@@ -50,7 +50,7 @@ func NewFriendHandler(service *service.FriendService, logger *logger.Logger, dbM
 	return &FriendHandler{
 		service:        service,
 		logger:         logger,
-		requestHandler: performance.NewRequestHandler(logger, dbManager.GetRedis()),
+		requestHandler: middleware.NewRequestHandler(logger, dbManager.GetRedis()),
 		rpcManager:     rpcManager,
 	}
 }
@@ -108,39 +108,6 @@ func (h *FriendHandler) fetchUsernameByUID(uid string) string {
 	return info.Username
 }
 
-// fetchEmailByUID 从用户服务获取用户邮箱
-func (h *FriendHandler) fetchEmailByUID(uid string) string {
-	ctx := context.Background()
-
-	// 生成正确的 JWT token 来获取用户信息
-	token, err := auth.GenerateToken(uid)
-	if err != nil {
-		h.logger.Errorf("生成token失败: %v", err)
-		return ""
-	}
-
-	req := &pb.UserInfoReq{Token: token}
-	resp, err := h.rpcManager.CallWithRetry(ctx, "user-service", "/user_info", req, 3)
-	if err != nil {
-		h.logger.Errorf("获取用户信息失败: %v", err)
-		return ""
-	}
-
-	var api pb.APIResp
-	if err := proto.Unmarshal(resp, &api); err != nil || api.Code != 0 {
-		h.logger.Errorf("解析用户信息响应失败: %v", err)
-		return ""
-	}
-
-	info := &pb.UserInfoResp{}
-	if err := proto.Unmarshal(api.Data, info); err != nil {
-		h.logger.Errorf("解析用户信息数据失败: %v", err)
-		return ""
-	}
-
-	return info.Email
-}
-
 // fetchUserInfo 从用户服务获取用户名与邮箱（支持外部超时控制）
 func (h *FriendHandler) fetchUserInfo(ctx context.Context, uid string) (string, string) {
 	// 生成 JWT token
@@ -169,7 +136,7 @@ func (h *FriendHandler) fetchUserInfo(ctx context.Context, uid string) (string, 
 }
 
 // helper: 调用消息服务推送通知
-func (h *FriendHandler) notify(to string, notif *pb.Notification) {
+func (h *FriendHandler) notify(notif *pb.Notification) {
 	ctx := context.Background()
 
 	_, err := h.rpcManager.CallWithRetry(ctx, "message-service", "/notify", notif, 3)
@@ -210,7 +177,7 @@ func (h *FriendHandler) addFriend(w http.ResponseWriter, r *http.Request) {
 	// 推送好友请求通知（旧类型）
 	fromUsername := h.fetchUsernameByUID(req.FromUid)
 	n := &pb.Notification{Type: "friend_request", From: req.FromUid, FromUsername: fromUsername, To: req.ToUid, Content: req.VerifyMsg}
-	h.notify(req.ToUid, n)
+	h.notify(n)
 
 	resp := &pb.AddFriendResp{Code: 0, Msg: "好友请求已发送"}
 	data, _ := proto.Marshal(resp)

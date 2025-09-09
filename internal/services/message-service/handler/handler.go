@@ -18,7 +18,7 @@ import (
 	"im/internal/shared/database"
 	"im/internal/shared/discovery"
 	"im/internal/shared/logger"
-	"im/internal/shared/performance"
+	"im/internal/shared/middleware"
 	pb "im/internal/shared/protocol/pb"
 	"im/internal/shared/queue"
 	"im/internal/shared/rpc"
@@ -34,7 +34,7 @@ import (
 type MessageHandler struct {
 	service           *service.MessageService
 	logger            *logger.Logger
-	requestHandler    *performance.RequestHandler
+	requestHandler    *middleware.RequestHandler
 	connectionManager *ws.ConnectionManager
 	rpcManager        *rpc.Manager
 	queueManager      *queue.Manager
@@ -89,7 +89,7 @@ func NewMessageHandler(service *service.MessageService, logger *logger.Logger, d
 	handler := &MessageHandler{
 		service:           service,
 		logger:            logger,
-		requestHandler:    performance.NewRequestHandler(logger, dbManager.GetRedis()),
+		requestHandler:    middleware.NewRequestHandler(logger, dbManager.GetRedis()),
 		connectionManager: connectionManager,
 		rpcManager:        rpcManager,
 		queueManager:      queueManager,
