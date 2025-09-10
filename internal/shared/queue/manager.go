@@ -52,13 +52,8 @@ func (m *Manager) PublishMessage(ctx context.Context, streamName string, message
 	return m.queue.PublishMessageWithConfig(ctx, streamName, messageType, data, config)
 }
 
-// ConsumeMessages 消费消息
-func (m *Manager) ConsumeMessages(ctx context.Context, streamName string, consumerGroup string, consumerName string, count int64) ([]redis.XStream, error) {
-	return m.queue.ConsumeMessages(ctx, streamName, consumerGroup, consumerName, count)
-}
-
 // ConsumeMessagesWithConfig 使用配置消费消息
-func (m *Manager) ConsumeMessagesWithConfig(ctx context.Context, streamName string, consumerGroup string, consumerName string) ([]redis.XStream, error) {
+func (m *Manager) ConsumeMessages(ctx context.Context, streamName string, consumerGroup string, consumerName string) ([]redis.XStream, error) {
 	config, exists := m.configs[streamName]
 	if !exists {
 		config = &QueueConfig{

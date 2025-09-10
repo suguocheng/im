@@ -48,7 +48,7 @@ func (pm *ProcessorManager) StartConsumer(ctx context.Context, streamName string
 			return nil
 		default:
 			// 消费消息
-			streams, err := pm.manager.ConsumeMessagesWithConfig(ctx, streamName, consumerGroup, consumerName)
+			streams, err := pm.manager.ConsumeMessages(ctx, streamName, consumerGroup, consumerName)
 			if err != nil {
 				pm.logger.Errorf("消费消息失败: %v", err)
 				time.Sleep(time.Second * 5)

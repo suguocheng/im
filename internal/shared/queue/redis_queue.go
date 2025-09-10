@@ -41,38 +41,6 @@ func NewMessageQueue(client *redis.Client, logger *logger.Logger) *MessageQueue 
 	}
 }
 
-// PublishMessage 发布消息到队列
-func (q *MessageQueue) PublishMessage(ctx context.Context, streamName string, messageType string, data map[string]interface{}) (string, error) {
-	msg := &QueueMessage{
-		Type:      messageType,
-		Data:      data,
-		Timestamp: time.Now().Unix(),
-		Retry:     0,
-	}
-
-	// 序列化消息
-	msgData, err := json.Marshal(msg)
-	if err != nil {
-		return "", fmt.Errorf("序列化消息失败: %v", err)
-	}
-
-	// 发布到Redis Stream
-	id, err := q.client.XAdd(ctx, &redis.XAddArgs{
-		Stream: streamName,
-		Values: map[string]interface{}{
-			"type":  messageType,
-			"data":  string(msgData),
-			"retry": 0,
-		},
-	}).Result()
-	if err != nil {
-		return "", fmt.Errorf("发布消息失败: %v", err)
-	}
-
-	q.logger.Debugf("消息已发布到队列 %s: %s", streamName, id)
-	return id, nil
-}
-
 // PublishMessageWithConfig 使用配置发布消息
 func (q *MessageQueue) PublishMessageWithConfig(ctx context.Context, streamName string, messageType string, data map[string]interface{}, config *QueueConfig) (string, error) {
 	msg := &QueueMessage{
@@ -112,32 +80,6 @@ func (q *MessageQueue) PublishMessageWithConfig(ctx context.Context, streamName 
 
 	q.logger.Debugf("消息已发布到队列 %s: %s", streamName, id)
 	return id, nil
-}
-
-// ConsumeMessages 消费消息
-func (q *MessageQueue) ConsumeMessages(ctx context.Context, streamName string, consumerGroup string, consumerName string, count int64) ([]redis.XStream, error) {
-	// 创建消费者组（如果不存在）
-	err := q.client.XGroupCreateMkStream(ctx, streamName, consumerGroup, "0").Err()
-	if err != nil && err.Error() != "BUSYGROUP Consumer Group name already exists" {
-		return nil, fmt.Errorf("创建消费者组失败: %v", err)
-	}
-
-	// 消费消息
-	streams, err := q.client.XReadGroup(ctx, &redis.XReadGroupArgs{
-		Group:    consumerGroup,
-		Consumer: consumerName,
-		Streams:  []string{streamName, ">"},
-		Count:    count,
-		Block:    time.Second * 5, // 5秒超时
-	}).Result()
-	if err != nil {
-		if err == redis.Nil {
-			return nil, nil // 没有消息
-		}
-		return nil, fmt.Errorf("消费消息失败: %v", err)
-	}
-
-	return streams, nil
 }
 
 // ConsumeMessagesWithConfig 使用配置消费消息

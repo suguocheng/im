@@ -42,7 +42,7 @@ fi
 if ! pgrep -x "traefik" > /dev/null; then
     echo -e "${GREEN}启动 Traefik...${NC}"
     nohup traefik --configfile=/home/pluto/work/im/configs/gateway/traefik.yml > scripts/logs/traefik.log 2>&1 &
-    echo $! > scripts/pids/traefik.pid
+    echo $! > scripts/pids/traefik-1.pid
     sleep 3
     echo -e "${GREEN}✅ Traefik 启动成功${NC}"
 else

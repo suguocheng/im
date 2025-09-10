@@ -129,32 +129,6 @@ func (m *Manager) checkConnections() {
 	}
 }
 
-// GetStats 获取连接池统计信息
-func (m *Manager) GetStats() map[string]interface{} {
-	m.mu.RLock()
-	defer m.mu.RUnlock()
-
-	stats := make(map[string]interface{})
-
-	if m.pool.MySQL != nil {
-		stats["mysql"] = map[string]interface{}{
-			"max_open_conns": m.pool.MySQL.Stats().MaxOpenConnections,
-			"open_conns":     m.pool.MySQL.Stats().OpenConnections,
-			"in_use":         m.pool.MySQL.Stats().InUse,
-			"idle":           m.pool.MySQL.Stats().Idle,
-		}
-	}
-
-	if m.pool.Redis != nil {
-		stats["redis"] = map[string]interface{}{
-			"pool_size":      m.pool.Redis.Options().PoolSize,
-			"min_idle_conns": m.pool.Redis.Options().MinIdleConns,
-		}
-	}
-
-	return stats
-}
-
 // Close 关闭所有连接
 func (m *Manager) Close() error {
 	m.mu.Lock()
